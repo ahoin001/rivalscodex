@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import Image from "next/image";
 import { ClippedPanel } from "@/components/ui";
 import { ExternalHero } from "@/lib/api/marvel-rivals";
@@ -10,6 +10,11 @@ import rmbIcon from "../../../../rivals-assets/icons/RMB-icon.png";
 
 type BlackWidowAbilitiesSectionProps = {
   hero: ExternalHero | null;
+  /**
+   * panel: gold ClippedPanel shell (hero detail tabs).
+   * immersive: no outer panel; full-bleed-friendly layout for lab / wide pages.
+   */
+  variant?: "panel" | "immersive";
 };
 
 type AbilitySectionId = "normal-attack" | "abilities" | "passives";
@@ -270,7 +275,45 @@ function formatStatLabel(label: string): string {
   return label.replace(/_/g, " ").replace(/\s+/g, " ").trim();
 }
 
-export function BlackWidowAbilitiesSection({ hero }: BlackWidowAbilitiesSectionProps) {
+/** Full-frame ability art: stretch to panel so header/body split tracks the PNG. */
+const abilityContainerBackdropStyle = {
+  backgroundImage: `url(${abilityContainerImage.src})`,
+  backgroundSize: "100% 100%",
+  backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
+} as const;
+
+const detailPanelShellPanelClass =
+  "relative flex h-[31.2rem] flex-col overflow-hidden border border-white/25 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]";
+
+const detailPanelShellImmersiveClass =
+  "relative flex min-h-[28rem] flex-col overflow-hidden border border-white/25 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)] sm:min-h-[32rem] lg:min-h-0 lg:h-full";
+
+/** Top band of the PNG (light slab): typography only — no gradients over the artwork. */
+const detailHeaderBandClass =
+  "shrink-0 border-b border-[#8893a8]/25 px-5 pb-4 pt-[1.125rem] sm:px-7 sm:pb-5 sm:pt-6";
+
+/** Dark body of the PNG: stats only — stays transparent so the asset shows through. */
+const detailBodyBandClass =
+  "min-h-0 flex-1 overflow-y-auto px-4 pb-5 pt-1 sm:px-6 sm:pb-7 sm:pt-2 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-[#fc3] [&::-webkit-scrollbar-track]:bg-[#8893a8]/35 [&::-webkit-scrollbar-track]:bg-no-repeat [&::-webkit-scrollbar-track]:bg-center [&::-webkit-scrollbar-track]:bg-cover";
+
+function DetailKeyChip({ children }: { children: ReactNode }) {
+  return (
+    <span
+      className="inline-flex h-6 shrink-0 min-w-[3.4rem] items-center justify-center bg-center bg-cover px-2 text-[11px] font-bold uppercase tracking-wide text-white"
+      style={{
+        backgroundImage: abilitySurfaceStyles.keyPnl,
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
+export function BlackWidowAbilitiesSection({
+  hero,
+  variant = "panel",
+}: BlackWidowAbilitiesSectionProps) {
   const sourceHero = hero ?? fallbackHero;
   const sections = useMemo(() => buildSections(sourceHero), [sourceHero]);
   const [panelMode, setPanelMode] = useState<"base" | "ability">("base");
@@ -290,15 +333,21 @@ export function BlackWidowAbilitiesSection({ hero }: BlackWidowAbilitiesSectionP
   const healthValue = transformation?.health ?? "250";
   const movementSpeedValue = transformation?.movementSpeed ?? "6m/s";
 
-  return (
-    <ClippedPanel tone="gold" className="border border-brand-gold/35 p-4 md:p-5">
-      <div className="space-y-4">
-        <h3 className="font-display text-3xl italic uppercase leading-none text-white md:text-4xl">
-          Abilities
-        </h3>
-
-        <div className="grid gap-4 lg:grid-cols-[6.8fr_10.37fr]">
-          <div className="space-y-2">
+  const grid = (
+    <div
+      className={
+        variant === "immersive"
+          ? "grid items-stretch gap-5 lg:grid-cols-[minmax(0,6.5fr)_minmax(0,11.5fr)] lg:gap-8"
+          : "grid gap-4 lg:grid-cols-[6.8fr_10.37fr]"
+      }
+    >
+          <div
+            className={
+              variant === "immersive"
+                ? "flex min-h-0 flex-col gap-2 lg:h-full lg:min-h-0"
+                : "space-y-2"
+            }
+          >
             <div
               className="relative ml-2 flex h-[4.8rem] items-end overflow-hidden"
               style={{
@@ -342,7 +391,11 @@ export function BlackWidowAbilitiesSection({ hero }: BlackWidowAbilitiesSectionP
             </div>
 
             <div
-              className="relative h-[24.6rem] w-full pb-2"
+              className={
+                variant === "immersive"
+                  ? "relative flex min-h-0 flex-1 flex-col pb-2 lg:min-h-[24rem]"
+                  : "relative h-[24.6rem] w-full pb-2"
+              }
               style={{
                 backgroundImage: abilitySurfaceStyles.skillScrollBorder,
                 backgroundSize: "94% 0.5rem",
@@ -350,7 +403,11 @@ export function BlackWidowAbilitiesSection({ hero }: BlackWidowAbilitiesSectionP
                 backgroundPosition: "0.6rem bottom",
               }}
             >
-              <div className="h-full overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-[#fc3] [&::-webkit-scrollbar-track]:bg-[#999] [&::-webkit-scrollbar-track]:bg-no-repeat [&::-webkit-scrollbar-track]:bg-center [&::-webkit-scrollbar-track]:bg-cover">
+              <div
+                className={`overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-[#fc3] [&::-webkit-scrollbar-track]:bg-[#999] [&::-webkit-scrollbar-track]:bg-no-repeat [&::-webkit-scrollbar-track]:bg-center [&::-webkit-scrollbar-track]:bg-cover ${
+                  variant === "immersive" ? "min-h-0 flex-1" : "h-full"
+                }`}
+              >
               {sections.map((section) => (
                 <section key={section.id} className="mb-2">
                   <p
@@ -433,43 +490,49 @@ export function BlackWidowAbilitiesSection({ hero }: BlackWidowAbilitiesSectionP
           </div>
 
           <section
-            className="relative h-[31.2rem] overflow-hidden border border-white/25 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)] bg-no-repeat bg-cover bg-center"
-            style={{
-              backgroundImage: `url(${abilityContainerImage.src})`,
-            }}
+            className={
+              variant === "immersive"
+                ? detailPanelShellImmersiveClass
+                : detailPanelShellPanelClass
+            }
+            style={abilityContainerBackdropStyle}
           >
-            <div className="relative">
+            <div className="relative flex min-h-0 flex-1 flex-col bg-transparent">
               {panelMode === "base" || !selectedAbility ? (
-                <div>
-                  <h4 className="h-[5rem] border-b border-[#bfc8d7] bg-[linear-gradient(135deg,#f4f7fb_0%,#e4eaf3_55%,#d9e1ee_100%)] px-4 py-3 font-display text-4xl italic uppercase leading-[3rem] text-[#0f1522]">
-                    Base Stats
-                  </h4>
-                  <div className="space-y-0 px-3 py-3">
+                <>
+                  <header className={detailHeaderBandClass}>
+                    <h4 className="font-display text-2xl italic uppercase leading-none text-[#0c111c] drop-shadow-[0_1px_0_rgba(255,255,255,0.35)] sm:text-3xl md:text-[2.15rem]">
+                      Base Stats
+                    </h4>
+                    <div className="mt-3 flex items-start gap-4 sm:mt-4 sm:gap-5">
+                      <DetailKeyChip>—</DetailKeyChip>
+                      <p className="min-h-0 flex-1 text-sm leading-snug text-[#2a3444]">
+                        Core survivability and mobility for this hero form. Values track the live
+                        data feed when available.
+                      </p>
+                    </div>
+                  </header>
+                  <div className={detailBodyBandClass}>
                     <StatLine label="Health" value={healthValue} />
                     <StatLine label="Movement Speed" value={movementSpeedValue} />
                   </div>
-                </div>
+                </>
               ) : (
-                <div>
-                  <div className="h-[8.4rem] border-b border-[#9ba9c2]/45 bg-[linear-gradient(135deg,#eef2f8_0%,#dce3ef_24%,#222c3f_24.4%,#1a2335_100%)] px-4 py-3">
-                    <h4 className="font-display text-4xl italic uppercase leading-none text-[#0f1522]">
+                <>
+                  <header className={detailHeaderBandClass}>
+                    <h4 className="font-display text-2xl italic uppercase leading-[1.05] text-[#0c111c] drop-shadow-[0_1px_0_rgba(255,255,255,0.35)] sm:text-3xl md:text-[2.15rem]">
                       {selectedAbility.name}
                     </h4>
-                    <div className="mt-2 flex items-start gap-3">
-                      <span
-                        className="mt-0.5 inline-flex h-6 min-w-[3.4rem] items-center justify-center bg-center bg-cover px-2 text-[11px] font-bold uppercase tracking-wide text-white"
-                        style={{
-                          backgroundImage: abilitySurfaceStyles.keyPnl,
-                        }}
-                      >
+                    <div className="mt-3 flex items-start gap-4 sm:mt-4 sm:gap-5">
+                      <DetailKeyChip>
                         <AbilityKeyDisplay keyDisplay={selectedAbility.keyDisplay} />
-                      </span>
-                      <p className="max-h-[4.8rem] overflow-y-auto pr-1 text-sm text-[#2f3848] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-[#fc3] [&::-webkit-scrollbar-track]:bg-[#999] [&::-webkit-scrollbar-track]:bg-no-repeat [&::-webkit-scrollbar-track]:bg-center [&::-webkit-scrollbar-track]:bg-cover">
+                      </DetailKeyChip>
+                      <p className="min-h-0 flex-1 text-sm leading-snug text-[#2a3444] sm:leading-relaxed">
                         {selectedAbility.description}
                       </p>
                     </div>
-                  </div>
-                  <div className="max-h-[22rem] overflow-y-auto px-3 py-3 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-[#fc3] [&::-webkit-scrollbar-track]:bg-[#999] [&::-webkit-scrollbar-track]:bg-no-repeat [&::-webkit-scrollbar-track]:bg-center [&::-webkit-scrollbar-track]:bg-cover">
+                  </header>
+                  <div className={detailBodyBandClass}>
                     {selectedAbility.fields.map((field) => (
                       <StatLine
                         key={`${selectedAbility.id}-${field.label}`}
@@ -478,11 +541,36 @@ export function BlackWidowAbilitiesSection({ hero }: BlackWidowAbilitiesSectionP
                       />
                     ))}
                   </div>
-                </div>
+                </>
               )}
             </div>
           </section>
         </div>
+  );
+
+  if (variant === "immersive") {
+    return (
+      <div className="w-full space-y-6 sm:space-y-8">
+        <header className="flex flex-wrap items-end justify-between gap-3">
+          <h3 className="font-display text-4xl italic uppercase leading-none text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)] sm:text-5xl lg:text-[3.75rem]">
+            Abilities
+          </h3>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-white/55 sm:text-xs">
+            Rivals
+          </p>
+        </header>
+        <div className="flex flex-col lg:min-h-0">{grid}</div>
+      </div>
+    );
+  }
+
+  return (
+    <ClippedPanel tone="gold" className="border border-brand-gold/35 p-4 md:p-5">
+      <div className="space-y-4">
+        <h3 className="font-display text-3xl italic uppercase leading-none text-white md:text-4xl">
+          Abilities
+        </h3>
+        <div>{grid}</div>
       </div>
     </ClippedPanel>
   );

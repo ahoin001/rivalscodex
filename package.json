@@ -12,6 +12,7 @@
     "validate-content": "tsx scripts/validate-content.ts",
     "sync:heroes": "tsx scripts/sync-heroes.ts",
     "sync:heroes:dry-run": "tsx scripts/sync-heroes.ts --dry-run",
+    "sync:roster-snapshot": "tsx scripts/sync-roster-snapshot.ts",
     "sync:hero-assets": "tsx scripts/sync-hero-assets.ts",
     "lighthouse:ci": "npm run build && lhci collect --config=./lighthouserc.json && lhci assert --config=./lighthouserc.json"
   },
@@ -21,6 +22,7 @@
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "server-only": "^0.0.1",
     "sharp": "^0.34.5",
     "zod": "^4.4.3"
   },
@@ -30,6 +32,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",

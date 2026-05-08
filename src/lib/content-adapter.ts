@@ -1,11 +1,11 @@
+import { cache } from "react";
 import heroesJson from "@/data/heroes.json";
 import { Hero, heroesSchema } from "@/data/schema";
 import { ExternalHero, fetchMarvelRivalsHeroes } from "@/lib/api/marvel-rivals";
 import { fetchYoutubeGuides } from "@/lib/api/youtube";
 import { ContentSource } from "@/lib/external-provider-config";
 import { featureFlags } from "@/lib/feature-flags";
-import { createSupabaseAnonymousServerClient } from "@/lib/supabase/anon-server-client";
-import { fetchHeroEditorialContent } from "@/lib/supabase/hero-editorial-repository";
+import { getCachedPublishedHeroEditorial } from "@/lib/supabase/hero-editorial-cached";
 import { mergeHeroWithEditorialPatch } from "@/lib/supabase/merge-hero-editorial";
 
 const validatedHeroes = heroesSchema.parse(heroesJson);
@@ -285,7 +285,7 @@ export async function getHeroes(): Promise<Hero[]> {
   return result.heroes;
 }
 
-export async function getHeroBySlug(slug: string): Promise<Hero | undefined> {
+async function resolveHeroBySlug(slug: string): Promise<Hero | undefined> {
   const result = await getHeroesWithSource();
   let hero: Hero | undefined = result.heroes.find(
     (candidate) => candidate.slug === slug,
@@ -335,17 +335,16 @@ export async function getHeroBySlug(slug: string): Promise<Hero | undefined> {
   }
 
   if (featureFlags.enableSupabase) {
-    const supabase = createSupabaseAnonymousServerClient();
-    if (supabase) {
-      const editorial = await fetchHeroEditorialContent(supabase, hero.slug, "published");
-      if (editorial) {
-        hero = mergeHeroWithEditorialPatch(hero, editorial);
-      }
+    const editorial = await getCachedPublishedHeroEditorial(hero.slug);
+    if (editorial) {
+      hero = mergeHeroWithEditorialPatch(hero, editorial);
     }
   }
 
   return hero;
 }
+
+export const getHeroBySlug = cache(resolveHeroBySlug);
 
 export async function getHeroSlugs(): Promise<string[]> {
   const result = await getHeroesWithSource();

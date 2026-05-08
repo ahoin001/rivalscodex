@@ -9,6 +9,9 @@
   --brand-gold: #f6d94f;
   --brand-gold-strong: #ffd84a;
   --brand-gold-muted: rgb(246 217 79 / 12%);
+  --brand-gold-rgb: 246 217 79;
+  --body-gradient: radial-gradient(circle at 18% 16%, #18203a 0%, #0a0b14 56%);
+  --body-noise-opacity: 0.28;
   --vanguard: #00a0ff;
   --duelist: #ff4655;
   --strategist: #00f5c8;
@@ -71,7 +74,7 @@
 }
 
 body {
-  background: radial-gradient(circle at 18% 16%, #18203a 0%, #0a0b14 56%);
+  background: var(--body-gradient);
   color: var(--foreground);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
   margin: 0;
@@ -85,7 +88,7 @@ body::before {
   background-size: 8px 8px;
   content: "";
   inset: 0;
-  opacity: 0.28;
+  opacity: var(--body-noise-opacity);
   pointer-events: none;
   position: fixed;
   z-index: -1;
@@ -114,11 +117,11 @@ a {
 .glass-panel-gold {
   background-image: linear-gradient(
     135deg,
-    rgb(246 217 79 / 16%),
-    rgb(246 217 79 / 2%) 36%,
+    rgb(var(--brand-gold-rgb) / 16%),
+    rgb(var(--brand-gold-rgb) / 2%) 36%,
     transparent 65%
   );
-  border-color: rgb(246 217 79 / 45%);
+  border-color: rgb(var(--brand-gold-rgb) / 45%);
 }
 
 .clipped-edge {
@@ -145,20 +148,66 @@ a {
 
 .brand-glow {
   box-shadow:
-    0 0 0 1px rgb(246 217 79 / 35%),
+    0 0 0 1px rgb(var(--brand-gold-rgb) / 35%),
     0 10px 30px rgb(6 8 18 / 45%),
-    0 0 34px rgb(246 217 79 / 22%);
+    0 0 34px rgb(var(--brand-gold-rgb) / 22%);
 }
 
 .brand-divider {
   background: linear-gradient(
     90deg,
-    rgb(246 217 79 / 0%),
-    rgb(246 217 79 / 85%) 48%,
-    rgb(246 217 79 / 0%)
+    rgb(var(--brand-gold-rgb) / 0%),
+    rgb(var(--brand-gold-rgb) / 85%) 48%,
+    rgb(var(--brand-gold-rgb) / 0%)
   );
   height: 2px;
   width: 100%;
+}
+
+/* Optional nav / global palettes (see PaletteSwitcher, data-palette on <html>) */
+[data-palette="crimson"] {
+  --background: #120a0e;
+  --foreground: #fff1f2;
+  --muted-foreground: #b8a0a8;
+  --brand-gold: #fb7185;
+  --brand-gold-strong: #fda4af;
+  --brand-gold-muted: rgb(251 113 133 / 14%);
+  --brand-gold-rgb: 251 113 133;
+  --panel: rgb(30 18 24 / 82%);
+  --panel-border: rgb(255 255 255 / 14%);
+  --body-gradient: radial-gradient(circle at 18% 16%, #2a1018 0%, #120a0e 58%);
+  --body-noise-opacity: 0.22;
+}
+
+[data-palette="aurora"] {
+  --background: #061a1a;
+  --foreground: #e6fffa;
+  --muted-foreground: #8eb5b3;
+  --brand-gold: #2dd4bf;
+  --brand-gold-strong: #5eead4;
+  --brand-gold-muted: rgb(45 212 191 / 14%);
+  --brand-gold-rgb: 45 212 191;
+  --panel: rgb(12 42 42 / 78%);
+  --panel-border: rgb(255 255 255 / 14%);
+  --body-gradient: radial-gradient(circle at 18% 16%, #0c3535 0%, #061a1a 58%);
+  --body-noise-opacity: 0.24;
+}
+
+[data-palette="dawn"] {
+  --background: #e8ecf7;
+  --foreground: #1a1d2e;
+  --muted-foreground: #5c6478;
+  --brand-gold: #c2410c;
+  --brand-gold-strong: #ea580c;
+  --brand-gold-muted: rgb(194 65 12 / 12%);
+  --brand-gold-rgb: 194 65 12;
+  --panel: rgb(255 255 255 / 76%);
+  --panel-border: rgb(26 29 46 / 12%);
+  --vanguard: #0369a1;
+  --duelist: #b91c1c;
+  --strategist: #0d9488;
+  --body-gradient: linear-gradient(180deg, #f4f6fc 0%, #e8ecf7 55%, #dce2f0 100%);
+  --body-noise-opacity: 0.1;
 }
 
 @keyframes fadeSlideIn {

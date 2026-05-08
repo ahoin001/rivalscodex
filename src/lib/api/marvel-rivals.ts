@@ -1,4 +1,9 @@
 import { externalProviderConfig } from "@/lib/external-provider-config";
+import { featureFlags } from "@/lib/feature-flags";
+import {
+  readStaleRosterSnapshotHeroes,
+  readStrictRosterSnapshotHeroes,
+} from "@/lib/supabase/roster-snapshot-repository";
 
 type ExternalAbility = {
   name: string;
@@ -252,7 +257,7 @@ async function fetchWithTimeout(
   }
 }
 
-async function fetchHeroesPayload(apiKey: string): Promise<unknown> {
+export async function fetchMarvelHeroesJsonPayload(apiKey: string): Promise<unknown> {
   const { baseUrl, cacheTtlSeconds, retryCount, timeoutMs } = externalProviderConfig.marvelRivals;
   const endpoint = `${baseUrl}/heroes`;
 
@@ -293,28 +298,71 @@ async function fetchHeroesPayload(apiKey: string): Promise<unknown> {
   throw new Error("Marvel Rivals API request failed.");
 }
 
-export async function fetchMarvelRivalsHeroes(): Promise<ExternalHero[]> {
-  const apiKey = externalProviderConfig.marvelRivals.apiKey;
-  if (!apiKey) {
-    return [];
-  }
-
-  const payload = await fetchHeroesPayload(apiKey);
-  const rawHeroes = Array.isArray((payload as { data?: unknown })?.data)
+function extractHeroListFromPayload(payload: unknown): unknown[] {
+  return Array.isArray((payload as { data?: unknown })?.data)
     ? (payload as { data: unknown[] }).data
     : Array.isArray((payload as { heroes?: unknown })?.heroes)
       ? (payload as { heroes: unknown[] }).heroes
-    : Array.isArray(payload)
-      ? payload
-      : [];
+      : Array.isArray(payload)
+        ? payload
+        : [];
+}
+
+export function heroesFromMarvelPayload(payload: unknown): ExternalHero[] {
+  const rawHeroes = extractHeroListFromPayload(payload);
 
   const normalized = rawHeroes
     .map((hero) => normalizeHero(hero))
     .filter((hero): hero is ExternalHero => hero !== null);
 
-  if (normalized.length === 0) {
+  return normalized;
+}
+
+export async function refreshMarvelRivalsHeroesFromNetwork(): Promise<
+  ExternalHero[]
+> {
+  const apiKey = externalProviderConfig.marvelRivals.apiKey;
+  if (!apiKey) {
+    throw new Error("Missing MARVEL_RIVALS_API_KEY — cannot refresh roster.");
+  }
+
+  const payload = await fetchMarvelHeroesJsonPayload(apiKey);
+  return heroesFromMarvelPayload(payload);
+}
+
+/**
+ * Loads roster heroes: prefers a fresh Supabase snapshot when configured, then Marvel API,
+ * then stale snapshot fallback if the upstream call fails.
+ */
+export async function fetchMarvelRivalsHeroes(options?: {
+  forceNetwork?: boolean;
+}): Promise<ExternalHero[]> {
+  const useSnapshotFirst =
+    !options?.forceNetwork && featureFlags.useRosterSnapshot;
+
+  if (useSnapshotFirst) {
+    const heroes = await readStrictRosterSnapshotHeroes();
+    if (heroes && heroes.length > 0) {
+      return heroes as ExternalHero[];
+    }
+  }
+
+  const apiKey = externalProviderConfig.marvelRivals.apiKey;
+
+  if (!apiKey) {
+    if (featureFlags.enableSupabase) {
+      const fallback = await readStaleRosterSnapshotHeroes();
+      return (fallback ?? []) as ExternalHero[];
+    }
+
     return [];
   }
 
-  return normalized;
+  try {
+    const payload = await fetchMarvelHeroesJsonPayload(apiKey);
+    return heroesFromMarvelPayload(payload);
+  } catch {
+    const fallback = await readStaleRosterSnapshotHeroes();
+    return (fallback ?? []) as ExternalHero[];
+  }
 }

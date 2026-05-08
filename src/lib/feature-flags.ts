@@ -9,4 +9,7 @@ export const featureFlags = {
     process.env.NEXT_PUBLIC_ENABLE_DEV_ADMIN_UI === "true",
   /** Curated hero copy from hub Supabase (`app_rivalscodex_v1.hero_editorial`, scope published). */
   enableSupabase: isSupabaseEnabled(),
+  /** Prefer freshly-synced Postgres roster snapshot over live Marvel Rivals HTTP on each request (when snapshot row is present and not stale). */
+  useRosterSnapshot:
+    isSupabaseEnabled() && process.env.SUPABASE_USE_ROSTER_SNAPSHOT !== "false",
 };

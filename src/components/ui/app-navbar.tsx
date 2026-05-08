@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PaletteSwitcher } from "@/features/theme/palette-switcher";
 
 const navLinks = [
   { href: "/", label: "Heroes" },
@@ -7,12 +8,16 @@ const navLinks = [
 
 export function AppNavbar() {
   return (
-    <header className="sticky top-0 z-50 border-b border-brand-gold/25 bg-[#0a0d16]/92 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-brand-gold/25 bg-background/92 backdrop-blur">
       <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 md:px-6">
-        <Link href="/" className="font-display text-2xl uppercase tracking-wide text-white">
+        <Link
+          href="/"
+          className="font-display text-2xl uppercase tracking-wide text-foreground"
+        >
           RivalsCodex
         </Link>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <PaletteSwitcher />
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -26,13 +31,13 @@ export function AppNavbar() {
             <>
               <Link
                 href="/dev/endpoints"
-                className="rounded border border-white/30 px-3 py-1 text-xs uppercase tracking-[0.14em] text-white/85 transition hover:border-white/55 hover:text-white"
+                className="rounded border border-panel-border px-3 py-1 text-xs uppercase tracking-[0.14em] text-muted-foreground transition hover:border-brand-gold/45 hover:text-foreground"
               >
                 Endpoint Testing
               </Link>
               <Link
                 href="/dev/hero-assets"
-                className="rounded border border-white/30 px-3 py-1 text-xs uppercase tracking-[0.14em] text-white/85 transition hover:border-white/55 hover:text-white"
+                className="rounded border border-panel-border px-3 py-1 text-xs uppercase tracking-[0.14em] text-muted-foreground transition hover:border-brand-gold/45 hover:text-foreground"
               >
                 Hero Assets
               </Link>

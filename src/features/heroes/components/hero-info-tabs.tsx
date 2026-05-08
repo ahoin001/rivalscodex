@@ -18,7 +18,10 @@ import { useHeroAdminDraft } from "@/features/heroes/use-hero-admin-draft";
 import { LazyVideoEmbed } from "@/features/heroes/components/lazy-video-embed";
 import { getYoutubeEmbedUrl } from "@/features/heroes/youtube";
 import { featureFlags } from "@/lib/feature-flags";
-import { saveHeroDraftToSupabaseAction } from "@/features/heroes/actions/hero-editorial-actions";
+import {
+  publishHeroEditorialToSupabaseAction,
+  saveHeroDraftToSupabaseAction,
+} from "@/features/heroes/actions/hero-editorial-actions";
 
 type TabId = "abilities" | "combos" | "playstyle" | "resources" | "notes";
 
@@ -68,7 +71,9 @@ export function HeroInfoTabs({
   }>({});
 
   const [draftRemoteMessage, setDraftRemoteMessage] = useState<string | null>(null);
-  const [savingDraftRemote, setSavingDraftRemote] = useState(false);
+  const [remoteSaveKind, setRemoteSaveKind] = useState<"idle" | "draft" | "publish">(
+    "idle",
+  );
 
   useEffect(() => {
     cancelEdit();
@@ -106,7 +111,7 @@ export function HeroInfoTabs({
       return;
     }
 
-    setSavingDraftRemote(true);
+    setRemoteSaveKind("draft");
     setDraftRemoteMessage(null);
     try {
       const outcome = await saveHeroDraftToSupabaseAction({
@@ -117,9 +122,35 @@ export function HeroInfoTabs({
         outcome.ok ? "Draft saved to Supabase (scope: draft)." : outcome.error,
       );
     } finally {
-      setSavingDraftRemote(false);
+      setRemoteSaveKind("idle");
     }
   };
+
+  const handlePublishEditorialToSupabase = async () => {
+    if (!draft) {
+      return;
+    }
+
+    setRemoteSaveKind("publish");
+    setDraftRemoteMessage(null);
+    try {
+      const outcome = await publishHeroEditorialToSupabaseAction({
+        heroSlug: hero.slug,
+        snapshot: draft,
+      });
+      setDraftRemoteMessage(
+        outcome.ok
+          ? "Published to Supabase. Live hero pages will pick this up (may require a refresh)."
+          : outcome.error,
+      );
+    } finally {
+      setRemoteSaveKind("idle");
+    }
+  };
+
+  const savingDraftRemote = remoteSaveKind === "draft";
+  const publishingRemote = remoteSaveKind === "publish";
+  const savingRemoteBusy = remoteSaveKind !== "idle";
 
   const applyCombosJson = useCallback(() => {
     try {
@@ -597,7 +628,8 @@ export function HeroInfoTabs({
               {featureFlags.enableSupabase ? (
                 <>
                   Preview here, copy JSON into git when you want versioning, or save a draft to
-                  Supabase when signed in. Published Supabase rows merge into live hero pages.
+                  Supabase when signed in. Use Publish when you want live pages to merge this
+                  editorial snapshot.
                 </>
               ) : (
                 <>Client-only previews and JSON export; enable Supabase to save drafts remotely.</>
@@ -622,14 +654,24 @@ export function HeroInfoTabs({
                     {copiedPatch ? "Copied" : "Copy patch JSON"}
                   </ClippedButton>
                   {featureFlags.enableSupabase && draft ? (
-                    <ClippedButton
-                      tone="brand"
-                      onClick={handleSaveDraftToSupabase}
-                      disabled={savingDraftRemote}
-                      className="px-3 py-2 text-[11px]"
-                    >
-                      {savingDraftRemote ? "Saving…" : "Save draft to Supabase"}
-                    </ClippedButton>
+                    <>
+                      <ClippedButton
+                        tone="brand"
+                        onClick={handleSaveDraftToSupabase}
+                        disabled={savingRemoteBusy}
+                        className="px-3 py-2 text-[11px]"
+                      >
+                        {savingDraftRemote ? "Saving…" : "Save draft to Supabase"}
+                      </ClippedButton>
+                      <ClippedButton
+                        tone="brand"
+                        onClick={handlePublishEditorialToSupabase}
+                        disabled={savingRemoteBusy}
+                        className="border border-brand-gold/65 px-3 py-2 text-[11px]"
+                      >
+                        {publishingRemote ? "Publishing…" : "Publish to site"}
+                      </ClippedButton>
+                    </>
                   ) : null}
                 </>
               )}
@@ -637,7 +679,8 @@ export function HeroInfoTabs({
             {draftRemoteMessage ? (
               <p
                 className={`max-w-xl text-right text-[11px] ${
-                  draftRemoteMessage.startsWith("Draft saved")
+                  draftRemoteMessage.startsWith("Draft saved") ||
+                  draftRemoteMessage.startsWith("Published to Supabase")
                     ? "text-emerald-200"
                     : draftRemoteMessage.includes("Sign in") ||
                         draftRemoteMessage.includes("not enabled")
