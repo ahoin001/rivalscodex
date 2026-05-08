@@ -37,7 +37,12 @@ export function HeroDetailClient({ hero }: HeroDetailClientProps) {
         activeForm={activeForm}
         hasTransformations={hasTransformations}
       />
-      <HeroInfoTabs hero={hero} activeForm={activeForm} forms={forms} />
+      <HeroInfoTabs
+        hero={hero}
+        activeForm={activeForm}
+        forms={forms}
+        allowAdminTools={featureFlags.enableDevAdminUi}
+      />
       {featureFlags.enableDevAdminUi && (
         <HeroIntelConsole
           heroName={hero.name}

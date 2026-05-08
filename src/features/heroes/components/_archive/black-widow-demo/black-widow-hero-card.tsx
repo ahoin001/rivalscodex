@@ -1,6 +1,11 @@
+/*
+ * ARCHIVED: Replaced on /lab/hero-card by Luna Snow recreation.
+ * Kept here for design reference only. Not imported by any route.
+ */
+
 import Image from "next/image";
-import widowFrameImage from "../../../../rivals-assets/heros/black-widow/black-widow-frame.png";
-import widowImage from "../../../../rivals-assets/heros/black-widow/black-widow.png";
+import widowFrameImage from "../../../../../../rivals-assets/heros/black-widow/black-widow-frame.png";
+import widowImage from "../../../../../../rivals-assets/heros/black-widow/black-widow.png";
 
 type BlackWidowHeroCardProps = {
   className?: string;

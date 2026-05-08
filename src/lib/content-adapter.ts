@@ -4,6 +4,9 @@ import { ExternalHero, fetchMarvelRivalsHeroes } from "@/lib/api/marvel-rivals";
 import { fetchYoutubeGuides } from "@/lib/api/youtube";
 import { ContentSource } from "@/lib/external-provider-config";
 import { featureFlags } from "@/lib/feature-flags";
+import { createSupabaseAnonymousServerClient } from "@/lib/supabase/anon-server-client";
+import { fetchHeroEditorialContent } from "@/lib/supabase/hero-editorial-repository";
+import { mergeHeroWithEditorialPatch } from "@/lib/supabase/merge-hero-editorial";
 
 const validatedHeroes = heroesSchema.parse(heroesJson);
 
@@ -284,7 +287,9 @@ export async function getHeroes(): Promise<Hero[]> {
 
 export async function getHeroBySlug(slug: string): Promise<Hero | undefined> {
   const result = await getHeroesWithSource();
-  const hero = result.heroes.find((candidate) => candidate.slug === slug);
+  let hero: Hero | undefined = result.heroes.find(
+    (candidate) => candidate.slug === slug,
+  );
 
   if (!hero) {
     try {
@@ -298,36 +303,48 @@ export async function getHeroBySlug(slug: string): Promise<Hero | undefined> {
         return undefined;
       }
 
-      return mapExternalHeroToRuntimeHero(externalHero);
+      hero = mapExternalHeroToRuntimeHero(externalHero);
     } catch {
       return undefined;
     }
   }
 
-  if (!featureFlags.enableExternalApis) {
-    return hero;
+  if (!hero) {
+    return undefined;
   }
 
-  try {
-    const videos = await fetchYoutubeGuides(`${hero.name} Marvel Rivals guide`);
-    if (videos.length === 0) {
-      return hero;
+  if (featureFlags.enableExternalApis) {
+    try {
+      const videos = await fetchYoutubeGuides(`${hero.name} Marvel Rivals guide`);
+      if (videos.length > 0) {
+        hero = {
+          ...hero,
+          externalResources: [
+            ...hero.externalResources,
+            ...videos.map((video) => ({
+              title: video.title,
+              url: video.url,
+              type: "youtube" as const,
+            })),
+          ],
+        };
+      }
+    } catch {
+      /* keep hero as-is when YouTube augmentation fails */
     }
-
-    return {
-      ...hero,
-      externalResources: [
-        ...hero.externalResources,
-        ...videos.map((video) => ({
-          title: video.title,
-          url: video.url,
-          type: "youtube" as const,
-        })),
-      ],
-    };
-  } catch {
-    return hero;
   }
+
+  if (featureFlags.enableSupabase) {
+    const supabase = createSupabaseAnonymousServerClient();
+    if (supabase) {
+      const editorial = await fetchHeroEditorialContent(supabase, hero.slug, "published");
+      if (editorial) {
+        hero = mergeHeroWithEditorialPatch(hero, editorial);
+      }
+    }
+  }
+
+  return hero;
 }
 
 export async function getHeroSlugs(): Promise<string[]> {

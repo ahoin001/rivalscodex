@@ -12,6 +12,24 @@
   --vanguard: #00a0ff;
   --duelist: #ff4655;
   --strategist: #00f5c8;
+
+  /* Rivals brand palette (additive; consumed by lab-scoped surfaces) */
+  --rivals-yellow-300: #fde680;
+  --rivals-yellow-400: #fde04e;
+  --rivals-yellow-500: #fbdc2c;
+  --rivals-yellow-600: #e7c41a;
+  --rivals-yellow-700: #b8990d;
+  --rivals-ink: #282736;
+  --rivals-ink-soft: #3a394a;
+  --rivals-ink-muted: #5a5b6b;
+  --rivals-light-100: #e1e5f4;
+  --rivals-light-200: #dce0ef;
+  --rivals-light-300: #d2d7ea;
+  --rivals-light-400: #c1c8de;
+  --rivals-light-50: #eef1fa;
+  --rivals-strategist: #2dd4bf;
+  --rivals-duelist: #ef4444;
+  --rivals-vanguard: #38bdf8;
 }
 
 @theme inline {
@@ -26,6 +44,24 @@
   --color-vanguard: var(--vanguard);
   --color-duelist: var(--duelist);
   --color-strategist: var(--strategist);
+
+  --color-rivals-yellow-300: var(--rivals-yellow-300);
+  --color-rivals-yellow-400: var(--rivals-yellow-400);
+  --color-rivals-yellow-500: var(--rivals-yellow-500);
+  --color-rivals-yellow-600: var(--rivals-yellow-600);
+  --color-rivals-yellow-700: var(--rivals-yellow-700);
+  --color-rivals-ink: var(--rivals-ink);
+  --color-rivals-ink-soft: var(--rivals-ink-soft);
+  --color-rivals-ink-muted: var(--rivals-ink-muted);
+  --color-rivals-light-50: var(--rivals-light-50);
+  --color-rivals-light-100: var(--rivals-light-100);
+  --color-rivals-light-200: var(--rivals-light-200);
+  --color-rivals-light-300: var(--rivals-light-300);
+  --color-rivals-light-400: var(--rivals-light-400);
+  --color-rivals-strategist: var(--rivals-strategist);
+  --color-rivals-duelist: var(--rivals-duelist);
+  --color-rivals-vanguard: var(--rivals-vanguard);
+
   --font-sans: var(--font-inter);
   --font-display: var(--font-barlow-condensed);
 }
@@ -149,4 +185,36 @@ a {
     clip-path: none;
     border-radius: 8px;
   }
+}
+
+/* ----- Lab-scoped light theme ----- */
+.lab-light-theme {
+  --background: var(--rivals-light-100);
+  --foreground: var(--rivals-ink);
+  --muted-foreground: var(--rivals-ink-muted);
+  background:
+    linear-gradient(180deg, var(--rivals-light-50) 0%, var(--rivals-light-100) 60%, var(--rivals-light-200) 100%);
+  color: var(--rivals-ink);
+}
+
+.lab-light-theme .brand-divider {
+  background: linear-gradient(
+    90deg,
+    rgb(40 39 54 / 0%),
+    rgb(40 39 54 / 35%) 48%,
+    rgb(40 39 54 / 0%)
+  );
+}
+
+.lab-light-theme ::selection {
+  background: var(--rivals-yellow-500);
+  color: var(--rivals-ink);
+}
+
+.rivals-clip-tab {
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%);
+}
+
+.rivals-clip-row {
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
 }

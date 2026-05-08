@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ClippedButton,
   ClippedPanel,
   HudSection,
+  RivalsPill,
   StatRow,
 } from "@/components/ui";
 import { Hero } from "@/data/schema";
@@ -13,8 +14,11 @@ import { externalResourceTypeLabels } from "@/components/ui/presets";
 import { HeroAbilitiesTabPanel } from "@/features/heroes/components/hero-abilities-tab-panel";
 import { FormContextBadge } from "@/features/heroes/components/form-context-badge";
 import { useHeroNotes } from "@/features/heroes/use-hero-notes";
+import { useHeroAdminDraft } from "@/features/heroes/use-hero-admin-draft";
 import { LazyVideoEmbed } from "@/features/heroes/components/lazy-video-embed";
 import { getYoutubeEmbedUrl } from "@/features/heroes/youtube";
+import { featureFlags } from "@/lib/feature-flags";
+import { saveHeroDraftToSupabaseAction } from "@/features/heroes/actions/hero-editorial-actions";
 
 type TabId = "abilities" | "combos" | "playstyle" | "resources" | "notes";
 
@@ -22,6 +26,7 @@ type HeroInfoTabsProps = {
   hero: Hero;
   activeForm: ResolvedHeroForm;
   forms: ResolvedHeroForm[];
+  allowAdminTools?: boolean;
 };
 
 const tabLabels: Record<TabId, string> = {
@@ -32,14 +37,135 @@ const tabLabels: Record<TabId, string> = {
   notes: "Personal Notes",
 };
 
-export function HeroInfoTabs({ hero, activeForm, forms }: HeroInfoTabsProps) {
+export function HeroInfoTabs({
+  hero,
+  activeForm,
+  forms,
+  allowAdminTools = false,
+}: HeroInfoTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>("abilities");
   const hasTransformations = forms.length > 1;
   const { notes, setNotes, clearNotes, hydrated } = useHeroNotes(hero.id);
+  const {
+    draft,
+    displayHero,
+    isEditing,
+    beginEdit,
+    cancelEdit,
+    resetToHero,
+    copyPatchJson,
+    updateDraft,
+  } = useHeroAdminDraft(hero);
+
+  const [copiedPatch, setCopiedPatch] = useState(false);
+  const [combosJson, setCombosJson] = useState("");
+  const [synergiesJson, setSynergiesJson] = useState("");
+  const [resourcesJson, setResourcesJson] = useState("");
+  const [jsonErrors, setJsonErrors] = useState<{
+    combos?: string;
+    synergies?: string;
+    resources?: string;
+  }>({});
+
+  const [draftRemoteMessage, setDraftRemoteMessage] = useState<string | null>(null);
+  const [savingDraftRemote, setSavingDraftRemote] = useState(false);
+
+  useEffect(() => {
+    cancelEdit();
+    setCopiedPatch(false);
+    setDraftRemoteMessage(null);
+  }, [hero.id, cancelEdit]);
+
+  const seedJsonEditors = () => {
+    setCombosJson(JSON.stringify(hero.combos, null, 2));
+    setSynergiesJson(JSON.stringify(hero.synergies, null, 2));
+    setResourcesJson(JSON.stringify(hero.externalResources, null, 2));
+    setJsonErrors({});
+  };
+
+  const handleBeginEdit = () => {
+    seedJsonEditors();
+    beginEdit();
+  };
+
+  const handleResetDraft = () => {
+    resetToHero();
+    seedJsonEditors();
+  };
+
+  const handleCopyPatch = async () => {
+    const ok = await copyPatchJson();
+    if (ok) {
+      setCopiedPatch(true);
+      window.setTimeout(() => setCopiedPatch(false), 1600);
+    }
+  };
+
+  const handleSaveDraftToSupabase = async () => {
+    if (!draft) {
+      return;
+    }
+
+    setSavingDraftRemote(true);
+    setDraftRemoteMessage(null);
+    try {
+      const outcome = await saveHeroDraftToSupabaseAction({
+        heroSlug: hero.slug,
+        snapshot: draft,
+      });
+      setDraftRemoteMessage(
+        outcome.ok ? "Draft saved to Supabase (scope: draft)." : outcome.error,
+      );
+    } finally {
+      setSavingDraftRemote(false);
+    }
+  };
+
+  const applyCombosJson = useCallback(() => {
+    try {
+      const parsed = JSON.parse(combosJson) as unknown;
+      validateCombosJson(parsed);
+      updateDraft((current) => ({ ...current, combos: parsed }));
+      setJsonErrors((current) => ({ ...current, combos: undefined }));
+    } catch (error) {
+      setJsonErrors((current) => ({
+        ...current,
+        combos: error instanceof Error ? error.message : "Invalid JSON.",
+      }));
+    }
+  }, [combosJson, updateDraft]);
+
+  const applySynergiesJson = useCallback(() => {
+    try {
+      const parsed = JSON.parse(synergiesJson) as unknown;
+      validateSynergiesJson(parsed);
+      updateDraft((current) => ({ ...current, synergies: parsed }));
+      setJsonErrors((current) => ({ ...current, synergies: undefined }));
+    } catch (error) {
+      setJsonErrors((current) => ({
+        ...current,
+        synergies: error instanceof Error ? error.message : "Invalid JSON.",
+      }));
+    }
+  }, [synergiesJson, updateDraft]);
+
+  const applyResourcesJson = useCallback(() => {
+    try {
+      const parsed = JSON.parse(resourcesJson) as unknown;
+      validateResourcesJson(parsed);
+      updateDraft((current) => ({ ...current, externalResources: parsed }));
+      setJsonErrors((current) => ({ ...current, resources: undefined }));
+    } catch (error) {
+      setJsonErrors((current) => ({
+        ...current,
+        resources: error instanceof Error ? error.message : "Invalid JSON.",
+      }));
+    }
+  }, [resourcesJson, updateDraft]);
 
   const combosWithContext = useMemo(
     () =>
-      hero.combos
+      displayHero.combos
         .map((combo) => {
           const matchedFormIds = inferMatchedFormIds(combo, forms);
           const appliesToLabel =
@@ -60,15 +186,51 @@ export function HeroInfoTabs({ hero, activeForm, forms }: HeroInfoTabsProps) {
             left.contextRank - right.contextRank ||
             left.combo.name.localeCompare(right.combo.name),
         ),
-    [activeForm.id, forms, hero.combos],
+    [activeForm.id, displayHero.combos, forms],
   );
 
   const tabContent = useMemo(
     () => ({
-      abilities: <HeroAbilitiesTabPanel hero={hero} activeForm={activeForm} />,
+      abilities: (
+        <div className="space-y-4">
+          {allowAdminTools && isEditing ? (
+            <p className="border border-brand-gold/35 bg-brand-gold-muted px-3 py-2 text-xs text-brand-gold/95">
+              Abilities mirror live dossier or API-backed data here. Editing is not surfaced in this
+              tab—use combos, playstyle, resources, notes, then copy patch JSON into your hero
+              content source.
+            </p>
+          ) : null}
+          <HeroAbilitiesTabPanel hero={displayHero} activeForm={activeForm} />
+        </div>
+      ),
       combos: (
         <div className="grid gap-4 lg:grid-cols-2">
           <HudSection title="Combo Recipes">
+            {allowAdminTools && isEditing && draft ? (
+              <div className="mb-4 space-y-2 border-b border-brand-gold/25 pb-4">
+                <label className="block space-y-1">
+                  <span className="text-[11px] uppercase tracking-[0.16em] text-brand-gold/90">
+                    Combos JSON
+                  </span>
+                  <textarea
+                    value={combosJson}
+                    onChange={(event) => setCombosJson(event.currentTarget.value)}
+                    spellCheck={false}
+                    className="min-h-40 w-full border border-brand-gold/35 bg-[#0f1422]/90 px-3 py-2 font-mono text-xs text-white outline-none focus:border-brand-gold"
+                  />
+                </label>
+                {jsonErrors.combos ? (
+                  <p className="text-xs text-rose-400">{jsonErrors.combos}</p>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={applyCombosJson}
+                  className="rounded border border-brand-gold/40 px-3 py-1 text-xs uppercase tracking-wide text-brand-gold hover:border-brand-gold hover:bg-brand-gold/15"
+                >
+                  Apply combos
+                </button>
+              </div>
+            ) : null}
             {hasTransformations && (
               <div className="mb-4 flex flex-wrap items-center gap-2 border-b border-brand-gold/25 pb-3">
                 <FormContextBadge
@@ -115,13 +277,38 @@ export function HeroInfoTabs({ hero, activeForm, forms }: HeroInfoTabsProps) {
           </HudSection>
 
           <HudSection title="Team Synergy Notes" tone="secondary">
+            {allowAdminTools && isEditing && draft ? (
+              <div className="mb-4 space-y-2 border-b border-white/15 pb-4">
+                <label className="block space-y-1">
+                  <span className="text-[11px] uppercase tracking-[0.16em] text-brand-gold/90">
+                    Synergies JSON
+                  </span>
+                  <textarea
+                    value={synergiesJson}
+                    onChange={(event) => setSynergiesJson(event.currentTarget.value)}
+                    spellCheck={false}
+                    className="min-h-32 w-full border border-brand-gold/35 bg-[#0f1422]/90 px-3 py-2 font-mono text-xs text-white outline-none focus:border-brand-gold"
+                  />
+                </label>
+                {jsonErrors.synergies ? (
+                  <p className="text-xs text-rose-400">{jsonErrors.synergies}</p>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={applySynergiesJson}
+                  className="rounded border border-brand-gold/40 px-3 py-1 text-xs uppercase tracking-wide text-brand-gold hover:border-brand-gold hover:bg-brand-gold/15"
+                >
+                  Apply synergies
+                </button>
+              </div>
+            ) : null}
             {hasTransformations && (
               <p className="mb-3 text-xs text-muted-foreground">
                 Synergy guidance remains hero-level and should be applied across forms.
               </p>
             )}
             <ul className="space-y-2 text-sm text-white/85">
-              {hero.synergies.map((synergy) => (
+              {displayHero.synergies.map((synergy) => (
                 <li key={synergy.hero}>
                   <span className="font-semibold text-white">{synergy.hero}: </span>
                   {synergy.reason}
@@ -139,10 +326,55 @@ export function HeroInfoTabs({ hero, activeForm, forms }: HeroInfoTabsProps) {
                 Playstyle guidance is holistic for the entire hero kit and transformation cycle.
               </p>
             )}
-            <p className="text-sm text-white/85">{hero.playstyle.positioning}</p>
-            <p className="mt-3 text-sm text-muted-foreground">
-              {hero.playstyle.overview}
-            </p>
+            {allowAdminTools && isEditing && draft ? (
+              <div className="space-y-4">
+                <label className="block space-y-1">
+                  <span className="text-[11px] uppercase tracking-[0.16em] text-brand-gold/90">
+                    Positioning
+                  </span>
+                  <textarea
+                    value={draft.playstyle.positioning}
+                    onChange={(event) =>
+                      updateDraft((current) => ({
+                        ...current,
+                        playstyle: {
+                          ...current.playstyle,
+                          positioning: event.currentTarget.value,
+                        },
+                      }))
+                    }
+                    rows={6}
+                    className="w-full border border-brand-gold/35 bg-[#0f1422]/90 px-3 py-2 text-sm text-white outline-none focus:border-brand-gold"
+                  />
+                </label>
+                <label className="block space-y-1">
+                  <span className="text-[11px] uppercase tracking-[0.16em] text-brand-gold/90">
+                    Overview / kit rhythm
+                  </span>
+                  <textarea
+                    value={draft.playstyle.overview}
+                    onChange={(event) =>
+                      updateDraft((current) => ({
+                        ...current,
+                        playstyle: {
+                          ...current.playstyle,
+                          overview: event.currentTarget.value,
+                        },
+                      }))
+                    }
+                    rows={8}
+                    className="w-full border border-brand-gold/35 bg-[#0f1422]/90 px-3 py-2 text-sm text-white outline-none focus:border-brand-gold"
+                  />
+                </label>
+              </div>
+            ) : (
+              <>
+                <p className="text-sm text-white/85">{displayHero.playstyle.positioning}</p>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  {displayHero.playstyle.overview}
+                </p>
+              </>
+            )}
           </HudSection>
 
           <HudSection title="Target Calls" tone="secondary">
@@ -151,21 +383,57 @@ export function HeroInfoTabs({ hero, activeForm, forms }: HeroInfoTabsProps) {
                 <p className="text-xs uppercase tracking-wide text-brand-gold">
                   Who To Target
                 </p>
-                <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-white/85">
-                  {hero.playstyle.targetPriority.map((target) => (
-                    <li key={target}>{target}</li>
-                  ))}
-                </ul>
+                {allowAdminTools && isEditing && draft ? (
+                  <textarea
+                    value={draft.playstyle.targetPriority.join("\n")}
+                    onChange={(event) =>
+                      updateDraft((current) => ({
+                        ...current,
+                        playstyle: {
+                          ...current.playstyle,
+                          targetPriority: linesToList(event.currentTarget.value),
+                        },
+                      }))
+                    }
+                    rows={14}
+                    placeholder="One call per line"
+                    className="mt-2 w-full border border-brand-gold/35 bg-[#0f1422]/90 px-3 py-2 text-sm text-white outline-none focus:border-brand-gold"
+                  />
+                ) : (
+                  <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-white/85">
+                    {displayHero.playstyle.targetPriority.map((target) => (
+                      <li key={target}>{target}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
               <div>
                 <p className="text-xs uppercase tracking-wide text-brand-gold">
                   Who To Avoid
                 </p>
-                <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-white/85">
-                  {hero.playstyle.avoidPriority.map((target) => (
-                    <li key={target}>{target}</li>
-                  ))}
-                </ul>
+                {allowAdminTools && isEditing && draft ? (
+                  <textarea
+                    value={draft.playstyle.avoidPriority.join("\n")}
+                    onChange={(event) =>
+                      updateDraft((current) => ({
+                        ...current,
+                        playstyle: {
+                          ...current.playstyle,
+                          avoidPriority: linesToList(event.currentTarget.value),
+                        },
+                      }))
+                    }
+                    rows={14}
+                    placeholder="One avoid per line"
+                    className="mt-2 w-full border border-brand-gold/35 bg-[#0f1422]/90 px-3 py-2 text-sm text-white outline-none focus:border-brand-gold"
+                  />
+                ) : (
+                  <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-white/85">
+                    {displayHero.playstyle.avoidPriority.map((target) => (
+                      <li key={target}>{target}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
           </HudSection>
@@ -174,6 +442,31 @@ export function HeroInfoTabs({ hero, activeForm, forms }: HeroInfoTabsProps) {
       resources: (
         <div className="grid gap-4 lg:grid-cols-[1.3fr_0.8fr]">
           <HudSection title="Guides & Links">
+            {allowAdminTools && isEditing && draft ? (
+              <div className="mb-4 space-y-2 border-b border-brand-gold/25 pb-4">
+                <label className="block space-y-1">
+                  <span className="text-[11px] uppercase tracking-[0.16em] text-brand-gold/90">
+                    External resources JSON
+                  </span>
+                  <textarea
+                    value={resourcesJson}
+                    onChange={(event) => setResourcesJson(event.currentTarget.value)}
+                    spellCheck={false}
+                    className="min-h-40 w-full border border-brand-gold/35 bg-[#0f1422]/90 px-3 py-2 font-mono text-xs text-white outline-none focus:border-brand-gold"
+                  />
+                </label>
+                {jsonErrors.resources ? (
+                  <p className="text-xs text-rose-400">{jsonErrors.resources}</p>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={applyResourcesJson}
+                  className="rounded border border-brand-gold/40 px-3 py-1 text-xs uppercase tracking-wide text-brand-gold hover:border-brand-gold hover:bg-brand-gold/15"
+                >
+                  Apply resources
+                </button>
+              </div>
+            ) : null}
             {hasTransformations && (
               <p className="mb-3 text-xs text-muted-foreground">
                 External resources are curated at hero level and may cover multiple forms in one
@@ -181,7 +474,7 @@ export function HeroInfoTabs({ hero, activeForm, forms }: HeroInfoTabsProps) {
               </p>
             )}
             <ul className="space-y-2 text-sm">
-              {hero.externalResources.map((resource) => {
+              {displayHero.externalResources.map((resource) => {
                 const embedUrl =
                   resource.type === "youtube"
                     ? getYoutubeEmbedUrl(resource.url)
@@ -214,8 +507,8 @@ export function HeroInfoTabs({ hero, activeForm, forms }: HeroInfoTabsProps) {
             <div className="space-y-2">
               <StatRow label="Role" value={activeForm.role} />
               <StatRow label="Form HP" value={`${activeForm.health}`} />
-              <StatRow label="Difficulty" value={`${hero.difficulty}/5`} />
-              <StatRow label="Last Updated" value={hero.updatedAt} showDivider={false} />
+              <StatRow label="Difficulty" value={`${displayHero.difficulty}/5`} />
+              <StatRow label="Last Updated" value={displayHero.updatedAt} showDivider={false} />
             </div>
             {activeForm.resource && (
               <div className="mt-4 border-t border-white/15 pt-3">
@@ -267,12 +560,26 @@ export function HeroInfoTabs({ hero, activeForm, forms }: HeroInfoTabsProps) {
     }),
     [
       activeForm,
+      applyCombosJson,
+      applyResourcesJson,
+      applySynergiesJson,
+      allowAdminTools,
+      combosJson,
       clearNotes,
       combosWithContext,
+      displayHero,
+      draft,
       hasTransformations,
-      hero,
       hydrated,
+      isEditing,
+      jsonErrors.combos,
+      jsonErrors.resources,
+      jsonErrors.synergies,
       notes,
+      resourcesJson,
+      synergiesJson,
+      updateDraft,
+      hero.name,
       setNotes,
     ],
   );
@@ -282,6 +589,68 @@ export function HeroInfoTabs({ hero, activeForm, forms }: HeroInfoTabsProps) {
       tone="gold"
       className="border border-brand-gold/35 p-4 md:flex md:h-[min(46rem,calc(100vh-8rem))] md:flex-col"
     >
+      {allowAdminTools ? (
+        <div className="mb-3 flex flex-col gap-2 border-b border-brand-gold/25 pb-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-2">
+            <RivalsPill tone="brand">Admin draft</RivalsPill>
+            <span className="text-xs text-muted-foreground">
+              {featureFlags.enableSupabase ? (
+                <>
+                  Preview here, copy JSON into git when you want versioning, or save a draft to
+                  Supabase when signed in. Published Supabase rows merge into live hero pages.
+                </>
+              ) : (
+                <>Client-only previews and JSON export; enable Supabase to save drafts remotely.</>
+              )}
+            </span>
+          </div>
+          <div className="flex flex-col items-stretch gap-2 sm:items-end">
+            <div className="flex flex-wrap items-center gap-2">
+              {!isEditing ? (
+                <ClippedButton tone="brand" onClick={handleBeginEdit}>
+                  Edit content
+                </ClippedButton>
+              ) : (
+                <>
+                  <ClippedButton tone="brand" onClick={() => cancelEdit()} className="px-3 py-2 text-[11px]">
+                    Close editor
+                  </ClippedButton>
+                  <ClippedButton onClick={handleResetDraft} className="px-3 py-2 text-[11px]">
+                    Reset from dossier
+                  </ClippedButton>
+                  <ClippedButton tone="brand" onClick={handleCopyPatch} className="px-3 py-2 text-[11px]">
+                    {copiedPatch ? "Copied" : "Copy patch JSON"}
+                  </ClippedButton>
+                  {featureFlags.enableSupabase && draft ? (
+                    <ClippedButton
+                      tone="brand"
+                      onClick={handleSaveDraftToSupabase}
+                      disabled={savingDraftRemote}
+                      className="px-3 py-2 text-[11px]"
+                    >
+                      {savingDraftRemote ? "Saving…" : "Save draft to Supabase"}
+                    </ClippedButton>
+                  ) : null}
+                </>
+              )}
+            </div>
+            {draftRemoteMessage ? (
+              <p
+                className={`max-w-xl text-right text-[11px] ${
+                  draftRemoteMessage.startsWith("Draft saved")
+                    ? "text-emerald-200"
+                    : draftRemoteMessage.includes("Sign in") ||
+                        draftRemoteMessage.includes("not enabled")
+                      ? "text-amber-200"
+                      : "text-rose-200"
+                }`}
+              >
+                {draftRemoteMessage}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
       <div className="hidden gap-2 md:flex">
         {(Object.keys(tabLabels) as TabId[]).map((tabId) => (
           <ClippedButton
@@ -317,6 +686,98 @@ export function HeroInfoTabs({ hero, activeForm, forms }: HeroInfoTabsProps) {
       </div>
     </ClippedPanel>
   );
+}
+
+function linesToList(value: string): string[] {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+}
+
+const resourceTypeSet = new Set<Hero["externalResources"][number]["type"]>([
+  "youtube",
+  "guide",
+  "community",
+]);
+
+function validateCombosJson(value: unknown): asserts value is Hero["combos"] {
+  if (!Array.isArray(value)) {
+    throw new Error('Expected combos to be a JSON array (e.g. `[{ "id": "...", "name": "...", "steps": ["..."] }]`).');
+  }
+
+  value.forEach((entry, index) => {
+    if (!entry || typeof entry !== "object") {
+      throw new Error(`Combo ${index}: each entry must be an object.`);
+    }
+
+    const row = entry as Record<string, unknown>;
+    if (typeof row.id !== "string" || typeof row.name !== "string") {
+      throw new Error(`Combo ${index}: require string "id" and "name".`);
+    }
+
+    if (!Array.isArray(row.steps)) {
+      throw new Error(`Combo ${index}: "steps" must be an array of strings.`);
+    }
+
+    row.steps.forEach((step, stepIndex) => {
+      if (typeof step !== "string") {
+        throw new Error(`Combo ${index}: step ${stepIndex} must be a string.`);
+      }
+    });
+
+    if (row.steps.length < 1) {
+      throw new Error(`Combo ${index}: supply at least one step.`);
+    }
+
+    if (
+      row.teamUp !== undefined &&
+      row.teamUp !== null &&
+      typeof row.teamUp !== "string"
+    ) {
+      throw new Error(`Combo ${index}: optional "teamUp" must be a string.`);
+    }
+  });
+}
+
+function validateSynergiesJson(value: unknown): asserts value is Hero["synergies"] {
+  if (!Array.isArray(value)) {
+    throw new Error('Expected synergies to be a JSON array.');
+  }
+
+  value.forEach((entry, index) => {
+    if (!entry || typeof entry !== "object") {
+      throw new Error(`Synergy ${index}: each entry must be an object.`);
+    }
+
+    const row = entry as Record<string, unknown>;
+    if (typeof row.hero !== "string" || typeof row.reason !== "string") {
+      throw new Error(`Synergy ${index}: require string fields "hero" and "reason".`);
+    }
+  });
+}
+
+function validateResourcesJson(value: unknown): asserts value is Hero["externalResources"] {
+  if (!Array.isArray(value)) {
+    throw new Error('Expected externalResources to be a JSON array.');
+  }
+
+  value.forEach((entry, index) => {
+    if (!entry || typeof entry !== "object") {
+      throw new Error(`Resource ${index}: each entry must be an object.`);
+    }
+
+    const row = entry as Record<string, unknown>;
+    if (typeof row.title !== "string" || typeof row.url !== "string") {
+      throw new Error(`Resource ${index}: require string "title" and "url".`);
+    }
+
+    if (typeof row.type !== "string" || !resourceTypeSet.has(row.type as Hero["externalResources"][number]["type"])) {
+      throw new Error(
+        `Resource ${index}: "type" must be one of: youtube | guide | community.`,
+      );
+    }
+  });
 }
 
 function getNormalizedHaystack(heroCombo: Hero["combos"][number]): string {

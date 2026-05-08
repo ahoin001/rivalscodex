@@ -1,0 +1,288 @@
+import { ExternalHero } from "@/lib/api/marvel-rivals";
+import { LunaAbility, LunaAbilityCategory } from "@/features/heroes/components/luna-abilities-section";
+import { LunaHeroGuideTabContent } from "@/features/heroes/components/luna-hero-guide-console";
+
+const LUNA_ABILITY_CATEGORY_BY_KEY: Array<{
+  match: (key: string, name: string) => boolean;
+  category: LunaAbilityCategory;
+}> = [
+  {
+    match: (key) => key === "left click" || key === "lmb" || key === "right click" || key === "rmb",
+    category: "Normal Attack",
+  },
+  {
+    match: (_key, name) =>
+      ["cryo heart", "smooth skate", "number one idol"].includes(name.toLowerCase()),
+    category: "Passive",
+  },
+];
+
+function inferCategory(rawKey: string | undefined, name: string): LunaAbilityCategory {
+  const key = (rawKey ?? "").trim().toLowerCase();
+  for (const rule of LUNA_ABILITY_CATEGORY_BY_KEY) {
+    if (rule.match(key, name)) {
+      return rule.category;
+    }
+  }
+  return "Abilities";
+}
+
+function toKeyLabel(rawKey: string | undefined, name: string): string {
+  const key = (rawKey ?? "").trim().toLowerCase();
+  if (!key) {
+    return inferCategory(rawKey, name) === "Passive" ? "PASSIVE" : "—";
+  }
+  if (key.includes("left click")) return "LMB";
+  if (key.includes("right click")) return "RMB";
+  if (key === "shift") return "SHIFT";
+  if (["q", "e", "f", "c", "v"].includes(key)) return key.toUpperCase();
+  if (key === "passive") return "PASSIVE";
+  return rawKey?.toUpperCase() ?? "—";
+}
+
+export function buildLunaAbilitiesFromHero(hero: ExternalHero | null | undefined): LunaAbility[] {
+  if (!hero?.abilities || hero.abilities.length === 0) {
+    return LUNA_FALLBACK_ABILITIES;
+  }
+
+  const seen = new Set<string>();
+
+  const abilities = hero.abilities
+    .filter((ability) => {
+      const dedupeKey = ability.name.trim().toLowerCase();
+      if (seen.has(dedupeKey)) return false;
+      seen.add(dedupeKey);
+      return true;
+    })
+    .map((ability) => {
+      const stats: LunaAbility["stats"] = [];
+      if (ability.keybind) stats.push({ label: "Key", value: ability.keybind.toUpperCase() });
+      if (ability.type) stats.push({ label: "Type", value: ability.type });
+      if (ability.damage) stats.push({ label: "Damage", value: ability.damage });
+      if (ability.cooldownSeconds && ability.cooldownSeconds > 0) {
+        stats.push({ label: "Cooldown", value: `${ability.cooldownSeconds}s` });
+      }
+      if (ability.additionalFields) {
+        for (const [label, value] of Object.entries(ability.additionalFields)) {
+          if (!value || value.trim().length === 0) continue;
+          if (label.toLowerCase() === "key" || label.toLowerCase() === "hotkey") continue;
+          stats.push({ label, value });
+        }
+      }
+
+      return {
+        id: `${ability.name}-${ability.keybind ?? "passive"}`
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-"),
+        name: ability.name,
+        keyLabel: toKeyLabel(ability.keybind, ability.name),
+        category: inferCategory(ability.keybind, ability.name),
+        description:
+          ability.description ?? "No description available for this ability yet.",
+        stats: stats.length > 0 ? stats : [{ label: "Type", value: ability.type ?? "Ability" }],
+      } satisfies LunaAbility;
+    });
+
+  return abilities.length > 0 ? abilities : LUNA_FALLBACK_ABILITIES;
+}
+
+export const LUNA_FALLBACK_ABILITIES: LunaAbility[] = [
+  {
+    id: "light-and-dark-ice",
+    name: "Light & Dark Ice",
+    keyLabel: "LMB",
+    category: "Normal Attack",
+    description:
+      "Fire alternating beams of light and dark ice that damage enemies or heal allies.",
+    stats: [
+      { label: "Key", value: "LMB" },
+      { label: "Casting", value: "Hold to fire continuously" },
+      { label: "Healing", value: "Switches when targeting allies" },
+      { label: "Range", value: "Up to 30m" },
+    ],
+  },
+  {
+    id: "fate-of-both-worlds",
+    name: "Fate of Both Worlds",
+    keyLabel: "Q",
+    category: "Abilities",
+    description:
+      "Unleash a finale that empowers allies in range with massive sustained healing or damage.",
+    stats: [
+      { label: "Key", value: "Q" },
+      { label: "Casting", value: "Channeled aura around Luna" },
+      { label: "Duration", value: "12s" },
+      { label: "Special Effect", value: "Empowers allied damage and healing" },
+    ],
+  },
+  {
+    id: "ice-arts",
+    name: "Ice Arts",
+    keyLabel: "SHIFT",
+    category: "Abilities",
+    description:
+      "Fire ice shards for a short duration, damaging enemies or healing allies while restoring her own Health.",
+    stats: [
+      { label: "Key", value: "SHIFT" },
+      { label: "Casting", value: "Single-cast spell field that pierces through enemies" },
+      { label: "Special Effect", value: "Replace the previous Light & Dark Ice cast" },
+      { label: "Damage", value: "50 damage per round" },
+      { label: "Healing Amount", value: "75 health per round" },
+      { label: "Range", value: "A cylindrical spell field with a radius of 1m and a height of 40m" },
+      { label: "Fire Rate", value: "1.43 rounds per second" },
+      { label: "Duration", value: "6s" },
+    ],
+  },
+  {
+    id: "share-the-stage",
+    name: "Share the Stage",
+    keyLabel: "E",
+    category: "Abilities",
+    description:
+      "Boost a designated ally with a powerful melody, increasing their performance for a short duration.",
+    stats: [
+      { label: "Key", value: "E" },
+      { label: "Casting", value: "Targeted ally buff" },
+      { label: "Duration", value: "12s" },
+      { label: "Cooldown", value: "20s" },
+    ],
+  },
+  {
+    id: "absolute-zero",
+    name: "Absolute Zero",
+    keyLabel: "RMB",
+    category: "Abilities",
+    description: "Throw a frostbomb that detonates and freezes any enemy caught in the area.",
+    stats: [
+      { label: "Key", value: "RMB" },
+      { label: "Casting", value: "Projectile" },
+      { label: "Special Effect", value: "Freezes enemies on impact" },
+      { label: "Cooldown", value: "12s" },
+    ],
+  },
+  {
+    id: "cryo-heart",
+    name: "Cryo Heart",
+    keyLabel: "PASSIVE",
+    category: "Passive",
+    description:
+      "Generates a thin frost shield while standing still that absorbs incoming damage.",
+    stats: [
+      { label: "Type", value: "Passive" },
+      { label: "Special Effect", value: "Personal frost shield" },
+    ],
+  },
+  {
+    id: "smooth-skate",
+    name: "Smooth Skate",
+    keyLabel: "PASSIVE",
+    category: "Passive",
+    description:
+      "Glide across surfaces with ice-skating mobility, increasing movement speed in combat.",
+    stats: [
+      { label: "Type", value: "Passive" },
+      { label: "Movement Speed", value: "+2m/s while skating" },
+    ],
+  },
+  {
+    id: "number-one-idol",
+    name: "Number One Idol",
+    keyLabel: "F",
+    category: "Passive",
+    description:
+      "Team-up upgrade. Activates a duet performance that empowers Luna and her partner.",
+    stats: [
+      { label: "Type", value: "Team-Up Passive" },
+      { label: "Special Effect", value: "Empowers a partnered ally" },
+    ],
+  },
+];
+
+export const LUNA_BASE_STATS: Array<{ label: string; value: string }> = [
+  { label: "Health", value: "250" },
+  { label: "Movement Speed", value: "6m/s" },
+  { label: "Role", value: "Strategist" },
+  { label: "Difficulty", value: "3 / 5" },
+];
+
+export const LUNA_HERO_GUIDE_TABS: LunaHeroGuideTabContent[] = [
+  {
+    id: "abilities",
+    label: "Abilities",
+    summary:
+      "Anchor your fight on Ice Arts pulses, then use Share the Stage to amplify a damage carry whenever the team needs to snowball.",
+    primaryPoints: [
+      "Lead with Ice Arts to control space and recover health while contesting objectives.",
+      "Use Share the Stage on a high-impact damage carry during major engagements.",
+      "Save Absolute Zero for follow-up freeze on a dive target or to peel off a flanker.",
+    ],
+    secondaryPoints: [
+      "Cycle Light & Dark Ice taps between healing allies and damaging key threats.",
+      "Pre-position with Smooth Skate before fights start to reach contest angles faster.",
+    ],
+  },
+  {
+    id: "combos",
+    label: "Combos & Synergies",
+    summary:
+      "Convert displacement and freeze windows into reliable burst with allies who excel at decisive follow-up.",
+    primaryPoints: [
+      "Absolute Zero into ally burst (Iron Man, Black Widow) for guaranteed pickoffs.",
+      "Ice Arts pulse into Fate of Both Worlds for sustained team fight uptime.",
+      "Share the Stage on dive duelists to overload the enemy backline.",
+    ],
+    secondaryPoints: [
+      "Coordinate Fate of Both Worlds with another ult for combined kill windows.",
+      "Avoid stacking ults on the same engagement; stagger for longer fight pressure.",
+    ],
+  },
+  {
+    id: "playstyle",
+    label: "Playstyle Guide",
+    summary:
+      "Operate as a hybrid skirmish-support: position with line-of-sight on your damage cores while denying enemy dive routes.",
+    primaryPoints: [
+      "Stay just behind your frontline with skating exits queued at all times.",
+      "Prioritize denying flank angles with Ice Arts before committing damage.",
+      "Reset cover after burst sequences to keep your healing economy intact.",
+    ],
+    secondaryPoints: [
+      "Track enemy ults and bait long-cooldown abilities before committing your own.",
+      "Rotate to objectives early; Luna's mobility lets her contest contested points fast.",
+    ],
+  },
+  {
+    id: "resources",
+    label: "Resources",
+    summary:
+      "Curated guide stack: short-form mechanics drills, structured matchup notes, and macro VOD references.",
+    primaryPoints: [
+      "Bookmark concise mechanics clips for warm-up consistency.",
+      "Track 3 problematic matchups per patch with execution counter notes.",
+      "Refresh resources after every balance update to avoid outdated tactics.",
+    ],
+    secondaryPoints: [
+      "Prefer guides with explicit decision criteria, not just montage cuts.",
+      "Review at least one high-rank Luna POV per session for macro reads.",
+    ],
+    links: [
+      { label: "Marvel Rivals API", href: "https://marvelrivalsapi.com/" },
+      { label: "Official Hero Page", href: "https://www.marvelrivals.com/heros/" },
+    ],
+  },
+  {
+    id: "notes",
+    label: "Personal Notes",
+    summary:
+      "Player-managed reminders for this hero: comfort picks, anti-tilt rules, and execution cues per match.",
+    primaryPoints: [
+      "Write a 3-line pre-match checklist for consistency under pressure.",
+      "Capture two mistakes after each session while memory is still fresh.",
+      "Save a custom callout shorthand your stack already understands.",
+    ],
+    secondaryPoints: [
+      "Retire stale notes every patch to avoid outdated habits.",
+      "Keep entries short enough to scan in queue downtime.",
+    ],
+  },
+];
