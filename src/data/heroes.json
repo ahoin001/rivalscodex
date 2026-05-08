@@ -1,0 +1,202 @@
+[
+  {
+    "id": "captain-america",
+    "slug": "captain-america",
+    "name": "Captain America",
+    "role": "Vanguard",
+    "difficulty": 3,
+    "health": 700,
+    "portraitImage": "/heroes/captain-america-portrait.webp",
+    "splashImage": "/heroes/captain-america-splash.webp",
+    "summary": "A frontline disruptor who blocks burst damage and creates openings for duelists.",
+    "abilities": [
+      {
+        "id": "shield-bash",
+        "name": "Shield Bash",
+        "keybind": "E",
+        "type": "Crowd Control",
+        "description": "Charge forward and stun the first enemy hit.",
+        "damage": "65",
+        "cooldownSeconds": 8
+      },
+      {
+        "id": "liberty-throw",
+        "name": "Liberty Throw",
+        "keybind": "RMB",
+        "type": "Ranged Utility",
+        "description": "Throw shield to damage and briefly reveal marked enemies.",
+        "damage": "40",
+        "cooldownSeconds": 6
+      },
+      {
+        "id": "freedom-aegis",
+        "name": "Freedom Aegis",
+        "keybind": "Q",
+        "type": "Ultimate",
+        "description": "Project a large kinetic barrier that absorbs heavy incoming fire.",
+        "cooldownSeconds": 0
+      }
+    ],
+    "combos": [
+      {
+        "id": "engage-pick",
+        "name": "Engage Pick Combo",
+        "steps": [
+          "Close distance with movement ability.",
+          "Stun target with Shield Bash (E).",
+          "Call duelist follow-up while target is locked."
+        ],
+        "teamUp": "Works best with burst duelists that can secure stunned targets."
+      }
+    ],
+    "synergies": [
+      {
+        "hero": "Rocket Raccoon",
+        "reason": "Sustained support lets Captain hold space longer."
+      }
+    ],
+    "playstyle": {
+      "overview": "Anchor your team in chokepoints and deny entry angles.",
+      "positioning": "Hold off-angles near cover to rotate your shield efficiently.",
+      "targetPriority": ["Overextended duelists", "Enemy supports with no mobility"],
+      "avoidPriority": ["Long-range chip from multiple angles", "Hard anti-tank focus fire"]
+    },
+    "externalResources": [
+      {
+        "title": "Captain America Fundamentals",
+        "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "type": "youtube"
+      }
+    ],
+    "updatedAt": "2026-05-01"
+  },
+  {
+    "id": "scarlet-witch",
+    "slug": "scarlet-witch",
+    "name": "Scarlet Witch",
+    "role": "Duelist",
+    "difficulty": 4,
+    "health": 600,
+    "portraitImage": "/heroes/scarlet-witch-portrait.webp",
+    "splashImage": "/heroes/scarlet-witch-splash.webp",
+    "summary": "A high-pressure skirmisher that excels at isolated target deletion and tempo control.",
+    "resource": {
+      "name": "Chaos Meter",
+      "description": "Build chaos through hits to amplify burst windows."
+    },
+    "abilities": [
+      {
+        "id": "hex-bolt",
+        "name": "Hex Bolt",
+        "keybind": "LMB",
+        "type": "Primary Fire",
+        "description": "Rapid magic bolts with strong close-mid pressure.",
+        "damage": "22 per bolt"
+      },
+      {
+        "id": "warp-seal",
+        "name": "Warp Seal",
+        "keybind": "Shift",
+        "type": "Mobility",
+        "description": "Short-range blink that resets line-of-sight.",
+        "cooldownSeconds": 7
+      },
+      {
+        "id": "chaos-collapse",
+        "name": "Chaos Collapse",
+        "keybind": "Q",
+        "type": "Ultimate",
+        "description": "Creates a vortex that drags enemies before detonating.",
+        "damage": "High AoE burst"
+      }
+    ],
+    "combos": [
+      {
+        "id": "blink-burst",
+        "name": "Blink Burst",
+        "steps": [
+          "Tag target from off-angle with Hex Bolt.",
+          "Blink past cover to force crosshair flick.",
+          "Commit burst during chaos meter spike."
+        ]
+      }
+    ],
+    "synergies": [
+      {
+        "hero": "Doctor Strange",
+        "reason": "Control tools keep enemies in Scarlet's burst range."
+      }
+    ],
+    "playstyle": {
+      "overview": "Play hit-and-run until cooldowns are baited, then all-in quickly.",
+      "positioning": "Abuse vertical and diagonal entry angles to avoid predictable peeks.",
+      "targetPriority": ["Low-mobility supports", "Damaged duelists"],
+      "avoidPriority": ["Layered hard CC", "Shielded frontlines without support pressure"]
+    },
+    "externalResources": [],
+    "updatedAt": "2026-05-01"
+  },
+  {
+    "id": "rocket-raccoon",
+    "slug": "rocket-raccoon",
+    "name": "Rocket Raccoon",
+    "role": "Strategist",
+    "difficulty": 2,
+    "health": 550,
+    "portraitImage": "/heroes/rocket-raccoon-portrait.webp",
+    "splashImage": "/heroes/rocket-raccoon-splash.webp",
+    "summary": "A flexible support strategist with strong utility and consistent sustain output.",
+    "abilities": [
+      {
+        "id": "repair-burst",
+        "name": "Repair Burst",
+        "keybind": "E",
+        "type": "Healing",
+        "description": "Deploy a short AoE heal with over-heal on full targets.",
+        "cooldownSeconds": 10
+      },
+      {
+        "id": "scrap-mine",
+        "name": "Scrap Mine",
+        "keybind": "RMB",
+        "type": "Zone Control",
+        "description": "Trap that slows and reveals enemies that pass through.",
+        "damage": "35",
+        "cooldownSeconds": 12
+      },
+      {
+        "id": "orbital-salvage",
+        "name": "Orbital Salvage",
+        "keybind": "Q",
+        "type": "Ultimate",
+        "description": "Summons a support drone swarm that heals allies and damages enemies.",
+        "damage": "Sustained AoE pulses"
+      }
+    ],
+    "combos": [
+      {
+        "id": "peel-loop",
+        "name": "Peel Loop",
+        "steps": [
+          "Drop Scrap Mine between diver and your backline.",
+          "Trigger Repair Burst as ally takes first burst.",
+          "Call frontline turn once diver cooldowns are spent."
+        ]
+      }
+    ],
+    "synergies": [
+      {
+        "hero": "Captain America",
+        "reason": "Sustain plus frontline shielding creates high objective uptime."
+      }
+    ],
+    "playstyle": {
+      "overview": "Control access points and keep your carries active with pre-emptive healing.",
+      "positioning": "Stay one lane behind your frontline and rotate around safe cover.",
+      "targetPriority": ["Assist on marked dive targets", "Enemy flankers entering your backline"],
+      "avoidPriority": ["Overextending without cooldowns", "Tunnel vision on damage output"]
+    },
+    "externalResources": [],
+    "updatedAt": "2026-05-01"
+  }
+]

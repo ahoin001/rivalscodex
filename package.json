@@ -1,0 +1,36 @@
+{
+  "name": "rivalscodex",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "generate-hero-images": "node scripts/generate-hero-images.mjs",
+    "draft-hero": "tsx scripts/create-hero-template.ts",
+    "validate-content": "tsx scripts/validate-content.ts",
+    "sync:heroes": "tsx scripts/sync-heroes.ts",
+    "sync:heroes:dry-run": "tsx scripts/sync-heroes.ts --dry-run",
+    "lighthouse:ci": "npm run build && lhci collect --config=./lighthouserc.json && lhci assert --config=./lighthouserc.json"
+  },
+  "dependencies": {
+    "next": "16.2.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "sharp": "^0.34.5",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@lhci/cli": "^0.15.1",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.6",
+    "tailwindcss": "^4",
+    "tsx": "^4.21.0",
+    "typescript": "^5"
+  }
+}

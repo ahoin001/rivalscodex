@@ -1,0 +1,55 @@
+{
+  "id": "hero-id",
+  "slug": "hero-slug",
+  "name": "Hero Name",
+  "role": "Vanguard",
+  "difficulty": 3,
+  "health": 650,
+  "portraitImage": "/heroes/hero-slug-portrait.webp",
+  "splashImage": "/heroes/hero-slug-splash.webp",
+  "summary": "One-line hero summary for fast understanding.",
+  "resource": {
+    "name": "Optional Resource Name",
+    "description": "Only include this object if the hero has a unique resource."
+  },
+  "abilities": [
+    {
+      "id": "ability-id",
+      "name": "Ability Name",
+      "keybind": "E",
+      "type": "Crowd Control",
+      "description": "What the ability does.",
+      "damage": "65",
+      "cooldownSeconds": 8,
+      "videoUrl": "https://www.youtube.com/watch?v=example"
+    }
+  ],
+  "combos": [
+    {
+      "id": "combo-id",
+      "name": "Combo Name",
+      "steps": ["Step 1", "Step 2", "Step 3"],
+      "teamUp": "Optional team-up note."
+    }
+  ],
+  "synergies": [
+    {
+      "hero": "Synergy Hero",
+      "reason": "Why this pairing is strong."
+    }
+  ],
+  "playstyle": {
+    "overview": "Core plan for this hero.",
+    "positioning": "Positioning and rotations guidance.",
+    "targetPriority": ["Enemy type 1", "Enemy type 2"],
+    "avoidPriority": ["Threat 1", "Threat 2"]
+  },
+  "externalResources": [
+    {
+      "title": "Guide Title",
+      "url": "https://example.com",
+      "type": "guide"
+    }
+  ],
+  "updatedAt": "2026-05-01"
+}
