@@ -1,7 +1,6 @@
 import Image from "next/image";
-import frameImage from "../../../../rivals-assets/frames/hero-frame.jpg";
-import widowSiloImage from "../../../../rivals-assets/heros/black widow/widow-silo.png";
-import widowImage from "../../../../hero-frames/widow.png";
+import widowFrameImage from "../../../../rivals-assets/heros/black-widow/black-widow-frame.png";
+import widowImage from "../../../../rivals-assets/heros/black-widow/black-widow.png";
 
 type BlackWidowHeroCardProps = {
   className?: string;
@@ -15,21 +14,12 @@ export function BlackWidowHeroCard({ className = "" }: BlackWidowHeroCardProps) 
     >
       <div className="relative aspect-[16/9] w-full min-h-[360px] sm:min-h-[430px] lg:min-h-[560px]">
         <Image
-          src={frameImage}
+          src={widowFrameImage}
           alt="Marvel Rivals style hero frame"
           fill
           priority
           sizes="100vw"
           className="object-cover object-center"
-        />
-
-        <Image
-          src={widowSiloImage}
-          alt=""
-          fill
-          sizes="100vw"
-          aria-hidden
-          className="pointer-events-none object-cover object-center"
         />
 
         <div className="absolute inset-y-0 left-0 z-20 flex w-full items-start px-4 pb-4 pt-6 sm:px-7 sm:pt-10 lg:max-w-[52%] lg:px-12 lg:pt-14 xl:max-w-[48%]">

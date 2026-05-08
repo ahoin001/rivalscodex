@@ -12,6 +12,7 @@
     "validate-content": "tsx scripts/validate-content.ts",
     "sync:heroes": "tsx scripts/sync-heroes.ts",
     "sync:heroes:dry-run": "tsx scripts/sync-heroes.ts --dry-run",
+    "sync:hero-assets": "tsx scripts/sync-hero-assets.ts",
     "lighthouse:ci": "npm run build && lhci collect --config=./lighthouserc.json && lhci assert --config=./lighthouserc.json"
   },
   "dependencies": {

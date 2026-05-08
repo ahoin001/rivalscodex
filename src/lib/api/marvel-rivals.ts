@@ -26,6 +26,8 @@ export type ExternalHero = {
   slug?: string;
   name: string;
   role?: string;
+  attackType?: string;
+  difficulty?: number;
   summary?: string;
   updatedAt?: string;
   portraitImageUrl?: string;
@@ -197,6 +199,7 @@ function normalizeHero(rawHero: unknown): ExternalHero | null {
     "portrait",
     "portrait_url",
     "image",
+    "imageUrl",
     "icon",
   ]);
   const splashImageUrl = pickString(hero, [
@@ -212,6 +215,8 @@ function normalizeHero(rawHero: unknown): ExternalHero | null {
     slug: pickString(hero, ["slug"]),
     name,
     role: pickString(hero, ["role", "class"]),
+    attackType: pickString(hero, ["attackType", "attack_type", "attack"]),
+    difficulty: pickNumber(hero, ["difficulty"]),
     summary: pickString(hero, ["summary", "description", "bio"]),
     updatedAt: pickString(hero, ["updatedAt", "updated_at", "lastUpdated"]),
     portraitImageUrl: toAbsoluteAssetUrl(portraitImageUrl),
@@ -297,6 +302,8 @@ export async function fetchMarvelRivalsHeroes(): Promise<ExternalHero[]> {
   const payload = await fetchHeroesPayload(apiKey);
   const rawHeroes = Array.isArray((payload as { data?: unknown })?.data)
     ? (payload as { data: unknown[] }).data
+    : Array.isArray((payload as { heroes?: unknown })?.heroes)
+      ? (payload as { heroes: unknown[] }).heroes
     : Array.isArray(payload)
       ? payload
       : [];

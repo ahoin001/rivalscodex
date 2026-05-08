@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import { cache } from "react";
 import {
   ClippedButton,
   RivalsFeatureSection,
@@ -7,8 +8,10 @@ import {
   RivalsPageShell,
   RivalsSectionHeader,
 } from "@/components/ui";
+import { ExternalHeroGalleryClient } from "@/features/heroes/components/external-hero-gallery-client";
 import { HeroGalleryClient } from "@/features/heroes/components/hero-gallery-client";
 import { DevApiPanel } from "@/features/dev-api/components/dev-api-panel";
+import { fetchMarvelRivalsHeroes } from "@/lib/api/marvel-rivals";
 import { getHeroes } from "@/lib/content-adapter";
 
 export const metadata: Metadata = {
@@ -17,8 +20,16 @@ export const metadata: Metadata = {
     "Browse Marvel Rivals hero dossiers with role filters, favorites, and in-match quick-reference guides.",
 };
 
+const getCachedExternalHeroes = cache(async () => fetchMarvelRivalsHeroes());
+
 export default async function Home() {
-  const heroes = await getHeroes();
+  const [heroes, externalHeroes] = await Promise.all([
+    getHeroes(),
+    getCachedExternalHeroes(),
+  ]);
+
+  const hasExternalRoster = externalHeroes.length > 0;
+  const localSlugs = heroes.map((hero) => hero.slug);
 
   return (
     <RivalsPageShell className="space-y-8 py-7 lg:py-12">
@@ -30,22 +41,18 @@ export default async function Home() {
 
       <RivalsFeatureSection
         eyebrow="Core Section"
-        title="Hero Database"
-        description="Browse role-sorted hero dossiers with favorites, matchup guidance, and quick tactical reads before every match."
-        media={
-          <div className="space-y-2">
-            <RivalsPill tone="brand">Content System</RivalsPill>
-            <p className="text-sm leading-6 text-muted-foreground">
-              Every hero section follows shared Rivals UI primitives, so adding
-              new cards, tactical panels, or media blocks stays consistent.
-            </p>
-            <div className="border-t border-brand-gold/40 pt-2 text-xs uppercase tracking-wide text-brand-gold/90">
-              Uniform Layout · Reusable Components · Fast Iteration
-            </div>
-          </div>
+        title={hasExternalRoster ? "Hero Directory" : "Hero Database"}
+        description={
+          hasExternalRoster
+            ? "Browse the full Marvel Rivals roster with cached API data, premium card navigation, and fast filtering."
+            : "Browse role-sorted hero dossiers with favorites, matchup guidance, and quick tactical reads before every match."
         }
       >
-        <HeroGalleryClient heroes={heroes} />
+        {hasExternalRoster ? (
+          <ExternalHeroGalleryClient heroes={externalHeroes} availableLocalSlugs={localSlugs} />
+        ) : (
+          <HeroGalleryClient heroes={heroes} />
+        )}
       </RivalsFeatureSection>
 
       {process.env.NODE_ENV === "development" ? (

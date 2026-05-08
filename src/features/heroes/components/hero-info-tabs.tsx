@@ -5,18 +5,12 @@ import {
   ClippedButton,
   ClippedPanel,
   HudSection,
-  RivalsDataTableSection,
-  RivalsPill,
   StatRow,
 } from "@/components/ui";
 import { Hero } from "@/data/schema";
 import { ResolvedHeroForm } from "@/features/heroes/hero-forms";
-import {
-  abilityMatrixColumns,
-  baseStatRowsPreset,
-  externalResourceTypeLabels,
-} from "@/components/ui/presets";
-import { AbilityCard } from "@/features/heroes/components/ability-card";
+import { externalResourceTypeLabels } from "@/components/ui/presets";
+import { HeroAbilitiesTabPanel } from "@/features/heroes/components/hero-abilities-tab-panel";
 import { FormContextBadge } from "@/features/heroes/components/form-context-badge";
 import { useHeroNotes } from "@/features/heroes/use-hero-notes";
 import { LazyVideoEmbed } from "@/features/heroes/components/lazy-video-embed";
@@ -71,102 +65,7 @@ export function HeroInfoTabs({ hero, activeForm, forms }: HeroInfoTabsProps) {
 
   const tabContent = useMemo(
     () => ({
-      abilities: (
-        <div className="grid gap-4 lg:grid-cols-[1.45fr_0.7fr]">
-          <RivalsDataTableSection
-            title={`${activeForm.name} Abilities`}
-            columns={abilityMatrixColumns}
-            rows={activeForm.abilities}
-            getRowKey={(ability) => ability.id}
-            renderCell={(ability, key) => {
-              if (key === "keybind") {
-                return (
-                  <span className="inline-flex h-8 min-w-8 items-center justify-center border border-brand-gold/55 bg-brand-gold-muted px-2 text-xs font-bold text-brand-gold">
-                    {ability.keybind}
-                  </span>
-                );
-              }
-
-              if (key === "name") {
-                return (
-                  <div className="space-y-1">
-                    <p className="font-semibold text-white">{ability.name}</p>
-                    <p className="line-clamp-2 text-xs text-muted-foreground">
-                      {ability.description}
-                    </p>
-                  </div>
-                );
-              }
-
-              if (key === "type") {
-                return <RivalsPill tone="brand">{ability.type}</RivalsPill>;
-              }
-
-              return (
-                <div className="flex flex-wrap gap-1">
-                  {ability.damage && (
-                    <RivalsPill tone="brand">Damage {ability.damage}</RivalsPill>
-                  )}
-                  {ability.cooldownSeconds !== undefined &&
-                    ability.cooldownSeconds > 0 && (
-                      <RivalsPill>CD {ability.cooldownSeconds}s</RivalsPill>
-                    )}
-                </div>
-              );
-            }}
-            renderMobile={(ability) => <AbilityCard ability={ability} />}
-          />
-          <HudSection title="Base Stats" titleSize="lg">
-            <div className="space-y-2 text-sm">
-              {baseStatRowsPreset.map((statRow, index) => {
-                const isLast = index === baseStatRowsPreset.length - 1;
-
-                if (statRow.key === "health") {
-                  return (
-                    <StatRow
-                      key={statRow.key}
-                      label={statRow.label}
-                      value={`${activeForm.health}`}
-                      showDivider={!isLast}
-                    />
-                  );
-                }
-
-                if (statRow.key === "role") {
-                  return (
-                    <StatRow
-                      key={statRow.key}
-                      label={statRow.label}
-                      value={activeForm.role}
-                      showDivider={!isLast}
-                    />
-                  );
-                }
-
-                if (statRow.key === "difficulty") {
-                  return (
-                    <StatRow
-                      key={statRow.key}
-                      label={statRow.label}
-                      value={`${hero.difficulty}/5`}
-                      showDivider={!isLast}
-                    />
-                  );
-                }
-
-                return (
-                  <StatRow
-                    key={statRow.key}
-                    label={statRow.label}
-                    value={hero.updatedAt}
-                    showDivider={!isLast}
-                  />
-                );
-              })}
-            </div>
-          </HudSection>
-        </div>
-      ),
+      abilities: <HeroAbilitiesTabPanel hero={hero} activeForm={activeForm} />,
       combos: (
         <div className="grid gap-4 lg:grid-cols-2">
           <HudSection title="Combo Recipes">
@@ -379,7 +278,10 @@ export function HeroInfoTabs({ hero, activeForm, forms }: HeroInfoTabsProps) {
   );
 
   return (
-    <ClippedPanel tone="gold" className="border border-brand-gold/35 p-4">
+    <ClippedPanel
+      tone="gold"
+      className="border border-brand-gold/35 p-4 md:flex md:h-[min(46rem,calc(100vh-8rem))] md:flex-col"
+    >
       <div className="hidden gap-2 md:flex">
         {(Object.keys(tabLabels) as TabId[]).map((tabId) => (
           <ClippedButton
@@ -393,7 +295,10 @@ export function HeroInfoTabs({ hero, activeForm, forms }: HeroInfoTabsProps) {
         ))}
       </div>
 
-      <div key={activeTab} className="fade-slide-in mt-4 hidden md:block">
+      <div
+        key={activeTab}
+        className="fade-slide-in mt-4 hidden min-h-0 md:block md:flex-1 md:overflow-y-auto md:pr-1"
+      >
         {tabContent[activeTab]}
       </div>
 

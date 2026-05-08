@@ -26,6 +26,153 @@ let adapterDiagnostics: AdapterDiagnostics = {
   reason: "initial-local-load",
 };
 
+function normalizeSlug(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function parseHealth(value: string | undefined, fallback: number): number {
+  if (!value) {
+    return fallback;
+  }
+
+  const parsed = Number(value.replace(/[^\d.]+/g, ""));
+  if (!Number.isFinite(parsed)) {
+    return fallback;
+  }
+
+  return Math.max(1, Math.round(parsed));
+}
+
+function parseCooldownSeconds(value?: string): number | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  const parsed = Number(value.replace(/[^\d.]+/g, ""));
+  if (!Number.isFinite(parsed)) {
+    return undefined;
+  }
+
+  return Math.max(0, parsed);
+}
+
+function deriveRole(externalHero: ExternalHero): Hero["role"] {
+  const role = externalHero.role?.trim().toLowerCase();
+  if (role === "vanguard" || role === "duelist" || role === "strategist") {
+    return (role.charAt(0).toUpperCase() + role.slice(1)) as Hero["role"];
+  }
+
+  return "Duelist";
+}
+
+function mapExternalHeroToRuntimeHero(externalHero: ExternalHero): Hero {
+  const role = deriveRole(externalHero);
+  const slug = normalizeSlug(externalHero.slug ?? externalHero.name);
+  const transformedForms =
+    externalHero.transformations
+      ?.map((form) => {
+        const formAbilities =
+          externalHero.abilities
+            ?.filter((ability) => ability.transformationId === form.id)
+            .map((ability) => ({
+              id: `${slug}-${normalizeSlug(ability.name)}`,
+              name: ability.name,
+              keybind: ability.keybind ?? ability.additionalFields?.Key ?? "Passive",
+              type: ability.type ?? "Ability",
+              description: ability.description ?? "No description available yet.",
+              damage: ability.damage ?? ability.additionalFields?.Damage,
+              cooldownSeconds:
+                ability.cooldownSeconds ??
+                parseCooldownSeconds(ability.additionalFields?.Cooldown),
+              videoUrl: ability.iconUrl,
+            })) ?? [];
+
+        return {
+          id: `${slug}-${normalizeSlug(form.name)}`,
+          name: form.name,
+          shortLabel: form.name,
+          trigger: "Transformation",
+          role,
+          health: parseHealth(form.health, 250),
+          summary: externalHero.summary ?? `${externalHero.name} transformation profile.`,
+          portraitImage: (form.iconUrl ?? externalHero.portraitImageUrl ?? "/heroes/captain-america-portrait.webp") as Hero["portraitImage"],
+          splashImage: (externalHero.splashImageUrl ??
+            externalHero.portraitImageUrl ??
+            "/heroes/captain-america-splash.webp") as Hero["splashImage"],
+          abilities: formAbilities,
+        };
+      })
+      .filter((form) => form.abilities.length > 0) ?? [];
+
+  const baseAbilities =
+    externalHero.abilities?.map((ability) => ({
+      id: `${slug}-${normalizeSlug(ability.name)}`,
+      name: ability.name,
+      keybind: ability.keybind ?? ability.additionalFields?.Key ?? "Passive",
+      type: ability.type ?? "Ability",
+      description: ability.description ?? "No description available yet.",
+      damage: ability.damage ?? ability.additionalFields?.Damage,
+      cooldownSeconds:
+        ability.cooldownSeconds ?? parseCooldownSeconds(ability.additionalFields?.Cooldown),
+      videoUrl: ability.iconUrl,
+    })) ?? [];
+
+  const resolvedAbilities =
+    baseAbilities.length > 0
+      ? baseAbilities
+      : [
+          {
+            id: `${slug}-ability-1`,
+            name: "Primary Ability",
+            keybind: "LMB",
+            type: "Ability",
+            description: "Data source did not provide ability details yet.",
+          },
+        ];
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  return {
+    id: normalizeSlug(externalHero.id ?? externalHero.name),
+    slug,
+    name: externalHero.name,
+    role,
+    difficulty: Math.max(1, Math.min(5, Math.round(externalHero.difficulty ?? 3))),
+    health: parseHealth(externalHero.transformations?.[0]?.health, 250),
+    portraitImage: (externalHero.portraitImageUrl ??
+      "/heroes/captain-america-portrait.webp") as Hero["portraitImage"],
+    splashImage: (externalHero.splashImageUrl ??
+      externalHero.portraitImageUrl ??
+      "/heroes/captain-america-splash.webp") as Hero["splashImage"],
+    summary: externalHero.summary ?? `${externalHero.name} tactical profile.`,
+    abilities: resolvedAbilities,
+    combos: [],
+    synergies: [],
+    playstyle: {
+      overview: "Guide content is being expanded for this hero.",
+      positioning: "Play around team sightlines and safe disengage routes.",
+      targetPriority: ["Isolated targets", "Low mobility backline"],
+      avoidPriority: ["Layered crowd control", "Crossfire choke points"],
+    },
+    externalResources: [],
+    forms:
+      transformedForms.length > 0
+        ? transformedForms.map((form) => ({
+            ...form,
+            abilities:
+              form.abilities.length > 0
+                ? form.abilities
+                : resolvedAbilities,
+          }))
+        : undefined,
+    defaultFormId: transformedForms[0]?.id,
+    updatedAt: externalHero.updatedAt?.slice(0, 10) ?? today,
+  };
+}
+
 function mergeExternalHeroData(localHeroes: Hero[], externalHeroes: ExternalHeroMap): Hero[] {
   return localHeroes.map((hero) => {
     const externalHero = externalHeroes.get(hero.name.toLowerCase());
@@ -140,7 +287,21 @@ export async function getHeroBySlug(slug: string): Promise<Hero | undefined> {
   const hero = result.heroes.find((candidate) => candidate.slug === slug);
 
   if (!hero) {
-    return undefined;
+    try {
+      const externalHeroes = await fetchMarvelRivalsHeroes();
+      const externalHero = externalHeroes.find((candidate) => {
+        const candidateSlug = normalizeSlug(candidate.slug ?? candidate.name);
+        return candidateSlug === slug;
+      });
+
+      if (!externalHero) {
+        return undefined;
+      }
+
+      return mapExternalHeroToRuntimeHero(externalHero);
+    } catch {
+      return undefined;
+    }
   }
 
   if (!featureFlags.enableExternalApis) {

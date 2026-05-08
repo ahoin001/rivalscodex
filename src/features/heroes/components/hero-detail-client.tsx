@@ -12,8 +12,7 @@ import {
   buildIntelContentFromHero,
   HeroIntelConsole,
 } from "@/features/heroes/components/hero-intel-console";
-import { HeroSplash } from "@/features/heroes/components/hero-splash";
-import { HeroStatsRail } from "@/features/heroes/components/hero-stats-rail";
+import { HeroDetailShowcaseCard } from "@/features/heroes/components/hero-detail-showcase-card";
 import { featureFlags } from "@/lib/feature-flags";
 
 type HeroDetailClientProps = {
@@ -33,10 +32,11 @@ export function HeroDetailClient({ hero }: HeroDetailClientProps) {
         activeFormId={activeForm.id}
         onFormChange={setActiveFormId}
       />
-      <section className="grid gap-5 lg:grid-cols-[1.45fr_0.72fr] lg:items-start">
-        <HeroSplash hero={hero} activeForm={activeForm} hasTransformations={hasTransformations} />
-        <HeroStatsRail hero={hero} activeForm={activeForm} />
-      </section>
+      <HeroDetailShowcaseCard
+        hero={hero}
+        activeForm={activeForm}
+        hasTransformations={hasTransformations}
+      />
       <HeroInfoTabs hero={hero} activeForm={activeForm} forms={forms} />
       {featureFlags.enableDevAdminUi && (
         <HeroIntelConsole

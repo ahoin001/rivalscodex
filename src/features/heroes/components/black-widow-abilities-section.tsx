@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import { ClippedPanel } from "@/components/ui";
 import { ExternalHero } from "@/lib/api/marvel-rivals";
-import abilityContainerImage from "../../../../hero-frames/ability-container.png";
+import abilityContainerImage from "../../../../rivals-assets/frames/ability-container.png";
 import lmbIcon from "../../../../rivals-assets/icons/LMB-icon.png";
 import rmbIcon from "../../../../rivals-assets/icons/RMB-icon.png";
 
@@ -12,7 +12,7 @@ type BlackWidowAbilitiesSectionProps = {
   hero: ExternalHero | null;
 };
 
-type AbilitySectionId = "normal-attack" | "abilities" | "team-up";
+type AbilitySectionId = "normal-attack" | "abilities" | "passives";
 
 type AbilitySection = {
   id: AbilitySectionId;
@@ -219,12 +219,13 @@ function buildSections(hero: ExternalHero): AbilitySection[] {
     .filter((ability) => ability.key.includes("left click") || ability.key.includes("right click"))
     .sort((left, right) => left.key.localeCompare(right.key));
 
-  const teamUp = mapped
+  const passives = mapped
     .filter((ability) => {
       const original = sourceAbilities.find(
         (candidate) => candidate.name.toLowerCase() === ability.name.toLowerCase(),
       );
-      return ability.key === "c" || original?.isCollab === true;
+      const typeIsPassive = (original?.type ?? "").toLowerCase().includes("passive");
+      return ability.key === "passive" || typeIsPassive;
     })
     .sort((left, right) => left.name.localeCompare(right.name));
 
@@ -232,7 +233,9 @@ function buildSections(hero: ExternalHero): AbilitySection[] {
     .filter(
       (ability) =>
         !normalAttack.some((candidate) => candidate.id === ability.id) &&
-        !teamUp.some((candidate) => candidate.id === ability.id),
+        !passives.some((candidate) => candidate.id === ability.id) &&
+        // Team-up abilities are intentionally hidden for now.
+        ability.key !== "c",
     )
     .sort((left, right) => {
       const leftRank = keyPriority.indexOf(left.key);
@@ -254,9 +257,9 @@ function buildSections(hero: ExternalHero): AbilitySection[] {
       abilities,
     },
     {
-      id: "team-up",
-      title: "Team-Up Abilities",
-      abilities: teamUp,
+      id: "passives",
+      title: "Passives",
+      abilities: passives,
     },
   ];
 

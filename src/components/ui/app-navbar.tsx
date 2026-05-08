@@ -23,12 +23,20 @@ export function AppNavbar() {
             </Link>
           ))}
           {process.env.NODE_ENV === "development" ? (
-            <Link
-              href="/dev/endpoints"
-              className="rounded border border-white/30 px-3 py-1 text-xs uppercase tracking-[0.14em] text-white/85 transition hover:border-white/55 hover:text-white"
-            >
-              Endpoint Testing
-            </Link>
+            <>
+              <Link
+                href="/dev/endpoints"
+                className="rounded border border-white/30 px-3 py-1 text-xs uppercase tracking-[0.14em] text-white/85 transition hover:border-white/55 hover:text-white"
+              >
+                Endpoint Testing
+              </Link>
+              <Link
+                href="/dev/hero-assets"
+                className="rounded border border-white/30 px-3 py-1 text-xs uppercase tracking-[0.14em] text-white/85 transition hover:border-white/55 hover:text-white"
+              >
+                Hero Assets
+              </Link>
+            </>
           ) : null}
         </div>
       </nav>
