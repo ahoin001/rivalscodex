@@ -51,5 +51,32 @@
       "type": "guide"
     }
   ],
+  "forms": [
+    {
+      "id": "form-id",
+      "name": "Form Name",
+      "shortLabel": "Form",
+      "trigger": "How this form activates",
+      "role": "Vanguard",
+      "health": 700,
+      "summary": "Optional form-specific summary.",
+      "resource": {
+        "name": "Optional Form Resource",
+        "description": "Only include if this form changes resources."
+      },
+      "abilities": [
+        {
+          "id": "form-ability-id",
+          "name": "Form Ability Name",
+          "keybind": "E",
+          "type": "Crowd Control",
+          "description": "What this form ability does.",
+          "damage": "70",
+          "cooldownSeconds": 10
+        }
+      ]
+    }
+  ],
+  "defaultFormId": "form-id",
   "updatedAt": "2026-05-01"
 }

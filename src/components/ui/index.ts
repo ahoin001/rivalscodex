@@ -9,3 +9,4 @@ export * from "@/components/ui/rivals-data-table-section";
 export * from "@/components/ui/presets";
 export * from "@/components/ui/rivals-pill";
 export * from "@/components/ui/rivals-input";
+export * from "@/components/ui/app-navbar";

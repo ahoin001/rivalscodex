@@ -198,5 +198,186 @@
     },
     "externalResources": [],
     "updatedAt": "2026-05-01"
+  },
+  {
+    "id": "hulk",
+    "slug": "hulk",
+    "name": "Hulk",
+    "role": "Vanguard",
+    "difficulty": 4,
+    "health": 650,
+    "portraitImage": "/heroes/captain-america-portrait.webp",
+    "splashImage": "/heroes/captain-america-splash.webp",
+    "summary": "A transformation-based frontliner that cycles between setup, brawl pressure, and empowered crowd control.",
+    "resource": {
+      "name": "Gamma Rage",
+      "description": "Build rage in combat to access stronger transformation windows."
+    },
+    "abilities": [
+      {
+        "id": "gamma-slam",
+        "name": "Gamma Slam",
+        "keybind": "E",
+        "type": "Disruption",
+        "description": "Leap and crash down to displace enemies in a small area.",
+        "damage": "60",
+        "cooldownSeconds": 9
+      },
+      {
+        "id": "thunderclap",
+        "name": "Thunderclap",
+        "keybind": "RMB",
+        "type": "Burst",
+        "description": "Release a short-range shockwave that pushes enemies back.",
+        "damage": "55",
+        "cooldownSeconds": 7
+      },
+      {
+        "id": "hulk-out",
+        "name": "Hulk Out",
+        "keybind": "Q",
+        "type": "Transformation",
+        "description": "Trigger empowered transformation and replace core abilities.",
+        "cooldownSeconds": 0
+      }
+    ],
+    "forms": [
+      {
+        "id": "bruce-banner",
+        "name": "Bruce Banner",
+        "shortLabel": "Banner",
+        "trigger": "Default Form",
+        "role": "Strategist",
+        "health": 500,
+        "summary": "A setup-focused form that pokes safely and prepares transformation timing.",
+        "abilities": [
+          {
+            "id": "gamma-pistol",
+            "name": "Gamma Pistol",
+            "keybind": "LMB",
+            "type": "Primary Fire",
+            "description": "Sustained ranged poke that builds Gamma Rage.",
+            "damage": "18 per shot"
+          },
+          {
+            "id": "gamma-barrier",
+            "name": "Gamma Barrier",
+            "keybind": "E",
+            "type": "Utility",
+            "description": "Deploy a short-duration barrier to survive dives.",
+            "cooldownSeconds": 12
+          },
+          {
+            "id": "mutate",
+            "name": "Mutate",
+            "keybind": "Q",
+            "type": "Transformation",
+            "description": "Transform into Hero Hulk when Gamma Rage is full.",
+            "cooldownSeconds": 0
+          }
+        ]
+      },
+      {
+        "id": "hero-hulk",
+        "name": "Hero Hulk",
+        "shortLabel": "Hero Hulk",
+        "trigger": "Mutate",
+        "role": "Vanguard",
+        "health": 800,
+        "summary": "Primary frontline form with high space control and dive interruption.",
+        "abilities": [
+          {
+            "id": "gamma-slam-form",
+            "name": "Gamma Slam",
+            "keybind": "E",
+            "type": "Disruption",
+            "description": "Leap and crash down to displace enemies in a small area.",
+            "damage": "60",
+            "cooldownSeconds": 9
+          },
+          {
+            "id": "thunderclap-form",
+            "name": "Thunderclap",
+            "keybind": "RMB",
+            "type": "Burst",
+            "description": "Release a short-range shockwave that pushes enemies back.",
+            "damage": "55",
+            "cooldownSeconds": 7
+          },
+          {
+            "id": "gamma-guard",
+            "name": "Gamma Guard",
+            "keybind": "Shift",
+            "type": "Defensive",
+            "description": "Reduce incoming damage while charging a counter shockwave.",
+            "cooldownSeconds": 10
+          }
+        ]
+      },
+      {
+        "id": "monster-hulk",
+        "name": "Monster Hulk",
+        "shortLabel": "Monster",
+        "trigger": "Ultimate",
+        "role": "Vanguard",
+        "health": 1000,
+        "summary": "Short empowered form with stronger crowd control and burst finish potential.",
+        "abilities": [
+          {
+            "id": "worldbreaker-slam",
+            "name": "Worldbreaker Slam",
+            "keybind": "E",
+            "type": "Crowd Control",
+            "description": "Heavy leap slam with a larger knock-up radius.",
+            "damage": "95",
+            "cooldownSeconds": 8
+          },
+          {
+            "id": "seismic-clap",
+            "name": "Seismic Clap",
+            "keybind": "RMB",
+            "type": "Burst",
+            "description": "Empowered clap that chains damage in a cone.",
+            "damage": "85",
+            "cooldownSeconds": 6
+          },
+          {
+            "id": "unstoppable-rage",
+            "name": "Unstoppable Rage",
+            "keybind": "Shift",
+            "type": "Mobility",
+            "description": "Gain movement speed and unstoppable status during engage.",
+            "cooldownSeconds": 10
+          }
+        ]
+      }
+    ],
+    "defaultFormId": "hero-hulk",
+    "combos": [
+      {
+        "id": "mutate-engage",
+        "name": "Mutate Frontline Engage",
+        "steps": [
+          "Build Gamma Rage while poking in Banner form.",
+          "Mutate into Hero Hulk at objective entry timing.",
+          "Open with Gamma Slam, then clap to force cooldowns."
+        ],
+        "teamUp": "Pair with follow-up burst to convert displacement into picks."
+      }
+    ],
+    "synergies": [
+      {
+        "hero": "Rocket Raccoon",
+        "reason": "Sustain and utility increase Hulk's frontline uptime during transform windows."
+      }
+    ],
+    "playstyle": {
+      "overview": "Cycle forms around objective timings and avoid wasting empowered windows on low-value targets.",
+      "positioning": "Use Banner form from safe angles, then take aggressive space once transformed.",
+      "targetPriority": ["Stacked backline players", "Immobile damage dealers"],
+      "avoidPriority": ["Kiting in open sightlines", "Overcommitting without support follow-up"]
+    },
+    "externalResources": [],
+    "updatedAt": "2026-05-08"
   }
 ]

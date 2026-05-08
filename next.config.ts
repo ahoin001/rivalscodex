@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ["image/webp"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "marvelrivalsapi.com",
+      },
+    ],
   },
 };
 

@@ -7,6 +7,18 @@ type ExternalAbility = {
   description?: string;
   damage?: string;
   cooldownSeconds?: number;
+  iconUrl?: string;
+  isCollab?: boolean;
+  transformationId?: string;
+  additionalFields?: Record<string, string>;
+};
+
+type ExternalTransformation = {
+  id: string;
+  name: string;
+  iconUrl?: string;
+  health?: string;
+  movementSpeed?: string;
 };
 
 export type ExternalHero = {
@@ -19,9 +31,12 @@ export type ExternalHero = {
   portraitImageUrl?: string;
   splashImageUrl?: string;
   abilities?: ExternalAbility[];
+  transformations?: ExternalTransformation[];
 };
 
 type AnyRecord = Record<string, unknown>;
+const MARVEL_RIVALS_ROOT_URL = "https://marvelrivalsapi.com";
+const MARVEL_RIVALS_IMAGE_BASE_URL = `${MARVEL_RIVALS_ROOT_URL}/rivals`;
 
 function pickString(record: AnyRecord, keys: string[]): string | undefined {
   for (const key of keys) {
@@ -77,11 +92,93 @@ function normalizeAbilities(rawAbilities: unknown): ExternalAbility[] | undefine
           "cooldown",
           "cd",
         ]),
+        iconUrl: pickString(abilityRecord, ["iconUrl", "icon", "image", "img"]),
+        isCollab:
+          typeof abilityRecord.isCollab === "boolean"
+            ? abilityRecord.isCollab
+            : undefined,
+        transformationId: pickString(abilityRecord, [
+          "transformationId",
+          "transformation_id",
+        ]),
+        additionalFields: normalizeAdditionalFields(abilityRecord.additional_fields),
       };
     })
     .filter((ability) => ability !== undefined);
 
   return abilities.length > 0 ? abilities : undefined;
+}
+
+function normalizeAdditionalFields(input: unknown): Record<string, string> | undefined {
+  if (!input || typeof input !== "object") {
+    return undefined;
+  }
+
+  const entries = Object.entries(input as AnyRecord)
+    .filter((entry): entry is [string, string] => {
+      const [, value] = entry;
+      return typeof value === "string" && value.trim().length > 0;
+    })
+    .map(([key, value]) => [key, value.trim()] as const);
+
+  if (entries.length === 0) {
+    return undefined;
+  }
+
+  return Object.fromEntries(entries);
+}
+
+function normalizeTransformations(
+  rawTransformations: unknown,
+): ExternalTransformation[] | undefined {
+  if (!Array.isArray(rawTransformations)) {
+    return undefined;
+  }
+
+  const transformations = rawTransformations.flatMap((rawTransformation) => {
+      if (!rawTransformation || typeof rawTransformation !== "object") {
+        return [];
+      }
+
+      const transformationRecord = rawTransformation as AnyRecord;
+      const id = pickString(transformationRecord, ["id", "transformation_id"]);
+      const name = pickString(transformationRecord, ["name", "title"]);
+      if (!id || !name) {
+        return [];
+      }
+
+      return [{
+        id,
+        name,
+        iconUrl: pickString(transformationRecord, ["iconUrl", "icon", "image"]),
+        health: pickString(transformationRecord, ["health", "hp"]),
+        movementSpeed: pickString(transformationRecord, [
+          "movementSpeed",
+          "movement_speed",
+          "speed",
+        ]),
+      }];
+    });
+
+  return transformations.length > 0 ? transformations : undefined;
+}
+
+function toAbsoluteAssetUrl(assetPath?: string): string | undefined {
+  if (!assetPath) {
+    return undefined;
+  }
+
+  if (/^https?:\/\//i.test(assetPath)) {
+    return assetPath;
+  }
+
+  const normalizedPath = assetPath.startsWith("/") ? assetPath : `/${assetPath}`;
+
+  if (normalizedPath.startsWith("/rivals/") || normalizedPath.startsWith("/premium/")) {
+    return `${MARVEL_RIVALS_ROOT_URL}${normalizedPath}`;
+  }
+
+  return `${MARVEL_RIVALS_IMAGE_BASE_URL}${normalizedPath}`;
 }
 
 function normalizeHero(rawHero: unknown): ExternalHero | null {
@@ -117,15 +214,18 @@ function normalizeHero(rawHero: unknown): ExternalHero | null {
     role: pickString(hero, ["role", "class"]),
     summary: pickString(hero, ["summary", "description", "bio"]),
     updatedAt: pickString(hero, ["updatedAt", "updated_at", "lastUpdated"]),
-    portraitImageUrl:
-      portraitImageUrl && /^https?:\/\//i.test(portraitImageUrl)
-        ? portraitImageUrl
-        : undefined,
-    splashImageUrl:
-      splashImageUrl && /^https?:\/\//i.test(splashImageUrl)
-        ? splashImageUrl
-        : undefined,
-    abilities: normalizeAbilities(hero.abilities ?? hero.skills),
+    portraitImageUrl: toAbsoluteAssetUrl(portraitImageUrl),
+    splashImageUrl: toAbsoluteAssetUrl(splashImageUrl),
+    abilities: normalizeAbilities(hero.abilities ?? hero.skills)?.map((ability) => ({
+      ...ability,
+      iconUrl: toAbsoluteAssetUrl(ability.iconUrl),
+    })),
+    transformations: normalizeTransformations(hero.transformations)?.map(
+      (transformation) => ({
+        ...transformation,
+        iconUrl: toAbsoluteAssetUrl(transformation.iconUrl),
+      }),
+    ),
   };
 }
 

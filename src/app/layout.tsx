@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Barlow_Condensed, Inter } from "next/font/google";
+import { AppNavbar } from "@/components/ui";
 import "./globals.css";
 
 const inter = Inter({
@@ -45,7 +46,10 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${barlowCondensed.variable} h-full antialiased`}
     >
-      <body className="min-h-full font-sans text-foreground">{children}</body>
+      <body className="min-h-full font-sans text-foreground">
+        <AppNavbar />
+        {children}
+      </body>
     </html>
   );
 }

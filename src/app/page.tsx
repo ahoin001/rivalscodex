@@ -1,11 +1,14 @@
 import { Metadata } from "next";
+import Link from "next/link";
 import {
+  ClippedButton,
   RivalsFeatureSection,
   RivalsPill,
   RivalsPageShell,
   RivalsSectionHeader,
 } from "@/components/ui";
 import { HeroGalleryClient } from "@/features/heroes/components/hero-gallery-client";
+import { DevApiPanel } from "@/features/dev-api/components/dev-api-panel";
 import { getHeroes } from "@/lib/content-adapter";
 
 export const metadata: Metadata = {
@@ -44,6 +47,35 @@ export default async function Home() {
       >
         <HeroGalleryClient heroes={heroes} />
       </RivalsFeatureSection>
+
+      {process.env.NODE_ENV === "development" ? (
+        <RivalsFeatureSection
+          eyebrow="Core Section"
+          title="Dev Endpoint Panel"
+          description="Organize and test Marvel Rivals heroes endpoints in a secure local-only workflow."
+          media={
+            <div className="space-y-2">
+              <RivalsPill tone="brand">Dev Tools</RivalsPill>
+              <p className="text-sm leading-6 text-muted-foreground">
+                Requests run through server routes so the API key never reaches
+                the client while you iterate on endpoint behavior.
+              </p>
+              <div className="border-t border-brand-gold/40 pt-2 text-xs uppercase tracking-wide text-brand-gold/90">
+                Local Only · Secure Key Handling · Endpoint Validation
+              </div>
+              <div className="pt-2">
+                <Link href="/dev/endpoints">
+                  <ClippedButton tone="brand" className="w-full md:w-auto">
+                    Open Dedicated Endpoint Page
+                  </ClippedButton>
+                </Link>
+              </div>
+            </div>
+          }
+        >
+          <DevApiPanel />
+        </RivalsFeatureSection>
+      ) : null}
     </RivalsPageShell>
   );
 }

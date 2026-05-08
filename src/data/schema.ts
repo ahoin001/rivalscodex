@@ -46,6 +46,20 @@ const heroResourceSchema = z.object({
   description: z.string(),
 });
 
+const heroFormSchema = z.object({
+  id: slugSchema,
+  name: z.string(),
+  shortLabel: z.string().optional(),
+  trigger: z.string().optional(),
+  role: heroRoleSchema.optional(),
+  health: z.number().int().positive(),
+  summary: z.string().optional(),
+  resource: heroResourceSchema.optional(),
+  portraitImage: localHeroImageSchema.optional(),
+  splashImage: localHeroImageSchema.optional(),
+  abilities: z.array(abilitySchema).min(1),
+});
+
 export const heroSchema = z.object({
   id: slugSchema,
   slug: slugSchema,
@@ -62,13 +76,29 @@ export const heroSchema = z.object({
   synergies: z.array(synergySchema).default([]),
   playstyle: playstyleSchema,
   externalResources: z.array(externalResourceSchema).default([]),
+  forms: z.array(heroFormSchema).min(1).optional(),
+  defaultFormId: slugSchema.optional(),
   updatedAt: isoDateSchema,
+}).superRefine((hero, context) => {
+  if (!hero.forms || !hero.defaultFormId) {
+    return;
+  }
+
+  const hasDefaultForm = hero.forms.some((form) => form.id === hero.defaultFormId);
+  if (!hasDefaultForm) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "defaultFormId must match one of the provided form ids.",
+      path: ["defaultFormId"],
+    });
+  }
 });
 
 export const heroesSchema = z.array(heroSchema).min(1);
 
 export type HeroRole = z.infer<typeof heroRoleSchema>;
 export type Hero = z.infer<typeof heroSchema>;
+export type HeroForm = z.infer<typeof heroFormSchema>;
 export type HeroAbility = Hero["abilities"][number];
 export type HeroCombo = Hero["combos"][number];
 export type HeroExternalResource = Hero["externalResources"][number];

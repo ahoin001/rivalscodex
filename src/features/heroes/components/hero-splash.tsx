@@ -1,13 +1,20 @@
 import Image from "next/image";
-import { ClippedPanel } from "@/components/ui";
+import { ClippedPanel, RivalsPill } from "@/components/ui";
 import { Hero } from "@/data/schema";
+import { ResolvedHeroForm } from "@/features/heroes/hero-forms";
 import { roleColorClass } from "@/features/heroes/role-utils";
 
 type HeroSplashProps = {
   hero: Hero;
+  activeForm: ResolvedHeroForm;
+  hasTransformations?: boolean;
 };
 
-export function HeroSplash({ hero }: HeroSplashProps) {
+export function HeroSplash({
+  hero,
+  activeForm,
+  hasTransformations = false,
+}: HeroSplashProps) {
   return (
     <ClippedPanel
       tone="gold"
@@ -23,20 +30,26 @@ export function HeroSplash({ hero }: HeroSplashProps) {
             <h1 className="slanted-title font-display text-[2.4rem] italic uppercase leading-[0.94] md:text-[4.1rem]">
               <span>{hero.name}</span>
             </h1>
+            {hasTransformations && (
+              <div className="flex flex-wrap items-center gap-2">
+                <RivalsPill tone="brand">{activeForm.name}</RivalsPill>
+                {activeForm.trigger ? <RivalsPill>{activeForm.trigger}</RivalsPill> : null}
+              </div>
+            )}
             <div className="brand-divider max-w-xl" />
             <p className="max-w-2xl text-[0.95rem] leading-6 text-muted-foreground md:text-base md:leading-7">
-              {hero.summary}
+              {activeForm.summary}
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
             <span
-              className={`rounded border px-2 py-1 text-xs font-semibold uppercase ${roleColorClass[hero.role]}`}
+              className={`rounded border px-2 py-1 text-xs font-semibold uppercase ${roleColorClass[activeForm.role]}`}
             >
-              {hero.role}
+              {activeForm.role}
             </span>
             <span className="rounded border border-brand-gold/60 bg-brand-gold/15 px-2 py-1 text-xs font-semibold uppercase text-brand-gold">
-              HP {hero.health}
+              HP {activeForm.health}
             </span>
             <span className="rounded border border-white/25 px-2 py-1 text-xs font-semibold uppercase text-white/80">
               Difficulty {hero.difficulty}/5
@@ -49,8 +62,8 @@ export function HeroSplash({ hero }: HeroSplashProps) {
 
       <div className="group relative mt-4 min-h-[20rem] w-full overflow-hidden clipped-edge border border-brand-gold/30 lg:min-h-[32rem]">
         <Image
-          src={hero.splashImage}
-          alt={`${hero.name} splash art`}
+          src={activeForm.splashImage}
+          alt={`${hero.name} ${activeForm.name} splash art`}
           fill
           priority
           sizes="(max-width: 1024px) 100vw, 72vw"

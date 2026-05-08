@@ -10,39 +10,73 @@ import {
   StatRow,
 } from "@/components/ui";
 import { Hero } from "@/data/schema";
+import { ResolvedHeroForm } from "@/features/heroes/hero-forms";
 import {
   abilityMatrixColumns,
   baseStatRowsPreset,
   externalResourceTypeLabels,
 } from "@/components/ui/presets";
 import { AbilityCard } from "@/features/heroes/components/ability-card";
+import { FormContextBadge } from "@/features/heroes/components/form-context-badge";
+import { useHeroNotes } from "@/features/heroes/use-hero-notes";
 import { LazyVideoEmbed } from "@/features/heroes/components/lazy-video-embed";
 import { getYoutubeEmbedUrl } from "@/features/heroes/youtube";
 
-type TabId = "abilities" | "combos" | "playstyle" | "resources";
+type TabId = "abilities" | "combos" | "playstyle" | "resources" | "notes";
 
 type HeroInfoTabsProps = {
   hero: Hero;
+  activeForm: ResolvedHeroForm;
+  forms: ResolvedHeroForm[];
 };
 
 const tabLabels: Record<TabId, string> = {
   abilities: "Abilities",
   combos: "Combos & Synergies",
   playstyle: "Playstyle Guide",
-  resources: "External Resources",
+  resources: "Resources",
+  notes: "Personal Notes",
 };
 
-export function HeroInfoTabs({ hero }: HeroInfoTabsProps) {
+export function HeroInfoTabs({ hero, activeForm, forms }: HeroInfoTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>("abilities");
+  const hasTransformations = forms.length > 1;
+  const { notes, setNotes, clearNotes, hydrated } = useHeroNotes(hero.id);
+
+  const combosWithContext = useMemo(
+    () =>
+      hero.combos
+        .map((combo) => {
+          const matchedFormIds = inferMatchedFormIds(combo, forms);
+          const appliesToLabel =
+            matchedFormIds.length === 0
+              ? "All Forms"
+              : getAppliesToLabel(matchedFormIds, forms);
+          const contextRank = getComboContextRank(matchedFormIds, activeForm.id);
+
+          return {
+            combo,
+            appliesToLabel,
+            contextRank,
+            isCurrentForm: matchedFormIds.includes(activeForm.id),
+          };
+        })
+        .sort(
+          (left, right) =>
+            left.contextRank - right.contextRank ||
+            left.combo.name.localeCompare(right.combo.name),
+        ),
+    [activeForm.id, forms, hero.combos],
+  );
 
   const tabContent = useMemo(
     () => ({
       abilities: (
         <div className="grid gap-4 lg:grid-cols-[1.45fr_0.7fr]">
           <RivalsDataTableSection
-            title="Abilities Matrix"
+            title={`${activeForm.name} Abilities`}
             columns={abilityMatrixColumns}
-            rows={hero.abilities}
+            rows={activeForm.abilities}
             getRowKey={(ability) => ability.id}
             renderCell={(ability, key) => {
               if (key === "keybind") {
@@ -92,7 +126,7 @@ export function HeroInfoTabs({ hero }: HeroInfoTabsProps) {
                     <StatRow
                       key={statRow.key}
                       label={statRow.label}
-                      value={`${hero.health}`}
+                      value={`${activeForm.health}`}
                       showDivider={!isLast}
                     />
                   );
@@ -103,7 +137,7 @@ export function HeroInfoTabs({ hero }: HeroInfoTabsProps) {
                     <StatRow
                       key={statRow.key}
                       label={statRow.label}
-                      value={hero.role}
+                      value={activeForm.role}
                       showDivider={!isLast}
                     />
                   );
@@ -136,15 +170,36 @@ export function HeroInfoTabs({ hero }: HeroInfoTabsProps) {
       combos: (
         <div className="grid gap-4 lg:grid-cols-2">
           <HudSection title="Combo Recipes">
+            {hasTransformations && (
+              <div className="mb-4 flex flex-wrap items-center gap-2 border-b border-brand-gold/25 pb-3">
+                <FormContextBadge
+                  label={`Viewing Form: ${activeForm.name}`}
+                  tone="active"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Guide content is shared hero-wide. Labels call out transformation context.
+                </p>
+              </div>
+            )}
             <div className="space-y-4">
-              {hero.combos.map((combo) => (
+              {combosWithContext.map(({ combo, appliesToLabel, isCurrentForm }) => (
                 <article
                   key={combo.id}
-                  className="border-l border-brand-gold/55 pl-3"
+                  className={`border-l pl-3 ${
+                    isCurrentForm ? "border-brand-gold/75" : "border-brand-gold/45"
+                  }`}
                 >
-                  <p className="text-xs uppercase tracking-[0.16em] text-brand-gold">
-                    {combo.name}
-                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-xs uppercase tracking-[0.16em] text-brand-gold">
+                      {combo.name}
+                    </p>
+                    {hasTransformations && (
+                      <FormContextBadge
+                        label={`Applies: ${appliesToLabel}`}
+                        tone={isCurrentForm ? "active" : "secondary"}
+                      />
+                    )}
+                  </div>
                   <ol className="mt-2 list-decimal space-y-1 pl-4 text-sm text-white/85">
                     {combo.steps.map((step) => (
                       <li key={step}>{step}</li>
@@ -161,6 +216,11 @@ export function HeroInfoTabs({ hero }: HeroInfoTabsProps) {
           </HudSection>
 
           <HudSection title="Team Synergy Notes" tone="secondary">
+            {hasTransformations && (
+              <p className="mb-3 text-xs text-muted-foreground">
+                Synergy guidance remains hero-level and should be applied across forms.
+              </p>
+            )}
             <ul className="space-y-2 text-sm text-white/85">
               {hero.synergies.map((synergy) => (
                 <li key={synergy.hero}>
@@ -175,6 +235,11 @@ export function HeroInfoTabs({ hero }: HeroInfoTabsProps) {
       playstyle: (
         <div className="grid gap-4 lg:grid-cols-2">
           <HudSection title="Positioning">
+            {hasTransformations && (
+              <p className="mb-3 text-xs text-muted-foreground">
+                Playstyle guidance is holistic for the entire hero kit and transformation cycle.
+              </p>
+            )}
             <p className="text-sm text-white/85">{hero.playstyle.positioning}</p>
             <p className="mt-3 text-sm text-muted-foreground">
               {hero.playstyle.overview}
@@ -208,40 +273,109 @@ export function HeroInfoTabs({ hero }: HeroInfoTabsProps) {
         </div>
       ),
       resources: (
-        <HudSection title="Guides & Links">
-          <ul className="space-y-2 text-sm">
-            {hero.externalResources.map((resource) => {
-              const embedUrl =
-                resource.type === "youtube"
-                  ? getYoutubeEmbedUrl(resource.url)
-                  : null;
+        <div className="grid gap-4 lg:grid-cols-[1.3fr_0.8fr]">
+          <HudSection title="Guides & Links">
+            {hasTransformations && (
+              <p className="mb-3 text-xs text-muted-foreground">
+                External resources are curated at hero level and may cover multiple forms in one
+                guide.
+              </p>
+            )}
+            <ul className="space-y-2 text-sm">
+              {hero.externalResources.map((resource) => {
+                const embedUrl =
+                  resource.type === "youtube"
+                    ? getYoutubeEmbedUrl(resource.url)
+                    : null;
 
-              return (
-                <li key={resource.url}>
-                  <div className="space-y-2">
-                    <a
-                      href={resource.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 text-white hover:text-brand-gold"
-                    >
-                      <span className="rounded border border-brand-gold/40 px-2 py-1 text-xs uppercase text-brand-gold/90">
-                        {externalResourceTypeLabels[resource.type]}
-                      </span>
-                      {resource.title}
-                    </a>
-                    {embedUrl && (
-                      <LazyVideoEmbed title={resource.title} embedUrl={embedUrl} />
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+                return (
+                  <li key={resource.url}>
+                    <div className="space-y-2">
+                      <a
+                        href={resource.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 text-white hover:text-brand-gold"
+                      >
+                        <span className="rounded border border-brand-gold/40 px-2 py-1 text-xs uppercase text-brand-gold/90">
+                          {externalResourceTypeLabels[resource.type]}
+                        </span>
+                        {resource.title}
+                      </a>
+                      {embedUrl && (
+                        <LazyVideoEmbed title={resource.title} embedUrl={embedUrl} />
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </HudSection>
+          <HudSection title="Reference Snapshot" tone="secondary">
+            <div className="space-y-2">
+              <StatRow label="Role" value={activeForm.role} />
+              <StatRow label="Form HP" value={`${activeForm.health}`} />
+              <StatRow label="Difficulty" value={`${hero.difficulty}/5`} />
+              <StatRow label="Last Updated" value={hero.updatedAt} showDivider={false} />
+            </div>
+            {activeForm.resource && (
+              <div className="mt-4 border-t border-white/15 pt-3">
+                <p className="text-xs uppercase tracking-wide text-brand-gold">Hero Resource</p>
+                <p className="mt-1 text-sm text-white">{activeForm.resource.name}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {activeForm.resource.description}
+                </p>
+              </div>
+            )}
+          </HudSection>
+        </div>
+      ),
+      notes: (
+        <HudSection title="Personal Notes" tone="secondary">
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground">
+              Save matchup reminders, comfort picks, and hero-specific practice goals. Notes are
+              stored locally for this hero.
+            </p>
+            <textarea
+              value={notes}
+              onChange={(event) => setNotes(event.currentTarget.value)}
+              placeholder={`Write your ${hero.name} notes here...`}
+              className="min-h-44 w-full resize-y border border-brand-gold/35 bg-[#0f1422]/90 px-3 py-3 text-sm text-white outline-none focus:border-brand-gold"
+            />
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div className="text-muted-foreground">
+                {hydrated ? (
+                  "Autosaves locally"
+                ) : (
+                  "Loading saved notes..."
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">{`${notes.length} characters`}</span>
+                <button
+                  type="button"
+                  onClick={clearNotes}
+                  className="border border-brand-gold/40 px-2 py-1 uppercase tracking-wide text-brand-gold hover:border-brand-gold hover:bg-brand-gold/10"
+                >
+                  Clear
+                </button>
+              </div>
+            </div>
+          </div>
         </HudSection>
       ),
     }),
-    [hero],
+    [
+      activeForm,
+      clearNotes,
+      combosWithContext,
+      hasTransformations,
+      hero,
+      hydrated,
+      notes,
+      setNotes,
+    ],
   );
 
   return (
@@ -278,4 +412,87 @@ export function HeroInfoTabs({ hero }: HeroInfoTabsProps) {
       </div>
     </ClippedPanel>
   );
+}
+
+function getNormalizedHaystack(heroCombo: Hero["combos"][number]): string {
+  return [heroCombo.name, ...heroCombo.steps, heroCombo.teamUp]
+    .filter(Boolean)
+    .join(" ")
+    .replace(/[^\w\s-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+}
+
+const genericAliases = new Set([
+  "form",
+  "default",
+  "ultimate",
+  "normal",
+  "mode",
+  "state",
+]);
+
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function getFormAliases(form: ResolvedHeroForm): string[] {
+  const aliases = [form.name, form.shortLabel, form.id.replace(/-/g, " ")]
+    .filter((value): value is string => typeof value === "string")
+    .map((value) => value.toLowerCase().trim())
+    .filter((value) => value.length >= 3)
+    .filter((value) => !genericAliases.has(value));
+
+  return Array.from(new Set(aliases));
+}
+
+function getAliasMatches(text: string, alias: string): boolean {
+  const pattern = new RegExp(`(?:^|\\b)${escapeRegex(alias)}(?:\\b|$)`, "i");
+  return pattern.test(text);
+}
+
+function inferMatchedFormIds(
+  heroCombo: Hero["combos"][number],
+  forms: ResolvedHeroForm[],
+): string[] {
+  if (forms.length <= 1) {
+    return [];
+  }
+
+  const haystack = getNormalizedHaystack(heroCombo);
+  const aliasMap = forms.map((form) => ({
+    formId: form.id,
+    aliases: getFormAliases(form),
+  }));
+
+  const matchedFormIds = aliasMap
+    .filter((entry) => entry.aliases.some((alias) => getAliasMatches(haystack, alias)))
+    .map((entry) => entry.formId);
+
+  return matchedFormIds;
+}
+
+function getAppliesToLabel(matchedFormIds: string[], forms: ResolvedHeroForm[]): string {
+  if (matchedFormIds.length === 0) {
+    return "All Forms";
+  }
+
+  if (matchedFormIds.length > 1) {
+    return "Multi-Form";
+  }
+
+  const form = forms.find((candidate) => candidate.id === matchedFormIds[0]);
+  return form?.shortLabel ?? form?.name ?? "Specific Form";
+}
+
+function getComboContextRank(matchedFormIds: string[], activeFormId: string): number {
+  if (matchedFormIds.includes(activeFormId)) {
+    return 0;
+  }
+
+  if (matchedFormIds.length === 0) {
+    return 1;
+  }
+
+  return 2;
 }

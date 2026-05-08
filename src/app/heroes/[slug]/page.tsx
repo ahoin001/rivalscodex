@@ -3,14 +3,12 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RivalsPageShell } from "@/components/ui";
-import { HeroSplash } from "@/features/heroes/components/hero-splash";
-import { HeroStatsRail } from "@/features/heroes/components/hero-stats-rail";
 import { getHeroBySlug, getHeroSlugs } from "@/lib/content-adapter";
 
-const HeroInfoTabs = dynamic(
+const DynamicHeroDetailClient = dynamic(
   () =>
-    import("@/features/heroes/components/hero-info-tabs").then(
-      (module) => module.HeroInfoTabs,
+    import("@/features/heroes/components/hero-detail-client").then(
+      (module) => module.HeroDetailClient,
     ),
   {
     loading: () => (
@@ -71,17 +69,13 @@ export default async function HeroPage({ params }: HeroPageProps) {
       >
         Back To Gallery
       </Link>
-      <section className="grid gap-5 lg:grid-cols-[1.45fr_0.72fr] lg:items-start">
-        <HeroSplash hero={hero} />
-        <HeroStatsRail hero={hero} />
-      </section>
       <section className="space-y-2">
         <p className="text-xs uppercase tracking-[0.2em] text-brand-gold">
           Combat Intelligence
         </p>
         <div className="brand-divider" />
       </section>
-      <HeroInfoTabs hero={hero} />
+      <DynamicHeroDetailClient hero={hero} />
     </RivalsPageShell>
   );
 }
