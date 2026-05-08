@@ -5,8 +5,8 @@ import Image from "next/image";
 import { ClippedPanel } from "@/components/ui";
 import { ExternalHero } from "@/lib/api/marvel-rivals";
 import abilityContainerImage from "../../../../hero-frames/ability-container.png";
-import lmbIcon from "../../../../rivals-assets/LMB-icon.png";
-import rmbIcon from "../../../../rivals-assets/RMB-icon.png";
+import lmbIcon from "../../../../rivals-assets/icons/LMB-icon.png";
+import rmbIcon from "../../../../rivals-assets/icons/RMB-icon.png";
 
 type BlackWidowAbilitiesSectionProps = {
   hero: ExternalHero | null;

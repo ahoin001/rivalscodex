@@ -1,6 +1,6 @@
 import Image from "next/image";
-import frameImage from "../../../../hero-frames/hero-frame.jpg";
-import widowSiloImage from "../../../../hero-frames/widow-silo.png";
+import frameImage from "../../../../rivals-assets/frames/hero-frame.jpg";
+import widowSiloImage from "../../../../rivals-assets/heros/black widow/widow-silo.png";
 import widowImage from "../../../../hero-frames/widow.png";
 
 type BlackWidowHeroCardProps = {
