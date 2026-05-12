@@ -30,7 +30,7 @@ export function RivalsTabBar({
       className={`${
         isVertical
           ? "flex flex-col gap-2"
-          : "flex flex-wrap gap-2 overflow-x-auto"
+          : "flex gap-2 overflow-x-auto pb-1 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       } ${className}`.trim()}
       role="tablist"
       aria-orientation={orientation}
@@ -44,7 +44,7 @@ export function RivalsTabBar({
             role="tab"
             aria-selected={isActive}
             onClick={() => onChange(tab.id)}
-            className={`rivals-clip-tab inline-flex items-center gap-2 px-5 py-2 font-display text-sm font-bold uppercase italic tracking-[0.18em] transition-colors duration-150 sm:text-base ${
+            className={`rivals-clip-tab inline-flex min-h-11 shrink-0 snap-start items-center gap-2 whitespace-nowrap px-4 py-2.5 font-display text-xs font-bold uppercase italic tracking-[0.16em] transition-colors duration-150 sm:px-5 sm:py-2 sm:text-base sm:tracking-[0.18em] ${
               isActive
                 ? "bg-rivals-yellow-500 text-rivals-ink shadow-[0_4px_18px_rgba(251,220,44,0.35)]"
                 : "bg-rivals-light-200 text-rivals-ink-soft hover:bg-rivals-light-300 hover:text-rivals-ink"

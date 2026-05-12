@@ -9,6 +9,8 @@
 4. Run `npm run validate-content`.
 5. Run `npm run lint` and `npm run build`.
 6. Verify hero card and detail page render in `npm run dev`.
+7. (Optional but recommended) refresh offline fallback from canonical codex:
+   - `npm run snapshot:codex`
 
 ## Fast Update Checklist
 

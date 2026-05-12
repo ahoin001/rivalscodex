@@ -17,3 +17,4 @@ export * from "@/components/ui/rivals-tab-bar";
 export * from "@/components/ui/rivals-brand-button";
 export * from "@/components/ui/rivals-key-chip";
 export * from "@/components/ui/rivals-stat-line";
+export * from "@/components/ui/tooltip";

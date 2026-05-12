@@ -1,35 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0b14;
-  --panel: rgb(20 23 35 / 78%);
-  --panel-border: rgb(255 255 255 / 16%);
-  --foreground: #eff4ff;
-  --muted-foreground: #9da7c2;
-  --brand-gold: #f6d94f;
-  --brand-gold-strong: #ffd84a;
-  --brand-gold-muted: rgb(246 217 79 / 12%);
-  --brand-gold-rgb: 246 217 79;
-  --body-gradient: radial-gradient(circle at 18% 16%, #18203a 0%, #0a0b14 56%);
-  --body-noise-opacity: 0.28;
-  --vanguard: #00a0ff;
-  --duelist: #ff4655;
-  --strategist: #00f5c8;
+  /* Gold Ops — app chrome (nav, data sections, body) */
+  --background: #1e242d;
+  --panel: rgb(30 36 45 / 82%);
+  --panel-border: rgb(255 255 255 / 12%);
+  --foreground: #e8edf5;
+  --muted-foreground: #98a3b8;
+  --brand-gold: #c9a25d;
+  --brand-gold-strong: #d4b06e;
+  --brand-gold-muted: rgb(201 162 93 / 16%);
+  --brand-gold-rgb: 201 162 93;
+  --body-gradient: radial-gradient(circle at 18% 16%, #2a3344 0%, #1e242d 56%);
+  --body-noise-opacity: 0.22;
+  --vanguard: #38bdf8;
+  --duelist: #f87171;
+  --strategist: #2dd4bf;
 
-  /* Rivals brand palette (additive; consumed by lab-scoped surfaces) */
-  --rivals-yellow-300: #fde680;
-  --rivals-yellow-400: #fde04e;
-  --rivals-yellow-500: #fbdc2c;
-  --rivals-yellow-600: #e7c41a;
-  --rivals-yellow-700: #b8990d;
-  --rivals-ink: #282736;
-  --rivals-ink-soft: #3a394a;
-  --rivals-ink-muted: #5a5b6b;
-  --rivals-light-100: #e1e5f4;
-  --rivals-light-200: #dce0ef;
-  --rivals-light-300: #d2d7ea;
-  --rivals-light-400: #c1c8de;
-  --rivals-light-50: #eef1fa;
+  /* Spotlight band (shared with .lab-light-theme and full-bleed sections) */
+  --surface-spotlight-top: #eef2f7;
+  --surface-spotlight-mid: #dbe4ed;
+  --surface-spotlight-bottom: #c9d4e2;
+  --surface-spotlight-gradient: linear-gradient(
+    180deg,
+    var(--surface-spotlight-top) 0%,
+    var(--surface-spotlight-mid) 58%,
+    var(--surface-spotlight-bottom) 100%
+  );
+  --surface-data: var(--background);
+  --category-rail: #b8c5d6;
+
+  /* Rivals brand palette — aligned with spotlight / ink system for lab + cards */
+  --rivals-yellow-300: #dfc9a0;
+  --rivals-yellow-400: #d4b06e;
+  --rivals-yellow-500: #c9a25d;
+  --rivals-yellow-600: #b08d4d;
+  --rivals-yellow-700: #8a6e3c;
+  --rivals-ink: #1a1d26;
+  --rivals-ink-soft: #2c3140;
+  --rivals-ink-muted: #5c6578;
+  --rivals-light-50: #eef2f7;
+  --rivals-light-100: #dbe4ed;
+  --rivals-light-200: #c9d4e2;
+  --rivals-light-300: #b8c5d6;
+  --rivals-light-400: #a8b5c8;
   --rivals-strategist: #2dd4bf;
   --rivals-duelist: #ef4444;
   --rivals-vanguard: #38bdf8;
@@ -64,6 +78,12 @@
   --color-rivals-strategist: var(--rivals-strategist);
   --color-rivals-duelist: var(--rivals-duelist);
   --color-rivals-vanguard: var(--rivals-vanguard);
+
+  --color-surface-spotlight-top: var(--surface-spotlight-top);
+  --color-surface-spotlight-mid: var(--surface-spotlight-mid);
+  --color-surface-spotlight-bottom: var(--surface-spotlight-bottom);
+  --color-surface-data: var(--surface-data);
+  --color-category-rail: var(--category-rail);
 
   --font-sans: var(--font-inter);
   --font-display: var(--font-barlow-condensed);
@@ -177,6 +197,30 @@ a {
   --panel-border: rgb(255 255 255 / 14%);
   --body-gradient: radial-gradient(circle at 18% 16%, #2a1018 0%, #120a0e 58%);
   --body-noise-opacity: 0.22;
+  --surface-spotlight-top: #fff5f6;
+  --surface-spotlight-mid: #fce7ea;
+  --surface-spotlight-bottom: #f5d0d8;
+  --surface-spotlight-gradient: linear-gradient(
+    180deg,
+    var(--surface-spotlight-top) 0%,
+    var(--surface-spotlight-mid) 58%,
+    var(--surface-spotlight-bottom) 100%
+  );
+  --surface-data: var(--background);
+  --category-rail: #e8b4bc;
+  --rivals-light-50: #fff5f6;
+  --rivals-light-100: #fce7ea;
+  --rivals-light-200: #f5d0d8;
+  --rivals-light-300: #e8b4bc;
+  --rivals-light-400: #d498a6;
+  --rivals-yellow-300: #fda4af;
+  --rivals-yellow-400: #fb7185;
+  --rivals-yellow-500: #fb7185;
+  --rivals-yellow-600: #f43f5e;
+  --rivals-yellow-700: #be123c;
+  --rivals-ink: #2a1218;
+  --rivals-ink-soft: #3d1f28;
+  --rivals-ink-muted: #7a5e66;
 }
 
 [data-palette="aurora"] {
@@ -191,6 +235,30 @@ a {
   --panel-border: rgb(255 255 255 / 14%);
   --body-gradient: radial-gradient(circle at 18% 16%, #0c3535 0%, #061a1a 58%);
   --body-noise-opacity: 0.24;
+  --surface-spotlight-top: #ecfeff;
+  --surface-spotlight-mid: #cffafe;
+  --surface-spotlight-bottom: #a5f3fc;
+  --surface-spotlight-gradient: linear-gradient(
+    180deg,
+    var(--surface-spotlight-top) 0%,
+    var(--surface-spotlight-mid) 58%,
+    var(--surface-spotlight-bottom) 100%
+  );
+  --surface-data: var(--background);
+  --category-rail: #7dd3d8;
+  --rivals-light-50: #ecfeff;
+  --rivals-light-100: #cffafe;
+  --rivals-light-200: #a5f3fc;
+  --rivals-light-300: #7dd3d8;
+  --rivals-light-400: #5cbfc9;
+  --rivals-yellow-300: #5eead4;
+  --rivals-yellow-400: #2dd4bf;
+  --rivals-yellow-500: #2dd4bf;
+  --rivals-yellow-600: #14b8a6;
+  --rivals-yellow-700: #0f766e;
+  --rivals-ink: #042f2e;
+  --rivals-ink-soft: #115e59;
+  --rivals-ink-muted: #5b7f7e;
 }
 
 [data-palette="dawn"] {
@@ -208,6 +276,30 @@ a {
   --strategist: #0d9488;
   --body-gradient: linear-gradient(180deg, #f4f6fc 0%, #e8ecf7 55%, #dce2f0 100%);
   --body-noise-opacity: 0.1;
+  --surface-spotlight-top: #fafbfe;
+  --surface-spotlight-mid: #f4f6fc;
+  --surface-spotlight-bottom: #e8ecf7;
+  --surface-spotlight-gradient: linear-gradient(
+    180deg,
+    var(--surface-spotlight-top) 0%,
+    var(--surface-spotlight-mid) 58%,
+    var(--surface-spotlight-bottom) 100%
+  );
+  --surface-data: #dce2f0;
+  --category-rail: #c5cfe0;
+  --rivals-light-50: #fafbfe;
+  --rivals-light-100: #f4f6fc;
+  --rivals-light-200: #e8ecf7;
+  --rivals-light-300: #dce2f0;
+  --rivals-light-400: #cbd5e8;
+  --rivals-yellow-300: #fb923c;
+  --rivals-yellow-400: #ea580c;
+  --rivals-yellow-500: #c2410c;
+  --rivals-yellow-600: #9a3412;
+  --rivals-yellow-700: #7c2d12;
+  --rivals-ink: #1a1d2e;
+  --rivals-ink-soft: #2d3348;
+  --rivals-ink-muted: #5c6478;
 }
 
 @keyframes fadeSlideIn {
@@ -236,28 +328,74 @@ a {
   }
 }
 
-/* ----- Lab-scoped light theme ----- */
+/* ----- Lab-scoped light theme (uses shared spotlight tokens) ----- */
 .lab-light-theme {
   --background: var(--rivals-light-100);
   --foreground: var(--rivals-ink);
   --muted-foreground: var(--rivals-ink-muted);
-  background:
-    linear-gradient(180deg, var(--rivals-light-50) 0%, var(--rivals-light-100) 60%, var(--rivals-light-200) 100%);
+  background: var(--surface-spotlight-gradient);
   color: var(--rivals-ink);
 }
 
 .lab-light-theme .brand-divider {
   background: linear-gradient(
     90deg,
-    rgb(40 39 54 / 0%),
-    rgb(40 39 54 / 35%) 48%,
-    rgb(40 39 54 / 0%)
+    rgb(var(--brand-gold-rgb) / 0%),
+    rgb(var(--brand-gold-rgb) / 35%) 48%,
+    rgb(var(--brand-gold-rgb) / 0%)
   );
 }
 
 .lab-light-theme ::selection {
-  background: var(--rivals-yellow-500);
+  background: rgb(var(--brand-gold-rgb) / 45%);
   color: var(--rivals-ink);
+}
+
+/* Full-bleed home / marketing bands */
+.page-spotlight-band {
+  --foreground: var(--rivals-ink);
+  --muted-foreground: var(--rivals-ink-muted);
+  background: var(--surface-spotlight-gradient);
+  color: var(--rivals-ink);
+}
+
+.page-data-band {
+  --foreground: #e8edf5;
+  --muted-foreground: #98a3b8;
+  background-color: var(--surface-data);
+  background-image:
+    linear-gradient(
+      145deg,
+      rgb(255 255 255 / 4%) 0%,
+      transparent 42%
+    ),
+    radial-gradient(circle, rgb(255 255 255 / 6%) 0.55px, transparent 0.65px);
+  background-size: auto, 10px 10px;
+  color: var(--foreground);
+}
+
+[data-palette="dawn"] .page-data-band {
+  --foreground: #1a1d2e;
+  --muted-foreground: #5c6478;
+}
+
+/* White “sheet” panels on dark data bands (gallery cards, filter strips) */
+.sheet-panel {
+  background: rgb(255 255 255 / 96%);
+  border: 1px solid rgb(var(--brand-gold-rgb) / 28%);
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 10%),
+    0 14px 42px rgb(0 0 0 / 26%);
+  color: var(--rivals-ink);
+  --foreground: var(--rivals-ink);
+  --muted-foreground: var(--rivals-ink-muted);
+}
+
+[data-palette="dawn"] .sheet-panel {
+  background: rgb(255 255 255 / 92%);
+  box-shadow:
+    0 0 0 1px rgb(26 29 46 / 8%),
+    0 12px 36px rgb(26 29 46 / 12%);
 }
 
 .rivals-clip-tab {

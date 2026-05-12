@@ -5,6 +5,11 @@ import {
   readStrictRosterSnapshotHeroes,
 } from "@/lib/supabase/roster-snapshot-repository";
 
+type ExternalAbilityStat = {
+  label: string;
+  value: string;
+};
+
 type ExternalAbility = {
   name: string;
   keybind?: string;
@@ -16,6 +21,12 @@ type ExternalAbility = {
   isCollab?: boolean;
   transformationId?: string;
   additionalFields?: Record<string, string>;
+  /** Site grouping when known: "Normal Attack" | "Abilities" | "Team-Up Abilities" | "Passive". */
+  category?: string;
+  /** Web-relative path or absolute URL for the keybind icon (e.g. LMB / RMB). */
+  keybindIconUrl?: string;
+  /** Ordered detail-panel stat rows (lossless, preserves site order). */
+  stats?: ExternalAbilityStat[];
 };
 
 type ExternalTransformation = {
@@ -40,6 +51,8 @@ export type ExternalHero = {
   abilities?: ExternalAbility[];
   transformations?: ExternalTransformation[];
 };
+
+export type { ExternalAbility, ExternalAbilityStat };
 
 type AnyRecord = Record<string, unknown>;
 const MARVEL_RIVALS_ROOT_URL = "https://marvelrivalsapi.com";

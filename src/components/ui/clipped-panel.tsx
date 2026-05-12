@@ -2,7 +2,8 @@ import { PropsWithChildren } from "react";
 
 type ClippedPanelProps = PropsWithChildren<{
   className?: string;
-  tone?: "default" | "gold";
+  /** `sheet` = opaque light panel for dark “data” contexts (hero gallery, filters). */
+  tone?: "default" | "gold" | "sheet";
 }>;
 
 export function ClippedPanel({
@@ -10,11 +11,12 @@ export function ClippedPanel({
   className = "",
   tone = "default",
 }: ClippedPanelProps) {
+  const surfaceClass =
+    tone === "sheet"
+      ? "sheet-panel"
+      : `glass-panel ${tone === "gold" ? "glass-panel-gold" : ""}`;
+
   return (
-    <section
-      className={`glass-panel clipped-edge ${tone === "gold" ? "glass-panel-gold" : ""} ${className}`.trim()}
-    >
-      {children}
-    </section>
+    <section className={`clipped-edge ${surfaceClass} ${className}`.trim()}>{children}</section>
   );
 }

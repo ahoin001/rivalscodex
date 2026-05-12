@@ -24,7 +24,7 @@ export async function createSupabaseServerClient(): Promise<
             cookieStore.set(name, value, options);
           });
         } catch {
-          /* Server Components may omit cookie writes — middleware handles refresh when possible */
+          /* Server Components may omit cookie writes — proxy handles refresh when possible */
         }
       },
     },

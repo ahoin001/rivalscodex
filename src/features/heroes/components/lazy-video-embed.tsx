@@ -11,12 +11,12 @@ export function LazyVideoEmbed({ title, embedUrl }: LazyVideoEmbedProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <div className="clipped-edge border border-brand-gold/30 bg-[#101524]/90 p-3">
+    <div className="clipped-edge overflow-hidden rounded-lg border border-brand-gold/25 bg-[#101524]/90 p-3 shadow-[0_8px_26px_rgba(3,8,20,0.45)]">
       {!isLoaded ? (
         <button
           type="button"
           onClick={() => setIsLoaded(true)}
-          className="w-full border border-brand-gold/45 bg-brand-gold-muted px-3 py-2 text-xs font-semibold uppercase tracking-wide text-brand-gold transition hover:border-brand-gold hover:bg-brand-gold hover:text-[#11131e]"
+          className="w-full min-h-11 border border-brand-gold/45 bg-brand-gold-muted px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-brand-gold transition hover:border-brand-gold hover:bg-brand-gold hover:text-[#11131e]"
         >
           Load Video Preview
         </button>
@@ -24,7 +24,7 @@ export function LazyVideoEmbed({ title, embedUrl }: LazyVideoEmbedProps) {
         <iframe
           src={embedUrl}
           title={title}
-          className="h-52 w-full"
+          className="aspect-video w-full rounded-md"
           loading="lazy"
           referrerPolicy="strict-origin-when-cross-origin"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

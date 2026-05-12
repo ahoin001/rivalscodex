@@ -1,6 +1,6 @@
 import { ExternalHero } from "@/lib/api/marvel-rivals";
 import { LunaAbility, LunaAbilityCategory } from "@/features/heroes/components/luna-abilities-section";
-import { LunaHeroGuideTabContent } from "@/features/heroes/components/luna-hero-guide-console";
+import type { HeroGuideTabContent as LunaHeroGuideTabContent } from "@/features/heroes/hero-guide-schema";
 
 const LUNA_ABILITY_CATEGORY_BY_KEY: Array<{
   match: (key: string, name: string) => boolean;
@@ -207,6 +207,28 @@ export const LUNA_BASE_STATS: Array<{ label: string; value: string }> = [
 
 export const LUNA_HERO_GUIDE_TABS: LunaHeroGuideTabContent[] = [
   {
+    id: "overview",
+    label: "Overview",
+    summary: "Luna Snow · Strategist · Difficulty 3 / 5",
+    body: [
+      {
+        type: "callout",
+        variant: "gameplan",
+        title: "Win condition",
+        body: "Control tempo with Ice Arts pulses, amplify one decisive carry with Share the Stage, and convert freezes into coordinated burst so the team snowballs objectives.",
+      },
+      {
+        type: "bullets",
+        title: "60-second checklist",
+        items: [
+          "Pre-skate to the next angle before the fight starts; do not skate in reaction to surprise flank audio.",
+          "Pick one damage buddy for Share the Stage each fight—rotate the target when their cooldowns spike.",
+          "Bank Absolute Zero for peel or confirmed follow-up, not for solo poke damage.",
+        ],
+      },
+    ],
+  },
+  {
     id: "abilities",
     label: "Abilities",
     summary:
@@ -226,14 +248,39 @@ export const LUNA_HERO_GUIDE_TABS: LunaHeroGuideTabContent[] = [
     label: "Combos & Synergies",
     summary:
       "Convert displacement and freeze windows into reliable burst with allies who excel at decisive follow-up.",
-    primaryPoints: [
-      "Absolute Zero into ally burst (Iron Man, Black Widow) for guaranteed pickoffs.",
-      "Ice Arts pulse into Fate of Both Worlds for sustained team fight uptime.",
-      "Share the Stage on dive duelists to overload the enemy backline.",
-    ],
-    secondaryPoints: [
-      "Coordinate Fate of Both Worlds with another ult for combined kill windows.",
-      "Avoid stacking ults on the same engagement; stagger for longer fight pressure.",
+    body: [
+      {
+        type: "combo",
+        name: "Absolute Zero → focus fire",
+        steps: [
+          "Throw Absolute Zero on a slowed or cornered target.",
+          "Call the hero name you want to layer burst with.",
+          "Layer Fate of Both Worlds or a duelist dive once the freeze confirms.",
+        ],
+        condition: "Best when enemy mobility cooldowns are already spent.",
+      },
+      {
+        type: "combo",
+        name: "Ice Arts → space denial",
+        steps: [
+          "Pulse Ice Arts through choke or payload corridor.",
+          "Swap Light & Dark taps to heal chip while keeping pressure.",
+          "Skate reset behind cover before the enemy line advances.",
+        ],
+      },
+      {
+        type: "twoColumn",
+        leftTitle: "Synergy spikes",
+        leftItems: [
+          "Iron Man / Black Widow: Absolute Zero into instant burst windows.",
+          "Dive duelists: Share the Stage during backline overload attempts.",
+        ],
+        rightTitle: "Ult cadence",
+        rightItems: [
+          "Stagger Fate of Both Worlds with another major ult for longer pressure.",
+          "Avoid stacking every ult on the same 2-second window unless it is a forced end.",
+        ],
+      },
     ],
   },
   {
@@ -241,14 +288,40 @@ export const LUNA_HERO_GUIDE_TABS: LunaHeroGuideTabContent[] = [
     label: "Playstyle Guide",
     summary:
       "Operate as a hybrid skirmish-support: position with line-of-sight on your damage cores while denying enemy dive routes.",
-    primaryPoints: [
-      "Stay just behind your frontline with skating exits queued at all times.",
-      "Prioritize denying flank angles with Ice Arts before committing damage.",
-      "Reset cover after burst sequences to keep your healing economy intact.",
-    ],
-    secondaryPoints: [
-      "Track enemy ults and bait long-cooldown abilities before committing your own.",
-      "Rotate to objectives early; Luna's mobility lets her contest contested points fast.",
+    body: [
+      {
+        type: "callout",
+        variant: "macro",
+        title: "Default posture",
+        body: "Stay just behind your frontline with skating exits queued. Prioritize denying flank angles with Ice Arts before committing damage, then reset cover after burst sequences to keep your healing economy intact.",
+      },
+      {
+        type: "twoColumn",
+        leftTitle: "High-value targets",
+        leftItems: [
+          "Isolated duelists overextended without peel.",
+          "Supports channeling ults without reposition options.",
+        ],
+        rightTitle: "Threats to respect",
+        rightItems: [
+          "Long-range snipers that collapse your LOS pockets.",
+          "Dive tanks that can body-block Absolute Zero angles.",
+        ],
+      },
+      {
+        type: "matchup",
+        disposition: "target",
+        opponent: "Flank duelists",
+        summary:
+          "Track their mobility cooldowns; when empty, Absolute Zero plus a called burst window deletes their tempo.",
+      },
+      {
+        type: "matchup",
+        disposition: "threat",
+        opponent: "High-ground hitscan",
+        summary:
+          "Do not ego-skate into open sightlines. Approach from vertical cover or force them to reposition before committing Fate.",
+      },
     ],
   },
   {

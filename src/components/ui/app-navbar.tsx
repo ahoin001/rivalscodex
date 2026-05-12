@@ -1,10 +1,6 @@
 import Link from "next/link";
+import { AppNavbarNav } from "@/components/ui/app-navbar-nav";
 import { PaletteSwitcher } from "@/features/theme/palette-switcher";
-
-const navLinks = [
-  { href: "/", label: "Heroes" },
-  { href: "/lab/hero-card", label: "Hero Card Lab" },
-];
 
 export function AppNavbar() {
   return (
@@ -18,31 +14,7 @@ export function AppNavbar() {
         </Link>
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <PaletteSwitcher />
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="rounded border border-brand-gold/45 bg-brand-gold-muted px-3 py-1 text-xs uppercase tracking-[0.14em] text-brand-gold transition hover:border-brand-gold hover:bg-brand-gold hover:text-[#10131f]"
-            >
-              {link.label}
-            </Link>
-          ))}
-          {process.env.NODE_ENV === "development" ? (
-            <>
-              <Link
-                href="/dev/endpoints"
-                className="rounded border border-panel-border px-3 py-1 text-xs uppercase tracking-[0.14em] text-muted-foreground transition hover:border-brand-gold/45 hover:text-foreground"
-              >
-                Endpoint Testing
-              </Link>
-              <Link
-                href="/dev/hero-assets"
-                className="rounded border border-panel-border px-3 py-1 text-xs uppercase tracking-[0.14em] text-muted-foreground transition hover:border-brand-gold/45 hover:text-foreground"
-              >
-                Hero Assets
-              </Link>
-            </>
-          ) : null}
+          <AppNavbarNav />
         </div>
       </nav>
     </header>

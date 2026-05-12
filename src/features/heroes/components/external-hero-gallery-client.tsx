@@ -80,8 +80,8 @@ export function ExternalHeroGalleryClient({
   return (
     <section className="space-y-6">
       <ClippedPanel
-        tone="gold"
-        className="border border-brand-gold/35 space-y-4 p-4"
+        tone="sheet"
+        className="space-y-4 p-4"
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-xs uppercase tracking-[0.16em] text-brand-gold">
@@ -231,8 +231,8 @@ function ExternalHeroCard({
 
   return (
     <ClippedPanel
-      tone="gold"
-      className="cinematic-glow h-full overflow-hidden border border-brand-gold/35 transition-transform duration-300 hover:-translate-y-1"
+      tone="sheet"
+      className="brand-glow h-full overflow-hidden transition-transform duration-300 hover:-translate-y-1"
     >
       <div className="flex h-full flex-col space-y-2 p-3">
         <div className="flex min-h-8 items-start justify-between gap-2">
@@ -267,7 +267,7 @@ function ExternalHeroCard({
               Portrait unavailable
             </div>
           )}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#0b0f19] to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background to-transparent" />
           <div className="pointer-events-none absolute inset-0 border border-white/5" />
         </div>
 
@@ -278,7 +278,7 @@ function ExternalHeroCard({
         <div className="mt-auto">
           <Link
             href={`/heroes/${slug}`}
-            className="clipped-edge inline-flex w-full items-center justify-center border border-brand-gold/55 bg-brand-gold-muted px-3 py-2 text-xs font-semibold uppercase tracking-wide text-brand-gold transition hover:border-brand-gold hover:bg-brand-gold hover:text-[#11131e]"
+            className="clipped-edge inline-flex w-full items-center justify-center border border-brand-gold/55 bg-brand-gold-muted px-3 py-2 text-xs font-semibold uppercase tracking-wide text-brand-gold transition hover:border-brand-gold hover:bg-brand-gold hover:text-rivals-ink"
           >
             {hasLocalDossier ? "Open Dossier" : "Open Hero"}
           </Link>

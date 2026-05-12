@@ -23,8 +23,8 @@ export function HeroGalleryControls({
 }: HeroGalleryControlsProps) {
   return (
     <ClippedPanel
-      tone="gold"
-      className="border border-brand-gold/35 flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between"
+      tone="sheet"
+      className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between"
     >
       <div className="flex flex-wrap gap-2">
         {heroRoleFilterOptions.map((option) => (

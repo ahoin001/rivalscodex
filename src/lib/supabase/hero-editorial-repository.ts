@@ -1,38 +1,20 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { RIVALSCODEX_APP_SCHEMA } from "@/lib/supabase/constants";
 
 export type HeroEditorialScope = "draft" | "published";
 
-/**
- * Reads curated hero JSON — exposed-schema table first, RPC fallback if needed.
- */
+/** Reads curated hero JSON through a single RPC path (no fallback branches). */
 export async function fetchHeroEditorialContent(
   supabase: SupabaseClient,
   heroSlug: string,
   scope: HeroEditorialScope = "published",
 ): Promise<unknown | null> {
-  const { data: row, error: tableError } = await supabase
-    .schema(RIVALSCODEX_APP_SCHEMA)
-    .from("hero_editorial")
-    .select("content")
-    .eq("hero_slug", heroSlug)
-    .eq("scope", scope)
-    .maybeSingle();
-
-  if (!tableError && row && row.content !== undefined && row.content !== null) {
-    return row.content as unknown;
-  }
-
   const { data, error } = await supabase.rpc("rivalscodex_get_hero_editorial", {
     p_hero_slug: heroSlug,
     p_scope: scope,
   });
 
   if (error) {
-    console.warn(
-      "[supabase] hero_editorial fetch failed",
-      tableError?.message ?? error.message,
-    );
+    console.warn("[supabase] hero_editorial fetch failed", error.message);
     return null;
   }
 

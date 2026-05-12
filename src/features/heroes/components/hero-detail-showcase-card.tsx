@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { Hero } from "@/data/schema";
 import { FavoriteHeroButton } from "@/features/favorites/favorite-hero-button";
-import { getHeroAssetOverride } from "@/features/heroes/hero-asset-overrides";
 import { ResolvedHeroForm } from "@/features/heroes/hero-forms";
 import frameImage from "../../../../rivals-assets/frames/hero-frame.jpg";
 
@@ -16,8 +15,6 @@ export function HeroDetailShowcaseCard({
   activeForm,
   hasTransformations,
 }: HeroDetailShowcaseCardProps) {
-  const assetOverride = getHeroAssetOverride(hero.slug);
-
   return (
     <section
       className="relative isolate w-full overflow-hidden border border-brand-gold/35 bg-[#d4dae7] shadow-[0_18px_45px_rgba(6,8,20,0.4)]"
@@ -25,7 +22,7 @@ export function HeroDetailShowcaseCard({
     >
       <div className="relative aspect-[16/9] w-full min-h-[360px] sm:min-h-[430px] lg:min-h-[560px]">
         <Image
-          src={assetOverride?.frame ?? frameImage}
+          src={hero.frameImage ?? frameImage}
           alt="Marvel Rivals style hero frame"
           fill
           priority
@@ -46,17 +43,17 @@ export function HeroDetailShowcaseCard({
               <h1 className="slanted-title font-display text-[2.45rem] uppercase leading-[0.86] text-[#141726] sm:text-[3.7rem] lg:text-[5.2rem]">
                 <span>{hero.name}</span>
               </h1>
-              {assetOverride?.logo && (
+              {hero.stackLogoImage ? (
                 <div className="mt-2 h-10 w-44">
                   <Image
-                    src={assetOverride.logo}
+                    src={hero.stackLogoImage}
                     alt={`${hero.name} logo`}
                     width={176}
                     height={40}
                     className="h-full w-auto object-contain"
                   />
                 </div>
-              )}
+              ) : null}
             </div>
 
             <div className="ml-1 max-w-[560px] pr-[34%] sm:pr-[32%] lg:pr-0">
@@ -85,12 +82,11 @@ export function HeroDetailShowcaseCard({
 
         <div className="pointer-events-none absolute bottom-[-16%] right-[-18%] z-30 h-[210%] w-[125%] sm:bottom-[-20%] sm:right-[-24%] sm:h-[235%] sm:w-[120%] lg:bottom-[-24%] lg:right-[-22%] lg:h-[260%] lg:w-[92%]">
           <Image
-            src={assetOverride?.portrait ?? activeForm.portraitImage}
+            src={activeForm.portraitImage}
             alt={`${hero.name} ${activeForm.name} portrait`}
             fill
             sizes="(max-width: 640px) 80vw, (max-width: 1024px) 55vw, 42vw"
             className="object-contain object-bottom drop-shadow-[0_12px_26px_rgba(8,10,25,0.5)]"
-            unoptimized
           />
         </div>
 

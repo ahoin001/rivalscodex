@@ -1,28 +1,21 @@
 import { Metadata } from "next";
-import dynamic from "next/dynamic";
-import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
-import { RivalsPageShell } from "@/components/ui";
+import { HeroFormAbilitiesPanel } from "@/features/heroes/components/hero-form-abilities-panel";
+import { HeroLabShowcaseCard } from "@/features/heroes/components/hero-lab-showcase-card";
+import { DraftPreviewAuthBanner } from "@/features/heroes/components/draft-preview-auth-banner";
+import { HeroGuideConsole } from "@/features/heroes/components/hero-guide-console";
+import { HeroGuideAdminLink } from "@/features/heroes/components/hero-guide-admin-link";
+import { buildHeroGuideTabsFromHero, mapHeroToExternalHero } from "@/features/heroes/hero-lab-data";
+import { resolveHeroGuideTabs } from "@/features/heroes/hero-guide-content";
 import { getHeroBySlug, getHeroSlugs } from "@/lib/content-adapter";
-
-const DynamicHeroDetailClient = dynamic(
-  () =>
-    import("@/features/heroes/components/hero-detail-client").then(
-      (module) => module.HeroDetailClient,
-    ),
-  {
-    loading: () => (
-      <section className="glass-panel clipped-edge p-4 text-sm text-muted-foreground">
-        Loading hero modules...
-      </section>
-    ),
-  },
-);
+import abilitiesBackgroundImage from "../../../../rivals-assets/frames/abilities-section.jpg";
 
 type HeroPageProps = {
   params: Promise<{
     slug: string;
   }>;
+  searchParams?: Promise<{ preview?: string }> | { preview?: string };
 };
 
 export async function generateStaticParams() {
@@ -53,7 +46,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function HeroPage({ params }: HeroPageProps) {
+export default async function HeroPage({ params, searchParams }: HeroPageProps) {
   const { slug } = await params;
   const hero = await getHeroBySlug(slug);
 
@@ -61,21 +54,55 @@ export default async function HeroPage({ params }: HeroPageProps) {
     notFound();
   }
 
+  const heroAsExternal = mapHeroToExternalHero(hero);
+  const fallbackGuideTabs = buildHeroGuideTabsFromHero(hero);
+  const resolvedSearchParams = await Promise.resolve(searchParams);
+  const wantsDraftPreview = resolvedSearchParams?.preview === "draft";
+  const guideScope = wantsDraftPreview ? "draft" : "published";
+  const loginNextPath = `/heroes/${hero.slug}${wantsDraftPreview ? "?preview=draft" : ""}`;
+  const guideTabs = await resolveHeroGuideTabs({
+    heroSlug: hero.slug,
+    fallbackTabs: fallbackGuideTabs,
+    scope: guideScope,
+  });
+
   return (
-    <RivalsPageShell className="flex flex-col gap-6">
-      <Link
-        href="/"
-        className="inline-flex w-fit border border-brand-gold/45 bg-brand-gold-muted px-3 py-1 text-xs uppercase tracking-wide text-brand-gold hover:border-brand-gold hover:bg-brand-gold hover:text-[#10131e]"
-      >
-        Back To Gallery
-      </Link>
-      <section className="space-y-2">
-        <p className="text-xs uppercase tracking-[0.2em] text-brand-gold">
-          Combat Intelligence
-        </p>
-        <div className="brand-divider" />
+    <div className="lab-light-theme min-h-screen">
+      <DraftPreviewAuthBanner
+        wantsDraftPreview={wantsDraftPreview}
+        loginNextPath={loginNextPath}
+      />
+      <section className="w-full">
+        <HeroLabShowcaseCard hero={hero} />
       </section>
-      <DynamicHeroDetailClient hero={hero} />
-    </RivalsPageShell>
+
+      <section className="relative isolate w-full overflow-hidden">
+        <Image
+          src={abilitiesBackgroundImage}
+          alt=""
+          fill
+          priority={false}
+          sizes="100vw"
+          aria-hidden
+          className="object-cover object-center"
+        />
+        <div className="relative mx-auto w-full max-w-[min(100%,1680px)] px-5 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-12">
+          <HeroFormAbilitiesPanel
+            hero={hero}
+            heroAsExternal={heroAsExternal}
+            stackLogoUrl={hero.stackLogoImage}
+            variant="immersive"
+          />
+        </div>
+      </section>
+
+      <HeroGuideConsole
+        heroName={hero.name}
+        stackLogoUrl={hero.stackLogoImage}
+        tabs={guideTabs}
+        defaultTabId="overview"
+      />
+      <HeroGuideAdminLink heroSlug={hero.slug} />
+    </div>
   );
 }

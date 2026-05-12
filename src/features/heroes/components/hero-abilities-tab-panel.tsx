@@ -1,7 +1,7 @@
 "use client";
 
 import { Hero } from "@/data/schema";
-import { BlackWidowAbilitiesSection } from "@/features/heroes/components/black-widow-abilities-section";
+import { HeroAbilitiesSection } from "@/features/heroes/components/hero-abilities-section";
 import { ResolvedHeroForm } from "@/features/heroes/hero-forms";
 import { ExternalHero } from "@/lib/api/marvel-rivals";
 
@@ -13,7 +13,7 @@ type HeroAbilitiesTabPanelProps = {
 export function HeroAbilitiesTabPanel({ hero, activeForm }: HeroAbilitiesTabPanelProps) {
   const mappedHero = mapHeroToAbilitiesPanel(hero, activeForm);
 
-  return <BlackWidowAbilitiesSection hero={mappedHero} />;
+  return <HeroAbilitiesSection hero={mappedHero} />;
 }
 
 function mapHeroToAbilitiesPanel(hero: Hero, activeForm: ResolvedHeroForm): ExternalHero {

@@ -1,10 +1,13 @@
 import { Metadata } from "next";
 import { cache } from "react";
 import Image from "next/image";
-import { BlackWidowAbilitiesSection } from "@/features/heroes/components/black-widow-abilities-section";
+import { HeroAbilitiesSection } from "@/features/heroes/components/hero-abilities-section";
 import { LunaHeroCard } from "@/features/heroes/components/luna-hero-card";
-import { LunaHeroGuideConsole } from "@/features/heroes/components/luna-hero-guide-console";
+import { DraftPreviewAuthBanner } from "@/features/heroes/components/draft-preview-auth-banner";
+import { HeroGuideConsole } from "@/features/heroes/components/hero-guide-console";
+import { HeroGuideAdminLink } from "@/features/heroes/components/hero-guide-admin-link";
 import { LUNA_HERO_GUIDE_TABS } from "@/features/heroes/components/luna-data";
+import { resolveHeroGuideTabs } from "@/features/heroes/hero-guide-content";
 import abilitiesBackgroundImage from "../../../../rivals-assets/frames/abilities-section.jpg";
 import { fetchMarvelRivalsHeroes } from "@/lib/api/marvel-rivals";
 
@@ -15,13 +18,22 @@ export const metadata: Metadata = {
 };
 
 const getCachedHeroes = cache(async () => fetchMarvelRivalsHeroes());
+const LUNA_SLUG = "luna-snow";
+
+type HeroCardLabPageProps = {
+  searchParams?: Promise<{ preview?: string }> | { preview?: string };
+};
 
 function isLunaSnow(name: string | undefined): boolean {
   if (!name) return false;
   return name.toLowerCase().replace(/[^a-z]/g, "") === "lunasnow";
 }
 
-export default async function HeroCardLabPage() {
+function toGuideScope(preview: string | undefined): "draft" | "published" {
+  return preview === "draft" ? "draft" : "published";
+}
+
+export default async function HeroCardLabPage({ searchParams }: HeroCardLabPageProps) {
   let lunaHero = null;
   try {
     const heroes = await getCachedHeroes();
@@ -30,8 +42,22 @@ export default async function HeroCardLabPage() {
     lunaHero = null;
   }
 
+  const resolvedSearchParams = await Promise.resolve(searchParams);
+  const wantsDraftPreview = resolvedSearchParams?.preview === "draft";
+  const guideScope = toGuideScope(resolvedSearchParams?.preview);
+  const loginNextPath = `/lab/hero-card${wantsDraftPreview ? "?preview=draft" : ""}`;
+  const lunaGuideTabs = await resolveHeroGuideTabs({
+    heroSlug: LUNA_SLUG,
+    fallbackTabs: LUNA_HERO_GUIDE_TABS,
+    scope: guideScope,
+  });
+
   return (
     <div className="lab-light-theme min-h-screen">
+      <DraftPreviewAuthBanner
+        wantsDraftPreview={wantsDraftPreview}
+        loginNextPath={loginNextPath}
+      />
       {/* Hero card is edge-to-edge for maximum impact */}
       <section className="w-full">
         <LunaHeroCard />
@@ -48,16 +74,17 @@ export default async function HeroCardLabPage() {
           className="object-cover object-center"
         />
         <div className="relative mx-auto w-full max-w-[min(100%,1680px)] px-5 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-12">
-          <BlackWidowAbilitiesSection hero={lunaHero} variant="immersive" />
+          <HeroAbilitiesSection hero={lunaHero} variant="immersive" />
         </div>
       </section>
 
-      <LunaHeroGuideConsole
+      <HeroGuideConsole
         heroName="Luna Snow"
         subtitle="Seol Hee"
-        tabs={LUNA_HERO_GUIDE_TABS}
-        defaultTabId="abilities"
+        tabs={lunaGuideTabs}
+        defaultTabId="overview"
       />
+      <HeroGuideAdminLink heroSlug={LUNA_SLUG} />
     </div>
   );
 }

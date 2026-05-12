@@ -13,8 +13,10 @@
     "sync:heroes": "tsx scripts/sync-heroes.ts",
     "sync:heroes:dry-run": "tsx scripts/sync-heroes.ts --dry-run",
     "sync:roster-snapshot": "tsx scripts/sync-roster-snapshot.ts",
-    "sync:hero-assets": "tsx scripts/sync-hero-assets.ts",
-    "lighthouse:ci": "npm run build && lhci collect --config=./lighthouserc.json && lhci assert --config=./lighthouserc.json"
+    "snapshot:codex": "tsx scripts/snapshot-codex-to-json.ts",
+    "snapshot:codex:dry-run": "tsx scripts/snapshot-codex-to-json.ts --dry-run",
+    "lighthouse:ci": "npm run build && lhci collect --config=./lighthouserc.json && lhci assert --config=./lighthouserc.json",
+    "release": "node scripts/release.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.3",

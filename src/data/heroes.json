@@ -1,383 +1,740 @@
 [
   {
-    "id": "captain-america",
-    "slug": "captain-america",
-    "name": "Captain America",
+    "id": "adam-warlock",
+    "slug": "adam-warlock",
+    "name": "Adam Warlock",
+    "realName": "Adam Warlock",
+    "role": "Strategist",
+    "difficulty": 3,
+    "health": 650,
+    "portraitImage": "/rivals-assets/heros/adam-warlock/adam-warlock.png",
+    "splashImage": "/rivals-assets/heros/adam-warlock/adam-warlock.png",
+    "summary": "The genetically-engineered Adam Warlock wields mighty Quantum Magic, allowing him to connect and heal souls with a gentle touch. When the time comes for his allies to unite, Warlock emerges as the unwavering epicenter of cosmic justice!",
+    "abilities": [
+      {
+        "id": "adam-warlock-quantum-magic",
+        "name": "Quantum Magic",
+        "keybind": "LMB",
+        "type": "Normal Attack",
+        "description": "Launch quantum energy to deal damage",
+        "damage": "60 damage per round",
+        "category": "Normal Attack",
+        "iconUrl": "/rivals-assets/heros/adam-warlock/icons/quantum-magic.png",
+        "keybindIconUrl": "/rivals-assets/icons/LMB-icon.png",
+        "stats": [
+          {
+            "label": "KEY",
+            "value": "LMB"
+          },
+          {
+            "label": "CASTING",
+            "value": "Single-cast direct hit"
+          },
+          {
+            "label": "DAMAGE",
+            "value": "60 damage per round"
+          },
+          {
+            "label": "DAMAGE FALLOFF",
+            "value": "Falloff begins at 20m, decreasing to 60% at 40m"
+          },
+          {
+            "label": "FIRE RATE",
+            "value": "2 rounds per second"
+          },
+          {
+            "label": "AMMO",
+            "value": "15"
+          },
+          {
+            "label": "CRITICAL HIT",
+            "value": "Yes"
+          }
+        ],
+        "siteOrder": 1
+      },
+      {
+        "id": "adam-warlock-karmic-revival",
+        "name": "Karmic Revival",
+        "keybind": "F",
+        "type": "Abilities",
+        "description": "Awaken the karma of allies to revive them. Allies revived have lower health but enjoy a brief period of Invincibility",
+        "category": "Abilities",
+        "iconUrl": "/rivals-assets/heros/adam-warlock/icons/karmic-revival.png",
+        "stats": [
+          {
+            "label": "KEY",
+            "value": "Q"
+          },
+          {
+            "label": "CASTING",
+            "value": "Persistent spell field that surrounds the caster"
+          },
+          {
+            "label": "SPECIAL EFFECT",
+            "value": "Revive allies within range, centered on Adam. Continuously monitor for fallen allies within this range; if they enter the area, they can be revived at the casting location"
+          },
+          {
+            "label": "HEALTH UPON REVIVAL",
+            "value": "30% of the Max Health"
+          },
+          {
+            "label": "RANGE",
+            "value": "35m spherical radius"
+          },
+          {
+            "label": "DURATION",
+            "value": "10s"
+          },
+          {
+            "label": "ENERGY COST",
+            "value": "4500"
+          },
+          {
+            "label": "HEALTH UPON REVIVAL",
+            "value": "Allies revived will be blessed with Bonus Health equal to 70% of their Maximum Health with a 5s duration. Bonus Health falloff begins at 5s, decreasing to 0 in 2s."
+          }
+        ],
+        "siteOrder": 2
+      },
+      {
+        "id": "adam-warlock-karmic-revival",
+        "name": "Karmic Revival",
+        "keybind": "Q",
+        "type": "Abilities",
+        "description": "Ability description pending detail capture.",
+        "category": "Abilities",
+        "iconUrl": "/rivals-assets/heros/adam-warlock/icons/karmic-revival.png",
+        "siteOrder": 3
+      },
+      {
+        "id": "adam-warlock-soul-bond",
+        "name": "Soul Bond",
+        "keybind": "SHIFT",
+        "type": "Abilities",
+        "description": "Forge a soul bond with allies, granting Healing Over Time and distributing damage taken across the bond",
+        "damage": "250",
+        "cooldownSeconds": 40,
+        "category": "Abilities",
+        "iconUrl": "/rivals-assets/heros/adam-warlock/icons/soul-bond.png",
+        "stats": [
+          {
+            "label": "KEY",
+            "value": "SHIFT"
+          },
+          {
+            "label": "CASTING",
+            "value": "Instant Cast"
+          },
+          {
+            "label": "SPECIAL EFFECT 1",
+            "value": "Adam Warlock will share a portion of the damage sustained by linked allies. If Adam Warlock sustains damage that would KO him due to the link, then the link will be broken, and he will retain 1 Health. The link will also break once enough damage is sustained, if Adam Warlock or the linked ally leave the link's range, or after a certain length of time has passed"
+          },
+          {
+            "label": "SPECIAL EFFECT 2",
+            "value": "Adam can hover and attack during the ability's duration"
+          },
+          {
+            "label": "HEALING AMOUNT",
+            "value": "15/s"
+          },
+          {
+            "label": "RANGE",
+            "value": "15m"
+          },
+          {
+            "label": "DURATION",
+            "value": "6s"
+          },
+          {
+            "label": "MAXIMUM DAMAGE SHARED PER TARGET",
+            "value": "250"
+          },
+          {
+            "label": "COOLDOWN",
+            "value": "40s"
+          }
+        ],
+        "siteOrder": 4
+      },
+      {
+        "id": "adam-warlock-avatar-life-stream",
+        "name": "Avatar Life Stream",
+        "keybind": "E",
+        "type": "Abilities",
+        "description": "Target an ally for a bouncing stream of healing energy, which also heals himself upon casting; self-targets if no ally is selected",
+        "cooldownSeconds": 2,
+        "category": "Abilities",
+        "iconUrl": "/rivals-assets/heros/adam-warlock/icons/avatar-life-stream.png",
+        "stats": [
+          {
+            "label": "KEY",
+            "value": "E"
+          },
+          {
+            "label": "CASTING",
+            "value": "Targeted"
+          },
+          {
+            "label": "SPECIAL EFFECT",
+            "value": "Bouncing target does not include Adam Warlock"
+          },
+          {
+            "label": "HEALING AMOUNT",
+            "value": "95"
+          },
+          {
+            "label": "HEALING AMOUNT (SELF)",
+            "value": "35"
+          },
+          {
+            "label": "NUMBER OF BOUNCES",
+            "value": "2"
+          },
+          {
+            "label": "RANGE",
+            "value": "20m spherical radius"
+          },
+          {
+            "label": "COOLDOWN",
+            "value": "2 charges, with each charge taking 6s to recharge; when a critical hit lands on an enemy, reduce the cooldown time of Avatar Life Stream by 1s."
+          }
+        ],
+        "siteOrder": 5
+      },
+      {
+        "id": "adam-warlock-cosmic-cluster",
+        "name": "Cosmic Cluster",
+        "keybind": "RMB",
+        "type": "Abilities",
+        "description": "Gather quantum energy into a cluster and then swiftly launch it at the enemy",
+        "damage": "38",
+        "category": "Abilities",
+        "iconUrl": "/rivals-assets/heros/adam-warlock/icons/cosmic-cluster.png",
+        "keybindIconUrl": "/rivals-assets/icons/RMB-icon.png",
+        "stats": [
+          {
+            "label": "KEY",
+            "value": "RMB"
+          },
+          {
+            "label": "CASTING",
+            "value": "Charged release, with multiple delayed projectiles"
+          },
+          {
+            "label": "DAMAGE",
+            "value": "38"
+          },
+          {
+            "label": "MAXIMUM PROJECTILE COUNT",
+            "value": "5"
+          },
+          {
+            "label": "FIRE RATE",
+            "value": "The firing interval for a single charged shot is 0.3s, while the interval for multiple shots is 0.07s"
+          },
+          {
+            "label": "PROJECTILE SPEED",
+            "value": "100 m/s"
+          },
+          {
+            "label": "SPECIAL EFFECT",
+            "value": "Cosmic Cluster shares ammo with Quantum Magic, each hit reduces the cooldown of Avatar Life Stream by 0.08s."
+          }
+        ],
+        "siteOrder": 6
+      },
+      {
+        "id": "adam-warlock-regenerative-cocoon",
+        "name": "Regenerative Cocoon",
+        "keybind": "PASSIVE",
+        "type": "Abilities",
+        "description": "Once his body perishes, Adam Warlock can freely move as a soul and reforge his body at a chosen spot",
+        "cooldownSeconds": 105,
+        "category": "Abilities",
+        "iconUrl": "/rivals-assets/heros/adam-warlock/icons/regenerative-cocoon.png",
+        "stats": [
+          {
+            "label": "KEY",
+            "value": "Passive"
+          },
+          {
+            "label": "COOLDOWN",
+            "value": "105s"
+          }
+        ],
+        "siteOrder": 7
+      },
+      {
+        "id": "adam-warlock-heavenly-harmony",
+        "name": "Heavenly Harmony",
+        "keybind": "F",
+        "type": "Team-Up Abilities",
+        "description": "Storm channels her elemental power into Adam Warlock. When Adam uses Soaring Surge, his movement speed is increased. While flying, Adam leaves behind a storm-charged trail that heals and speeds up allies within it",
+        "category": "Team-Up Abilities",
+        "iconUrl": "/rivals-assets/heros/adam-warlock/icons/heavenly-harmony.png",
+        "stats": [
+          {
+            "label": "KEY",
+            "value": "F"
+          },
+          {
+            "label": "MOVEMENT BOOST",
+            "value": "5m/s"
+          },
+          {
+            "label": "MAXIMUM ENERGY",
+            "value": "120"
+          },
+          {
+            "label": "ENERGY COST",
+            "value": "30/s"
+          },
+          {
+            "label": "ENERGY RECOVERY SPEED",
+            "value": "8/s"
+          },
+          {
+            "label": "TRAIL WIDTH",
+            "value": "4m"
+          },
+          {
+            "label": "TRAIL DURATION",
+            "value": "5s"
+          },
+          {
+            "label": "HEALING AMOUNT",
+            "value": "35/s"
+          },
+          {
+            "label": "MOVEMENT BOOST",
+            "value": "0.25"
+          }
+        ],
+        "siteOrder": 8
+      }
+    ],
+    "combos": [],
+    "synergies": [],
+    "playstyle": {
+      "overview": "Core plan for this hero.",
+      "positioning": "Positioning and rotations guidance.",
+      "targetPriority": [
+        "Enemy type 1",
+        "Enemy type 2"
+      ],
+      "avoidPriority": [
+        "Threat 1",
+        "Threat 2"
+      ]
+    },
+    "externalResources": [],
+    "updatedAt": "2026-05-11"
+  },
+  {
+    "id": "angela",
+    "slug": "angela",
+    "name": "Angela",
+    "realName": "Aldrif Odinsdottir",
     "role": "Vanguard",
     "difficulty": 3,
-    "health": 700,
-    "portraitImage": "/heroes/captain-america-portrait.webp",
-    "splashImage": "/heroes/captain-america-splash.webp",
-    "summary": "A frontline disruptor who blocks burst damage and creates openings for duelists.",
-    "abilities": [
-      {
-        "id": "shield-bash",
-        "name": "Shield Bash",
-        "keybind": "E",
-        "type": "Crowd Control",
-        "description": "Charge forward and stun the first enemy hit.",
-        "damage": "65",
-        "cooldownSeconds": 8
-      },
-      {
-        "id": "liberty-throw",
-        "name": "Liberty Throw",
-        "keybind": "RMB",
-        "type": "Ranged Utility",
-        "description": "Throw shield to damage and briefly reveal marked enemies.",
-        "damage": "40",
-        "cooldownSeconds": 6
-      },
-      {
-        "id": "freedom-aegis",
-        "name": "Freedom Aegis",
-        "keybind": "Q",
-        "type": "Ultimate",
-        "description": "Project a large kinetic barrier that absorbs heavy incoming fire.",
-        "cooldownSeconds": 0
-      }
-    ],
-    "combos": [
-      {
-        "id": "engage-pick",
-        "name": "Engage Pick Combo",
-        "steps": [
-          "Close distance with movement ability.",
-          "Stun target with Shield Bash (E).",
-          "Call duelist follow-up while target is locked."
-        ],
-        "teamUp": "Works best with burst duelists that can secure stunned targets."
-      }
-    ],
-    "synergies": [
-      {
-        "hero": "Rocket Raccoon",
-        "reason": "Sustained support lets Captain hold space longer."
-      }
-    ],
-    "playstyle": {
-      "overview": "Anchor your team in chokepoints and deny entry angles.",
-      "positioning": "Hold off-angles near cover to rotate your shield efficiently.",
-      "targetPriority": ["Overextended duelists", "Enemy supports with no mobility"],
-      "avoidPriority": ["Long-range chip from multiple angles", "Hard anti-tank focus fire"]
-    },
-    "externalResources": [
-      {
-        "title": "Captain America Fundamentals",
-        "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        "type": "youtube"
-      }
-    ],
-    "updatedAt": "2026-05-01"
-  },
-  {
-    "id": "scarlet-witch",
-    "slug": "scarlet-witch",
-    "name": "Scarlet Witch",
-    "role": "Duelist",
-    "difficulty": 4,
-    "health": 600,
-    "portraitImage": "/heroes/scarlet-witch-portrait.webp",
-    "splashImage": "/heroes/scarlet-witch-splash.webp",
-    "summary": "A high-pressure skirmisher that excels at isolated target deletion and tempo control.",
-    "resource": {
-      "name": "Chaos Meter",
-      "description": "Build chaos through hits to amplify burst windows."
-    },
-    "abilities": [
-      {
-        "id": "hex-bolt",
-        "name": "Hex Bolt",
-        "keybind": "LMB",
-        "type": "Primary Fire",
-        "description": "Rapid magic bolts with strong close-mid pressure.",
-        "damage": "22 per bolt"
-      },
-      {
-        "id": "warp-seal",
-        "name": "Warp Seal",
-        "keybind": "Shift",
-        "type": "Mobility",
-        "description": "Short-range blink that resets line-of-sight.",
-        "cooldownSeconds": 7
-      },
-      {
-        "id": "chaos-collapse",
-        "name": "Chaos Collapse",
-        "keybind": "Q",
-        "type": "Ultimate",
-        "description": "Creates a vortex that drags enemies before detonating.",
-        "damage": "High AoE burst"
-      }
-    ],
-    "combos": [
-      {
-        "id": "blink-burst",
-        "name": "Blink Burst",
-        "steps": [
-          "Tag target from off-angle with Hex Bolt.",
-          "Blink past cover to force crosshair flick.",
-          "Commit burst during chaos meter spike."
-        ]
-      }
-    ],
-    "synergies": [
-      {
-        "hero": "Doctor Strange",
-        "reason": "Control tools keep enemies in Scarlet's burst range."
-      }
-    ],
-    "playstyle": {
-      "overview": "Play hit-and-run until cooldowns are baited, then all-in quickly.",
-      "positioning": "Abuse vertical and diagonal entry angles to avoid predictable peeks.",
-      "targetPriority": ["Low-mobility supports", "Damaged duelists"],
-      "avoidPriority": ["Layered hard CC", "Shielded frontlines without support pressure"]
-    },
-    "externalResources": [],
-    "updatedAt": "2026-05-01"
-  },
-  {
-    "id": "rocket-raccoon",
-    "slug": "rocket-raccoon",
-    "name": "Rocket Raccoon",
-    "role": "Strategist",
-    "difficulty": 2,
-    "health": 550,
-    "portraitImage": "/heroes/rocket-raccoon-portrait.webp",
-    "splashImage": "/heroes/rocket-raccoon-splash.webp",
-    "summary": "A flexible support strategist with strong utility and consistent sustain output.",
-    "abilities": [
-      {
-        "id": "repair-burst",
-        "name": "Repair Burst",
-        "keybind": "E",
-        "type": "Healing",
-        "description": "Deploy a short AoE heal with over-heal on full targets.",
-        "cooldownSeconds": 10
-      },
-      {
-        "id": "scrap-mine",
-        "name": "Scrap Mine",
-        "keybind": "RMB",
-        "type": "Zone Control",
-        "description": "Trap that slows and reveals enemies that pass through.",
-        "damage": "35",
-        "cooldownSeconds": 12
-      },
-      {
-        "id": "orbital-salvage",
-        "name": "Orbital Salvage",
-        "keybind": "Q",
-        "type": "Ultimate",
-        "description": "Summons a support drone swarm that heals allies and damages enemies.",
-        "damage": "Sustained AoE pulses"
-      }
-    ],
-    "combos": [
-      {
-        "id": "peel-loop",
-        "name": "Peel Loop",
-        "steps": [
-          "Drop Scrap Mine between diver and your backline.",
-          "Trigger Repair Burst as ally takes first burst.",
-          "Call frontline turn once diver cooldowns are spent."
-        ]
-      }
-    ],
-    "synergies": [
-      {
-        "hero": "Captain America",
-        "reason": "Sustain plus frontline shielding creates high objective uptime."
-      }
-    ],
-    "playstyle": {
-      "overview": "Control access points and keep your carries active with pre-emptive healing.",
-      "positioning": "Stay one lane behind your frontline and rotate around safe cover.",
-      "targetPriority": ["Assist on marked dive targets", "Enemy flankers entering your backline"],
-      "avoidPriority": ["Overextending without cooldowns", "Tunnel vision on damage output"]
-    },
-    "externalResources": [],
-    "updatedAt": "2026-05-01"
-  },
-  {
-    "id": "hulk",
-    "slug": "hulk",
-    "name": "Hulk",
-    "role": "Vanguard",
-    "difficulty": 4,
     "health": 650,
-    "portraitImage": "/heroes/captain-america-portrait.webp",
-    "splashImage": "/heroes/captain-america-splash.webp",
-    "summary": "A transformation-based frontliner that cycles between setup, brawl pressure, and empowered crowd control.",
-    "resource": {
-      "name": "Gamma Rage",
-      "description": "Build rage in combat to access stronger transformation windows."
-    },
+    "portraitImage": "/rivals-assets/heros/angela/angela.png",
+    "splashImage": "/rivals-assets/heros/angela/angela.png",
+    "summary": "As the Hand of Heven, the warrior called Angela embodies unwavering courage and determination. Able to manipulate Ichors into various weapons and unfurl her wings to soar across the battlefield, she is ready to deliver divine judgment upon her foes!",
     "abilities": [
       {
-        "id": "gamma-slam",
-        "name": "Gamma Slam",
-        "keybind": "E",
-        "type": "Disruption",
-        "description": "Leap and crash down to displace enemies in a small area.",
-        "damage": "60",
-        "cooldownSeconds": 9
-      },
-      {
-        "id": "thunderclap",
-        "name": "Thunderclap",
-        "keybind": "RMB",
-        "type": "Burst",
-        "description": "Release a short-range shockwave that pushes enemies back.",
-        "damage": "55",
-        "cooldownSeconds": 7
-      },
-      {
-        "id": "hulk-out",
-        "name": "Hulk Out",
-        "keybind": "Q",
-        "type": "Transformation",
-        "description": "Trigger empowered transformation and replace core abilities.",
-        "cooldownSeconds": 0
-      }
-    ],
-    "forms": [
-      {
-        "id": "bruce-banner",
-        "name": "Bruce Banner",
-        "shortLabel": "Banner",
-        "trigger": "Default Form",
-        "role": "Strategist",
-        "health": 500,
-        "summary": "A setup-focused form that pokes safely and prepares transformation timing.",
-        "abilities": [
+        "id": "angela-spear-of-ichors",
+        "name": "Spear Of Ichors",
+        "keybind": "LMB",
+        "type": "Normal Attack",
+        "description": "Lunge forward with your spear, dealing damage that increases with Attack Charge. At full charge, Spear of Ichor can launch up enemies",
+        "damage": "45",
+        "category": "Normal Attack",
+        "iconUrl": "/rivals-assets/heros/angela/icons/spear-of-ichors.png",
+        "keybindIconUrl": "/rivals-assets/icons/LMB-icon.png",
+        "stats": [
           {
-            "id": "gamma-pistol",
-            "name": "Gamma Pistol",
-            "keybind": "LMB",
-            "type": "Primary Fire",
-            "description": "Sustained ranged poke that builds Gamma Rage.",
-            "damage": "18 per shot"
+            "label": "KEY",
+            "value": "LMB"
           },
           {
-            "id": "gamma-barrier",
-            "name": "Gamma Barrier",
-            "keybind": "E",
-            "type": "Utility",
-            "description": "Deploy a short-duration barrier to survive dives.",
-            "cooldownSeconds": 12
+            "label": "CASTING",
+            "value": "Melee"
           },
           {
-            "id": "mutate",
-            "name": "Mutate",
-            "keybind": "Q",
-            "type": "Transformation",
-            "description": "Transform into Hero Hulk when Gamma Rage is full.",
-            "cooldownSeconds": 0
+            "label": "DAMAGE",
+            "value": "45"
+          },
+          {
+            "label": "CHARGE-DAMAGE CONVERSION RATIO",
+            "value": "35%"
+          },
+          {
+            "label": "MAXIMUM DISTANCE",
+            "value": "7m"
+          },
+          {
+            "label": "ATTACK INTERVAL",
+            "value": "0.96s per hit"
+          },
+          {
+            "label": "SPECIAL EFFECT",
+            "value": "At full charge, Spear of Ichor can launch up enemies and cause 20 extra damage."
           }
-        ]
-      },
-      {
-        "id": "hero-hulk",
-        "name": "Hero Hulk",
-        "shortLabel": "Hero Hulk",
-        "trigger": "Mutate",
-        "role": "Vanguard",
-        "health": 800,
-        "summary": "Primary frontline form with high space control and dive interruption.",
-        "abilities": [
-          {
-            "id": "gamma-slam-form",
-            "name": "Gamma Slam",
-            "keybind": "E",
-            "type": "Disruption",
-            "description": "Leap and crash down to displace enemies in a small area.",
-            "damage": "60",
-            "cooldownSeconds": 9
-          },
-          {
-            "id": "thunderclap-form",
-            "name": "Thunderclap",
-            "keybind": "RMB",
-            "type": "Burst",
-            "description": "Release a short-range shockwave that pushes enemies back.",
-            "damage": "55",
-            "cooldownSeconds": 7
-          },
-          {
-            "id": "gamma-guard",
-            "name": "Gamma Guard",
-            "keybind": "Shift",
-            "type": "Defensive",
-            "description": "Reduce incoming damage while charging a counter shockwave.",
-            "cooldownSeconds": 10
-          }
-        ]
-      },
-      {
-        "id": "monster-hulk",
-        "name": "Monster Hulk",
-        "shortLabel": "Monster",
-        "trigger": "Ultimate",
-        "role": "Vanguard",
-        "health": 1000,
-        "summary": "Short empowered form with stronger crowd control and burst finish potential.",
-        "abilities": [
-          {
-            "id": "worldbreaker-slam",
-            "name": "Worldbreaker Slam",
-            "keybind": "E",
-            "type": "Crowd Control",
-            "description": "Heavy leap slam with a larger knock-up radius.",
-            "damage": "95",
-            "cooldownSeconds": 8
-          },
-          {
-            "id": "seismic-clap",
-            "name": "Seismic Clap",
-            "keybind": "RMB",
-            "type": "Burst",
-            "description": "Empowered clap that chains damage in a cone.",
-            "damage": "85",
-            "cooldownSeconds": 6
-          },
-          {
-            "id": "unstoppable-rage",
-            "name": "Unstoppable Rage",
-            "keybind": "Shift",
-            "type": "Mobility",
-            "description": "Gain movement speed and unstoppable status during engage.",
-            "cooldownSeconds": 10
-          }
-        ]
-      }
-    ],
-    "defaultFormId": "hero-hulk",
-    "combos": [
-      {
-        "id": "mutate-engage",
-        "name": "Mutate Frontline Engage",
-        "steps": [
-          "Build Gamma Rage while poking in Banner form.",
-          "Mutate into Hero Hulk at objective entry timing.",
-          "Open with Gamma Slam, then clap to force cooldowns."
         ],
-        "teamUp": "Pair with follow-up burst to convert displacement into picks."
-      }
-    ],
-    "synergies": [
+        "siteOrder": 1
+      },
       {
-        "hero": "Rocket Raccoon",
-        "reason": "Sustain and utility increase Hulk's frontline uptime during transform windows."
+        "id": "angela-axes-of-ichors",
+        "name": "Axes Of Ichors",
+        "keybind": "LMB",
+        "type": "Normal Attack",
+        "description": "Alternate powerful strikes forward with twin axes, dealing increased damage as Attack Charge grows. The fourth strike propels you forward in a swift dash",
+        "damage": "First three strikes: 30; the forth strike: 50.",
+        "category": "Normal Attack",
+        "iconUrl": "/rivals-assets/heros/angela/icons/axes-of-ichors.png",
+        "keybindIconUrl": "/rivals-assets/icons/LMB-icon.png",
+        "stats": [
+          {
+            "label": "KEY",
+            "value": "LMB"
+          },
+          {
+            "label": "CASTING",
+            "value": "Melee"
+          },
+          {
+            "label": "DAMAGE",
+            "value": "First three strikes: 30; the forth strike: 50."
+          },
+          {
+            "label": "CHARGE-DAMAGE CONVERSION RATIO",
+            "value": "45%"
+          },
+          {
+            "label": "MAXIMUM DISTANCE",
+            "value": "4m"
+          },
+          {
+            "label": "ATTACK INTERVAL",
+            "value": "First three strikes: 0.4s per hit; the forth strike: 0.6s per hit."
+          },
+          {
+            "label": "SPECIAL EFFECT",
+            "value": "The fourth strike propels you forward in a swift dash."
+          }
+        ],
+        "siteOrder": 2
+      },
+      {
+        "id": "angela-shielded-stance",
+        "name": "Shielded Stance",
+        "keybind": "RMB",
+        "type": "Abilities",
+        "description": "Transform Ichors into a shield, gaining Attack Charge when absorbing damage",
+        "damage": "35%",
+        "cooldownSeconds": 1.5,
+        "category": "Abilities",
+        "iconUrl": "/rivals-assets/heros/angela/icons/shielded-stance.png",
+        "keybindIconUrl": "/rivals-assets/icons/RMB-icon.png",
+        "stats": [
+          {
+            "label": "KEY",
+            "value": "RMB"
+          },
+          {
+            "label": "MAXIMUM SHIELD VALUE",
+            "value": "300"
+          },
+          {
+            "label": "COOLDOWN",
+            "value": "1.5s"
+          },
+          {
+            "label": "COOLDOWN AFTER DESTROYED",
+            "value": "4s"
+          },
+          {
+            "label": "DELAYED RECOVERY AFTER RELEASE",
+            "value": "2s"
+          },
+          {
+            "label": "RECOVERY SPEED",
+            "value": "50/s"
+          },
+          {
+            "label": "DAMAGE RESISTED-CHARGE CONVERSION RATIO",
+            "value": "35%"
+          }
+        ],
+        "siteOrder": 3
+      },
+      {
+        "id": "angela-seraphic-soar",
+        "name": "Seraphic Soar",
+        "keybind": "PASSIVE",
+        "type": "Abilities",
+        "description": "Glide freely through the air. Continuous flight builds Attack Charge",
+        "category": "Abilities",
+        "iconUrl": "/rivals-assets/heros/angela/icons/seraphic-soar.png",
+        "stats": [
+          {
+            "label": "KEY",
+            "value": "PASSIVE"
+          },
+          {
+            "label": "TIME REQUIRED TO ENTER GLIDE",
+            "value": "0.1s"
+          },
+          {
+            "label": "GLIDE ACTIVATION CONDITION",
+            "value": "Maintain the forward speed faster than 5m/s for 1s"
+          },
+          {
+            "label": "GLIDE SPEED",
+            "value": "10m/s"
+          },
+          {
+            "label": "PASSIVE ENERGY GAINED DURING GLIDE",
+            "value": "22.2/s"
+          }
+        ],
+        "siteOrder": 4
+      },
+      {
+        "id": "angela-divine-judgement",
+        "name": "Divine Judgement",
+        "keybind": "E",
+        "type": "Abilities",
+        "description": "Dive downward, switch to twin axes and infuse the ground with Ichors to create a Divine Judgement Zone upon impact. Within the zone, gain enhanced Speed and attacks grant Bonus Health to self and nearby allies",
+        "damage": "Hit damage: 30; damage over time: 12.5/s",
+        "cooldownSeconds": 12,
+        "category": "Abilities",
+        "iconUrl": "/rivals-assets/heros/angela/icons/divine-judgement.png",
+        "stats": [
+          {
+            "label": "KEY",
+            "value": "E"
+          },
+          {
+            "label": "DAMAGE",
+            "value": "Hit damage: 30; damage over time: 12.5/s"
+          },
+          {
+            "label": "DAMAGE OVER TIME SPELL FIELD RANGE",
+            "value": "A cylindrical spell field with a radius of 8m and a height of 2m."
+          },
+          {
+            "label": "COOLDOWN",
+            "value": "12s"
+          },
+          {
+            "label": "MOVEMENT BOOST (SELF)",
+            "value": "35%"
+          },
+          {
+            "label": "SPELL FIELD DURATION",
+            "value": "6s"
+          },
+          {
+            "label": "BONUS HEALTH",
+            "value": "Within the Divine Judgement zone, Angelaâ€™s each Axes of Ichors hit grants 50 Bonus Health to herself and 25 Bonus Health to allies within the area."
+          },
+          {
+            "label": "BONUS MAX HEALTH",
+            "value": "200"
+          }
+        ],
+        "siteOrder": 5
+      },
+      {
+        "id": "angela-wingblade-ascent",
+        "name": "Wingblade Ascent",
+        "keybind": "E",
+        "type": "Abilities",
+        "description": "Take to the skies, switching back to Spear of Ichors",
+        "category": "Abilities",
+        "iconUrl": "/rivals-assets/heros/angela/icons/wingblade-ascent.png",
+        "stats": [
+          {
+            "label": "KEY",
+            "value": "E"
+          },
+          {
+            "label": "ASCENT HEIGHT",
+            "value": "8m"
+          },
+          {
+            "label": "ASCENT DURATION",
+            "value": "0.35s"
+          },
+          {
+            "label": "ASCENT ELEVATION ANGLE",
+            "value": "60Â°"
+          }
+        ],
+        "siteOrder": 6
+      },
+      {
+        "id": "angela-assassin-s-charge",
+        "name": "Assassin'S Charge",
+        "keybind": "SHIFT",
+        "type": "Abilities",
+        "description": "Enter an accelerated dash state,  enemies struck head-on are carried through the air for a short distance",
+        "damage": "30",
+        "cooldownSeconds": 6,
+        "category": "Abilities",
+        "iconUrl": "/rivals-assets/heros/angela/icons/assassin-s-charge.png",
+        "stats": [
+          {
+            "label": "KEY",
+            "value": "Shift"
+          },
+          {
+            "label": "COOLDOWN",
+            "value": "6s"
+          },
+          {
+            "label": "MAXIMUM ENERGY",
+            "value": "100"
+          },
+          {
+            "label": "ENERGY RECOVERY SPEED",
+            "value": "12.5/s"
+          },
+          {
+            "label": "ENERGY COST",
+            "value": "25/s; 75/s when piercing an enemy"
+          },
+          {
+            "label": "ONE-TIME ENERGY COST",
+            "value": "20"
+          },
+          {
+            "label": "ENERGY REQUIRED TO ACTIVATE THE ABILITY",
+            "value": "30"
+          },
+          {
+            "label": "RECOVER DELAY",
+            "value": "2"
+          },
+          {
+            "label": "DASH STATE SPEED",
+            "value": "18 m/s"
+          },
+          {
+            "label": "MAXIMUM ENEMIES COULD BE CARRIED",
+            "value": "2"
+          },
+          {
+            "label": "PASSIVE ENERGY GAINED DURING THE DASH",
+            "value": "25/s"
+          },
+          {
+            "label": "SPECIAL EFFECT",
+            "value": "Every enemy pierced grants Angela with a 50/s passive energy recovery."
+          },
+          {
+            "label": "PIERCING DAMAGE",
+            "value": "30"
+          }
+        ],
+        "siteOrder": 7
+      },
+      {
+        "id": "angela-heven-s-retribution",
+        "name": "Heven'S Retribution",
+        "keybind": "Q",
+        "type": "Abilities",
+        "description": "Wrap your spear in ribbons and hurl it with force. Upon impact, the ribbons bind nearby enemies. Angela can leap to the spear's location, damaging surrounding enemies and creating a Divine Judgement Zone",
+        "damage": "40",
+        "category": "Abilities",
+        "iconUrl": "/rivals-assets/heros/angela/icons/heven-s-retribution.png",
+        "stats": [
+          {
+            "label": "KEY",
+            "value": "Q"
+          },
+          {
+            "label": "ENERGY COST",
+            "value": "3100"
+          },
+          {
+            "label": "PROJECTILE SPEED",
+            "value": "60 m/s"
+          },
+          {
+            "label": "SPELL FIELD DAMAGE",
+            "value": "40"
+          },
+          {
+            "label": "SPELL FIELD RANGE",
+            "value": "8m spherical radius"
+          },
+          {
+            "label": "HIT GROUND DAMAGE",
+            "value": "100"
+          },
+          {
+            "label": "HIT GROUND SPELL FIELD RANGE",
+            "value": "8m spherical radius"
+          },
+          {
+            "label": "SPECIAL EFFECT",
+            "value": "Mobility abilities of enemies bound by the ribbons will be disabled. Enemies within a certain distance around the spear will be slowed."
+          },
+          {
+            "label": "SLOW RATE",
+            "value": "80%"
+          },
+          {
+            "label": "PROJECTILE DAMAGE",
+            "value": "30"
+          },
+          {
+            "label": "SUMMONS' HEALTH",
+            "value": "650"
+          }
+        ],
+        "siteOrder": 8
+      },
+      {
+        "id": "angela-celestial-command",
+        "name": "Celestial Command",
+        "keybind": "PASSIVE",
+        "type": "Team-Up Abilities",
+        "description": "Angela shares fragments of her Ichors with Thor, empowering him to hurl a Thunder Spear that restores Thorforce for each enemy struck. Afterward, Thor can leap to the spear's explosion point, dealing a second wave of damage to all enemies within range",
+        "category": "Team-Up Abilities",
+        "iconUrl": "/rivals-assets/heros/angela/icons/celestial-command.png",
+        "stats": [
+          {
+            "label": "KEY",
+            "value": "Passive"
+          },
+          {
+            "label": "TEAM-UP BONUS",
+            "value": "+100 Max Health"
+          }
+        ],
+        "siteOrder": 9
       }
     ],
+    "combos": [],
+    "synergies": [],
     "playstyle": {
-      "overview": "Cycle forms around objective timings and avoid wasting empowered windows on low-value targets.",
-      "positioning": "Use Banner form from safe angles, then take aggressive space once transformed.",
-      "targetPriority": ["Stacked backline players", "Immobile damage dealers"],
-      "avoidPriority": ["Kiting in open sightlines", "Overcommitting without support follow-up"]
+      "overview": "Core plan for this hero.",
+      "positioning": "Positioning and rotations guidance.",
+      "targetPriority": [
+        "Enemy type 1",
+        "Enemy type 2"
+      ],
+      "avoidPriority": [
+        "Threat 1",
+        "Threat 2"
+      ]
     },
     "externalResources": [],
-    "updatedAt": "2026-05-08"
+    "updatedAt": "2026-05-11"
   }
 ]

@@ -25,4 +25,4 @@ export const externalProviderConfig = {
   },
 };
 
-export type ContentSource = "api" | "local";
+export type ContentSource = "api" | "local" | "codex";

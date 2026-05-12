@@ -19,8 +19,8 @@ export function HeroCard({
 }: HeroCardProps) {
   return (
     <ClippedPanel
-      tone="gold"
-      className="cinematic-glow overflow-hidden border border-brand-gold/35 transition-transform duration-300 hover:-translate-y-1"
+      tone="sheet"
+      className="brand-glow overflow-hidden transition-transform duration-300 hover:-translate-y-1"
     >
       <div className="group relative h-52 w-full overflow-hidden">
         <Image
@@ -29,12 +29,11 @@ export function HeroCard({
           fill
           sizes="(max-width: 768px) 100vw, 33vw"
           quality={55}
-          unoptimized
           loading={prioritizeImage ? "eager" : "lazy"}
           fetchPriority={prioritizeImage ? "high" : "auto"}
           className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
         />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0a0b14] to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background to-transparent" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-brand-gold/15" />
         <button
           type="button"
@@ -42,8 +41,8 @@ export function HeroCard({
           aria-label={isFavorite ? "Remove favorite" : "Add favorite"}
           className={`absolute right-3 top-3 rounded-full border px-2 py-1 text-xs font-semibold uppercase tracking-wide transition ${
             isFavorite
-              ? "border-brand-gold bg-brand-gold text-[#11131e]"
-              : "border-brand-gold/55 bg-[#0e1220]/85 text-brand-gold hover:border-brand-gold hover:bg-brand-gold hover:text-[#11131e]"
+              ? "border-brand-gold bg-brand-gold text-rivals-ink"
+              : "border-brand-gold/55 bg-background/85 text-brand-gold hover:border-brand-gold hover:bg-brand-gold hover:text-rivals-ink"
           }`}
         >
           {isFavorite ? "Favorited" : "Favorite"}
@@ -67,7 +66,7 @@ export function HeroCard({
         </div>
         <Link
           href={`/heroes/${hero.slug}`}
-          className="clipped-edge inline-flex w-full items-center justify-center border border-brand-gold/55 bg-brand-gold-muted px-4 py-2 text-sm font-semibold uppercase tracking-wide text-brand-gold transition hover:border-brand-gold hover:bg-brand-gold hover:text-[#11131e]"
+          className="clipped-edge inline-flex w-full items-center justify-center border border-brand-gold/55 bg-brand-gold-muted px-4 py-2 text-sm font-semibold uppercase tracking-wide text-brand-gold transition hover:border-brand-gold hover:bg-brand-gold hover:text-rivals-ink"
         >
           Open Dossier
         </Link>

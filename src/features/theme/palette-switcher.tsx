@@ -43,7 +43,7 @@ export function PaletteSwitcher() {
         onChange={handleChange}
         suppressHydrationWarning
         aria-label="Color palette"
-        className="max-w-[9.5rem] cursor-pointer rounded border border-panel-border bg-panel/90 py-1.5 pl-2 pr-6 text-[11px] font-medium uppercase tracking-wide text-foreground shadow-sm outline-none backdrop-blur-sm focus:border-brand-gold/55 focus:ring-1 focus:ring-brand-gold/35 sm:max-w-[11rem] sm:text-xs"
+        className="max-w-[9.5rem] cursor-pointer rounded border border-brand-gold/45 bg-panel/90 py-1.5 pl-2 pr-6 text-[11px] font-medium uppercase tracking-wide text-foreground shadow-sm outline-none backdrop-blur-sm focus:border-brand-gold focus:ring-1 focus:ring-brand-gold/40 sm:max-w-[11rem] sm:text-xs"
       >
         {PALETTE_OPTIONS.map((option) => (
           <option key={option.id} value={option.id}>
