@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+import {
+  comboStepSchema,
+  comboDifficultySchema,
+} from "@/data/schema";
+
 /**
  * Storage decision:
  * - Near-term: Supabase-backed editorial JSON (`hero_editorial.content.heroGuideTabs`)
@@ -56,6 +61,13 @@ export const heroGuideBlockSchema = z.discriminatedUnion("type", [
     type: z.literal("combo"),
     name: z.string().trim().min(1).max(120),
     steps: z.array(z.string().trim().min(1).max(400)).min(1).max(12),
+    structuredSteps: z.array(comboStepSchema).optional(),
+    difficulty: comboDifficultySchema.optional(),
+    resourceCost: z.object({
+      resourceName: z.string().trim().min(1).max(60),
+      startingAmount: z.number(),
+      perStepDelta: z.array(z.number()).optional(),
+    }).optional(),
     condition: z.string().trim().max(500).optional(),
     clip: heroGuideClipSchema.optional(),
   }),

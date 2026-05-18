@@ -1,309 +1,231 @@
 "use client";
 
+import { type ReactNode, useMemo, useState } from "react";
 import type { HeroGuideBlock } from "@/features/heroes/hero-guide-schema";
-import { LazyVideoEmbed } from "@/features/heroes/components/lazy-video-embed";
-import { getYoutubeEmbedUrl } from "@/features/heroes/youtube";
+import type { ResolvedAbilityRef } from "@/features/heroes/ability-lookup";
+import { DIFFICULTY_TIERS } from "@/features/heroes/combo-display";
+import {
+  buildHeroGuideBodyNavItems,
+  buildPortraitLookup,
+  findPortraitByOpponent,
+  type HeroGuideBodyNavItem,
+  type HeroPortraitEntry,
+} from "./hero-guide-body/types";
+import { BlockCallout } from "./hero-guide-body/block-callout";
+import { BlockBullets } from "./hero-guide-body/block-bullets";
+import { BlockTwoColumn } from "./hero-guide-body/block-two-column";
+import { BlockCombo } from "./hero-guide-body/block-combo";
+import { BlockMatchup } from "./hero-guide-body/block-matchup";
+import { BlockVideo } from "./hero-guide-body/block-video";
+import {
+  ComboFilterPills,
+  DifficultyGroupHeader,
+} from "./hero-guide-body/combo-groups";
 
-export type HeroGuideBodyNavItem = {
-  id: string;
-  label: string;
+// Re-export public types and helpers so existing callers don't break.
+export type { HeroGuideBodyNavItem, HeroPortraitEntry };
+export { buildHeroGuideBodyNavItems };
+
+type ComboBlock = Extract<HeroGuideBlock, { type: "combo" }>;
+
+type IndexedComboBlock = {
+  block: ComboBlock;
+  index: number;
 };
 
-function slugify(value: string): string {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 48);
-}
-
-function getBlockLabel(block: HeroGuideBlock, index: number): string {
-  switch (block.type) {
-    case "callout":
-      return block.title ?? `Callout ${index + 1}`;
-    case "bullets":
-      return block.title ?? `Key points ${index + 1}`;
-    case "twoColumn":
-      return `${block.leftTitle} / ${block.rightTitle}`;
-    case "combo":
-      return block.name;
-    case "matchup":
-      return `${block.disposition === "target" ? "Target" : "Threat"}: ${block.opponent}`;
-    case "video":
-      return block.title;
-  }
-}
-
-export function buildHeroGuideBodyNavItems(
-  blocks: HeroGuideBlock[],
-  anchorPrefix: string,
-): HeroGuideBodyNavItem[] {
-  return blocks.map((block, index) => {
-    const label = getBlockLabel(block, index);
-    const labelSlug = slugify(label) || `${block.type}-${index + 1}`;
-    return {
-      id: `${anchorPrefix}-${index + 1}-${labelSlug}`,
-      label,
-    };
-  });
-}
-
-function GuideClip({ label, href }: { label: string; href: string }) {
-  const embedUrl = getYoutubeEmbedUrl(href);
-  if (!embedUrl) {
-    return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noreferrer"
-        className="inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-semibold text-rivals-ink underline decoration-rivals-yellow-600/80 underline-offset-2 hover:text-rivals-yellow-800"
-      >
-        {label}
-        <span aria-hidden>→</span>
-      </a>
-    );
-  }
-  return <LazyVideoEmbed title={label} embedUrl={embedUrl} />;
-}
-
-function BlockCallout({
-  variant,
-  title,
-  body,
+/**
+ * Section wrapper applied to every rendered block. Adds the scroll anchor
+ * + the reveal-on-scroll animation hook. Pulled out so each block-render
+ * site stays tiny and consistent.
+ */
+function GuideSection({
+  id,
+  children,
 }: {
-  variant?: "gameplan" | "macro" | "tip";
-  title?: string;
-  body: string;
-}) {
-  const tone =
-    variant === "macro"
-      ? "border-cyan-500/35 bg-cyan-50/90"
-      : variant === "tip"
-        ? "border-rivals-yellow-500/40 bg-rivals-yellow-50/80"
-        : "border-rivals-ink/15 bg-rivals-light-200/90";
-
-  return (
-    <div className={`rounded border px-4 py-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm ${tone}`}>
-      {title ? (
-        <p className="font-display text-[11px] uppercase tracking-[0.22em] text-rivals-ink-muted">
-          {title}
-        </p>
-      ) : null}
-      <p className={`text-sm leading-6 text-rivals-ink-soft sm:text-[15px] sm:leading-7 ${title ? "mt-2" : ""}`}>
-        {body}
-      </p>
-    </div>
-  );
-}
-
-function BlockBullets({ title, items }: { title?: string; items: string[] }) {
-  return (
-    <div>
-      {title ? (
-        <p className="font-display text-[11px] uppercase tracking-[0.22em] text-rivals-ink-muted">
-          {title}
-        </p>
-      ) : null}
-      <ul
-        className={`mt-2 list-disc space-y-1.5 pl-4 text-sm leading-6 text-rivals-ink-soft sm:text-[15px] ${title ? "" : "mt-0"}`}
-      >
-        {items.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function BlockTwoColumn({
-  leftTitle,
-  leftItems,
-  rightTitle,
-  rightItems,
-}: {
-  leftTitle: string;
-  leftItems: string[];
-  rightTitle: string;
-  rightItems: string[];
+  id: string;
+  children: ReactNode;
 }) {
   return (
-    <div className="grid gap-5 sm:grid-cols-2">
-      <div className="rounded border border-emerald-600/20 bg-emerald-50/50 px-3 py-3 transition-all duration-200 hover:shadow-sm sm:px-4">
-        <p className="font-display text-[11px] uppercase tracking-[0.22em] text-emerald-900/70">
-          {leftTitle}
-        </p>
-        <ul className="mt-2 list-disc space-y-1.5 pl-4 text-sm leading-6 text-rivals-ink-soft sm:text-[15px]">
-          {leftItems.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </div>
-      <div className="rounded border border-rose-500/25 bg-rose-50/50 px-3 py-3 transition-all duration-200 hover:shadow-sm sm:px-4">
-        <p className="font-display text-[11px] uppercase tracking-[0.22em] text-rose-900/70">
-          {rightTitle}
-        </p>
-        <ul className="mt-2 list-disc space-y-1.5 pl-4 text-sm leading-6 text-rivals-ink-soft sm:text-[15px]">
-          {rightItems.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </div>
-    </div>
+    <section id={id} className="scroll-reveal scroll-mt-28">
+      {children}
+    </section>
   );
 }
 
-function BlockCombo({
-  name,
-  steps,
-  condition,
-  clip,
-}: {
-  name: string;
-  steps: string[];
-  condition?: string;
-  clip?: { label: string; href: string };
-}) {
-  return (
-    <div className="rounded border border-rivals-ink/12 bg-white/80 px-4 py-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <p className="font-display text-sm font-extrabold uppercase italic text-rivals-ink">{name}</p>
-      {condition ? (
-        <p className="mt-1 text-xs leading-5 text-rivals-ink-muted">{condition}</p>
-      ) : null}
-      <ol className="mt-2 list-decimal space-y-1 pl-4 text-sm leading-6 text-rivals-ink-soft sm:text-[15px]">
-        {steps.map((step) => (
-          <li key={step}>{step}</li>
-        ))}
-      </ol>
-      {clip ? (
-        <div className="mt-3 max-w-lg border-t border-rivals-light-300 pt-3">
-          <p className="mb-2 text-[11px] uppercase tracking-[0.18em] text-rivals-ink-muted">
-            Example clip
-          </p>
-          <GuideClip label={clip.label} href={clip.href} />
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function BlockMatchup({
-  disposition,
-  opponent,
-  summary,
-  clip,
-}: {
-  disposition: "target" | "threat";
-  opponent: string;
-  summary: string;
-  clip?: { label: string; href: string };
-}) {
-  const isTarget = disposition === "target";
-  const shell = isTarget
-    ? "border-emerald-600/25 bg-emerald-50/40"
-    : "border-rose-500/30 bg-rose-50/45";
-  const badge = isTarget ? "text-emerald-900/80" : "text-rose-900/80";
-  const badgeText = isTarget ? "Target" : "Threat";
-
-  return (
-    <div className={`rounded border px-4 py-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm ${shell}`}>
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <p className={`font-display text-xs font-bold uppercase italic tracking-wide ${badge}`}>
-          {badgeText}: {opponent}
-        </p>
-      </div>
-      <p className="mt-2 text-sm leading-6 text-rivals-ink-soft sm:text-[15px]">{summary}</p>
-      {clip ? (
-        <div className="mt-3 max-w-lg">
-          <GuideClip label={clip.label} href={clip.href} />
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function BlockVideo({ title, watchUrl }: { title: string; watchUrl: string }) {
-  return (
-    <div>
-      <p className="mb-2 font-display text-[11px] uppercase tracking-[0.18em] text-rivals-ink-muted">
-        Video
-      </p>
-      <GuideClip label={title} href={watchUrl} />
-    </div>
-  );
-}
+type HeroGuideBodyProps = {
+  blocks: HeroGuideBlock[];
+  anchorPrefix: string;
+  abilityLookup?: Map<string, ResolvedAbilityRef>;
+  heroPortraits?: HeroPortraitEntry[];
+};
 
 export function HeroGuideBody({
   blocks,
   anchorPrefix,
-}: {
-  blocks: HeroGuideBlock[];
-  anchorPrefix: string;
-}) {
-  const navItems = buildHeroGuideBodyNavItems(blocks, anchorPrefix);
+  abilityLookup,
+  heroPortraits,
+}: HeroGuideBodyProps) {
+  const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
+
+  const navItems = useMemo(
+    () => buildHeroGuideBodyNavItems(blocks, anchorPrefix),
+    [blocks, anchorPrefix],
+  );
+
+  const portraitLookup = useMemo(
+    () => buildPortraitLookup(heroPortraits),
+    [heroPortraits],
+  );
+
+  // Compute combo grouping once per blocks change. `groupedCombos` is null
+  // unless there are ≥2 tagged combos -- below that threshold we render
+  // each combo inline like the other block types so single-combo tabs
+  // don't pick up an unnecessary section header.
+  const comboMeta = useMemo(() => {
+    const indexed: IndexedComboBlock[] = [];
+    blocks.forEach((block, index) => {
+      if (block.type === "combo") indexed.push({ block, index });
+    });
+
+    const taggedCount = indexed.filter((c) => c.block.difficulty).length;
+    const hasDifficultyTags = taggedCount >= 2;
+
+    if (!hasDifficultyTags) {
+      return {
+        hasDifficultyTags: false,
+        renderedComboIndices: new Set<number>(),
+        availableDifficulties: new Set<string>(),
+        groups: null,
+        untagged: [] as IndexedComboBlock[],
+      };
+    }
+
+    const availableDifficulties = new Set<string>();
+    for (const c of indexed) {
+      if (c.block.difficulty) availableDifficulties.add(c.block.difficulty);
+    }
+
+    const groups = DIFFICULTY_TIERS
+      .filter((tier) => availableDifficulties.has(tier.key))
+      .map((tier) => ({
+        tier,
+        combos: indexed.filter((c) => c.block.difficulty === tier.key),
+      }));
+
+    const untagged = indexed.filter((c) => !c.block.difficulty);
+    const renderedComboIndices = new Set<number>(indexed.map((c) => c.index));
+
+    return {
+      hasDifficultyTags: true,
+      renderedComboIndices,
+      availableDifficulties,
+      groups,
+      untagged,
+    };
+  }, [blocks]);
+
+  const renderBlock = (block: HeroGuideBlock, index: number): ReactNode => {
+    const navItem = navItems[index];
+
+    switch (block.type) {
+      case "callout":
+        return (
+          <GuideSection id={navItem.id}>
+            <BlockCallout variant={block.variant} title={block.title} body={block.body} />
+          </GuideSection>
+        );
+      case "bullets":
+        return (
+          <GuideSection id={navItem.id}>
+            <BlockBullets title={block.title} items={block.items} />
+          </GuideSection>
+        );
+      case "twoColumn":
+        return (
+          <GuideSection id={navItem.id}>
+            <BlockTwoColumn
+              leftTitle={block.leftTitle}
+              leftItems={block.leftItems}
+              rightTitle={block.rightTitle}
+              rightItems={block.rightItems}
+            />
+          </GuideSection>
+        );
+      case "combo":
+        return (
+          <GuideSection id={navItem.id}>
+            <BlockCombo block={block} abilityLookup={abilityLookup} clip={block.clip} />
+          </GuideSection>
+        );
+      case "matchup":
+        return (
+          <GuideSection id={navItem.id}>
+            <BlockMatchup
+              disposition={block.disposition}
+              opponent={block.opponent}
+              summary={block.summary}
+              clip={block.clip}
+              portrait={findPortraitByOpponent(portraitLookup, block.opponent)}
+            />
+          </GuideSection>
+        );
+      case "video":
+        return (
+          <GuideSection id={navItem.id}>
+            <BlockVideo title={block.title} watchUrl={block.watchUrl} />
+          </GuideSection>
+        );
+    }
+  };
+
+  let comboGroupInserted = false;
 
   return (
     <div className="space-y-6 pb-1 sm:space-y-5">
       {blocks.map((block, index) => {
-        const key = `${block.type}-${index}`;
-        const navItem = navItems[index];
-        switch (block.type) {
-          case "callout":
-            return (
-              <section key={key} id={navItem.id} className="scroll-mt-28">
-                <BlockCallout
-                  variant={block.variant}
-                  title={block.title}
-                  body={block.body}
-                />
-              </section>
-            );
-          case "bullets":
-            return (
-              <section key={key} id={navItem.id} className="scroll-mt-28">
-                <BlockBullets title={block.title} items={block.items} />
-              </section>
-            );
-          case "twoColumn":
-            return (
-              <section key={key} id={navItem.id} className="scroll-mt-28">
-                <BlockTwoColumn
-                  leftTitle={block.leftTitle}
-                  leftItems={block.leftItems}
-                  rightTitle={block.rightTitle}
-                  rightItems={block.rightItems}
-                />
-              </section>
-            );
-          case "combo":
-            return (
-              <section key={key} id={navItem.id} className="scroll-mt-28">
-                <BlockCombo
-                  name={block.name}
-                  steps={block.steps}
-                  condition={block.condition}
-                  clip={block.clip}
-                />
-              </section>
-            );
-          case "matchup":
-            return (
-              <section key={key} id={navItem.id} className="scroll-mt-28">
-                <BlockMatchup
-                  disposition={block.disposition}
-                  opponent={block.opponent}
-                  summary={block.summary}
-                  clip={block.clip}
-                />
-              </section>
-            );
-          case "video":
-            return (
-              <section key={key} id={navItem.id} className="scroll-mt-28">
-                <BlockVideo title={block.title} watchUrl={block.watchUrl} />
-              </section>
-            );
+        // When difficulty tags are present, all combo blocks render together
+        // inside a single grouped section in place of the first combo block.
+        if (comboMeta.hasDifficultyTags && comboMeta.renderedComboIndices.has(index)) {
+          if (comboGroupInserted) return null;
+          comboGroupInserted = true;
+
+          return (
+            <div key="combo-groups" className="space-y-6">
+              <ComboFilterPills
+                active={difficultyFilter}
+                onChange={setDifficultyFilter}
+                availableDifficulties={comboMeta.availableDifficulties}
+              />
+
+              {comboMeta.groups?.map(({ tier, combos }) => {
+                if (difficultyFilter !== "all" && difficultyFilter !== tier.key) {
+                  return null;
+                }
+                if (combos.length === 0) return null;
+                return (
+                  <div key={tier.key} className="scroll-reveal space-y-4">
+                    <DifficultyGroupHeader label={tier.label} className={tier.lightClass} />
+                    {combos.map(({ block: comboBlock, index: comboIndex }) => (
+                      <div key={`combo-${comboIndex}`}>
+                        {renderBlock(comboBlock, comboIndex)}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+
+              {comboMeta.untagged.length > 0 && difficultyFilter === "all"
+                ? comboMeta.untagged.map(({ block: comboBlock, index: comboIndex }) => (
+                    <div key={`combo-untagged-${comboIndex}`}>
+                      {renderBlock(comboBlock, comboIndex)}
+                    </div>
+                  ))
+                : null}
+            </div>
+          );
         }
+
+        return <div key={`block-${index}-${block.type}`}>{renderBlock(block, index)}</div>;
       })}
     </div>
   );

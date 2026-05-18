@@ -8,7 +8,10 @@ import { HeroGuideConsole } from "@/features/heroes/components/hero-guide-consol
 import { HeroGuideAdminLink } from "@/features/heroes/components/hero-guide-admin-link";
 import { buildHeroGuideTabsFromHero, mapHeroToExternalHero } from "@/features/heroes/hero-lab-data";
 import { resolveHeroGuideTabs } from "@/features/heroes/hero-guide-content";
-import { getHeroBySlug, getHeroSlugs } from "@/lib/content-adapter";
+import { getHeroBySlug, getHeroSlugs, getHeroes } from "@/lib/content-adapter";
+import { buildAbilityLookup } from "@/features/heroes/ability-lookup";
+import { buildHeroPortraitEntries } from "@/features/heroes/hero-portrait-map";
+import { AbilityLookupProvider } from "@/features/heroes/components/ability-lookup-provider";
 import abilitiesBackgroundImage from "../../../../rivals-assets/frames/abilities-section.jpg";
 
 type HeroPageProps = {
@@ -60,11 +63,22 @@ export default async function HeroPage({ params, searchParams }: HeroPageProps) 
   const wantsDraftPreview = resolvedSearchParams?.preview === "draft";
   const guideScope = wantsDraftPreview ? "draft" : "published";
   const loginNextPath = `/heroes/${hero.slug}${wantsDraftPreview ? "?preview=draft" : ""}`;
-  const guideTabs = await resolveHeroGuideTabs({
-    heroSlug: hero.slug,
-    fallbackTabs: fallbackGuideTabs,
-    scope: guideScope,
-  });
+  const [guideTabs, allHeroes] = await Promise.all([
+    resolveHeroGuideTabs({
+      heroSlug: hero.slug,
+      fallbackTabs: fallbackGuideTabs,
+      scope: guideScope,
+    }),
+    getHeroes(),
+  ]);
+
+  const allAbilities = hero.forms
+    ? hero.forms.flatMap((f) => f.abilities)
+    : hero.abilities;
+  const abilityEntries = Array.from(
+    buildAbilityLookup(allAbilities).entries(),
+  );
+  const heroPortraits = buildHeroPortraitEntries(allHeroes);
 
   return (
     <div className="lab-light-theme min-h-screen">
@@ -96,12 +110,18 @@ export default async function HeroPage({ params, searchParams }: HeroPageProps) 
         </div>
       </section>
 
-      <HeroGuideConsole
-        heroName={hero.name}
-        stackLogoUrl={hero.stackLogoImage}
-        tabs={guideTabs}
-        defaultTabId="overview"
-      />
+      <AbilityLookupProvider entries={abilityEntries}>
+        {(abilityLookup) => (
+          <HeroGuideConsole
+            heroName={hero.name}
+            stackLogoUrl={hero.stackLogoImage}
+            tabs={guideTabs}
+            defaultTabId="overview"
+            abilityLookup={abilityLookup}
+            heroPortraits={heroPortraits}
+          />
+        )}
+      </AbilityLookupProvider>
       <HeroGuideAdminLink heroSlug={hero.slug} />
     </div>
   );

@@ -1,6 +1,12 @@
 "use client";
 
-import { type CSSProperties, useEffect, useMemo, useState } from "react";
+import {
+  type CSSProperties,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Image from "next/image";
 import { RivalsTab, RivalsTabBar } from "@/components/ui";
 import type {
@@ -10,7 +16,9 @@ import type {
 import {
   buildHeroGuideBodyNavItems,
   HeroGuideBody,
+  type HeroPortraitEntry,
 } from "@/features/heroes/components/hero-guide-body";
+import type { ResolvedAbilityRef } from "@/features/heroes/ability-lookup";
 import lunaStackLogoImage from "../../../../rivals-assets/heros/luna/luna-stack-logo.png";
 
 type HeroGuideConsoleProps = {
@@ -20,6 +28,8 @@ type HeroGuideConsoleProps = {
   subtitle?: string;
   tabs: HeroGuideTabContent[];
   defaultTabId?: HeroGuideTabId;
+  abilityLookup?: Map<string, ResolvedAbilityRef>;
+  heroPortraits?: HeroPortraitEntry[];
   className?: string;
 };
 
@@ -35,39 +45,103 @@ const stackBackdropMaskStyle: CSSProperties = {
   maskRepeat: "no-repeat",
 };
 
+/** Duration tokens — kept in sync with `--motion-*` in globals.css. */
+const TAB_EXIT_MS = 140;
+const TAB_ENTER_MS = 240;
+
 export function HeroGuideConsole({
   heroName,
   stackLogoUrl,
   subtitle,
   tabs,
   defaultTabId,
+  abilityLookup,
+  heroPortraits,
   className = "",
 }: HeroGuideConsoleProps) {
   const initialTabId = defaultTabId ?? tabs[0]?.id;
   const [activeTabId, setActiveTabId] = useState<HeroGuideTabId>(
     (initialTabId ?? "abilities") as HeroGuideTabId,
   );
-  const [contentVisible, setContentVisible] = useState(true);
 
   const backdropImage = stackLogoUrl ?? lunaStackLogoImage;
   const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0];
-  const heroGuideTopId = `${heroName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-guide-top`;
-  const bodyAnchorPrefix = `${heroName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${activeTabId}`;
+  const heroSlugLike = useMemo(
+    () => heroName.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+    [heroName],
+  );
+  const heroGuideTopId = `${heroSlugLike}-guide-top`;
+  const bodyAnchorPrefix = `${heroSlugLike}-${activeTabId}`;
   const bodyNavItems = useMemo(
     () => (activeTab.body ? buildHeroGuideBodyNavItems(activeTab.body, bodyAnchorPrefix) : []),
     [activeTab.body, bodyAnchorPrefix],
   );
 
-  const tabBarItems: RivalsTab[] = tabs.map((tab) => ({
-    id: tab.id,
-    label: tab.label,
-  }));
+  const tabBarItems: RivalsTab[] = useMemo(
+    () => tabs.map((tab) => ({ id: tab.id, label: tab.label })),
+    [tabs],
+  );
+
+  // Single state value drives the CSS class that plays the exit→enter
+  // tab animation. Both timers are tracked together so unmount/rerun
+  // clears all in-flight work.
+  const [transition, setTransition] = useState<"idle" | "exit" | "enter">("idle");
 
   useEffect(() => {
-    setContentVisible(false);
-    const frame = requestAnimationFrame(() => setContentVisible(true));
-    return () => cancelAnimationFrame(frame);
+    setTransition("exit");
+    const exitTimer = setTimeout(() => {
+      setTransition("enter");
+    }, TAB_EXIT_MS);
+    const enterTimer = setTimeout(() => {
+      setTransition("idle");
+    }, TAB_EXIT_MS + TAB_ENTER_MS);
+    return () => {
+      clearTimeout(exitTimer);
+      clearTimeout(enterTimer);
+    };
   }, [activeTabId]);
+
+  // Parallax: write transform directly to the backdrop via ref + rAF.
+  // Using setState here would re-render the entire console on every
+  // scroll frame, which is wasteful and stutters on lower-end machines.
+  const sectionRef = useRef<HTMLElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (prefersReduced) return;
+
+    let rafId = 0;
+    let queued = false;
+
+    const apply = () => {
+      queued = false;
+      const section = sectionRef.current;
+      const backdrop = backdropRef.current;
+      if (!section || !backdrop) return;
+      const rect = section.getBoundingClientRect();
+      const viewH = window.innerHeight;
+      if (rect.bottom < 0 || rect.top > viewH) return;
+      const progress = -rect.top / (rect.height + viewH);
+      backdrop.style.transform = `translate3d(0, ${progress * 40}px, 0)`;
+    };
+
+    const onScroll = () => {
+      if (queued) return;
+      queued = true;
+      rafId = requestAnimationFrame(apply);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    apply();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(rafId);
+    };
+  }, []);
 
   if (!activeTab) {
     return null;
@@ -75,14 +149,18 @@ export function HeroGuideConsole({
 
   return (
     <section
+      ref={sectionRef}
       id={heroGuideTopId}
       className={`relative isolate w-full overflow-hidden border-b border-black/40 bg-black pb-[max(4rem,env(safe-area-inset-bottom))] sm:pb-20 ${className}`.trim()}
       aria-label={`${heroName} hero guide`}
     >
-      {/* Feathered stack art: subdued + masked so typography stays dominant */}
+      {/* Feathered stack art: subdued + masked so typography stays dominant.
+          Transform is mutated directly by the parallax effect below — DO NOT
+          drive this with React state or you'll re-render every scroll frame. */}
       <div className="pointer-events-none absolute inset-0 select-none">
         <div
-          className="absolute inset-0 opacity-[0.48]"
+          ref={backdropRef}
+          className="absolute inset-0 opacity-[0.48] will-change-transform"
           style={stackBackdropMaskStyle}
           aria-hidden
         >
@@ -130,7 +208,7 @@ export function HeroGuideConsole({
 
         {/* Fixed-height shell: tab switches swap body inside scroll region so outer layout doesn’t jump */}
         <article
-          className="rivals-clip-row flex flex-col rounded-xl border border-white/15 bg-rivals-light-100/96 p-4 shadow-[0_8px_28px_rgba(0,0,0,0.26)] backdrop-blur-sm sm:min-h-[min(58vh,38rem)] sm:rounded-none sm:p-6 sm:shadow-[0_12px_48px_rgba(0,0,0,0.35)] lg:min-h-[min(52vh,40rem)]"
+          className="clip-reveal rivals-clip-row flex flex-col rounded-xl border border-white/15 bg-rivals-light-100/96 p-4 shadow-[0_8px_28px_rgba(0,0,0,0.26)] backdrop-blur-sm sm:min-h-[min(58vh,38rem)] sm:rounded-none sm:p-6 sm:shadow-[0_12px_48px_rgba(0,0,0,0.35)] lg:min-h-[min(52vh,40rem)]"
           aria-live="polite"
         >
           <header className="shrink-0 border-b border-rivals-light-300 pb-3">
@@ -143,9 +221,13 @@ export function HeroGuideConsole({
           </header>
 
           <div
-            className={`flex min-h-0 flex-1 flex-col overflow-visible pt-4 transition-[opacity,transform] duration-300 ease-out sm:overflow-y-auto sm:overscroll-contain sm:[-webkit-overflow-scrolling:touch] ${
-              contentVisible ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0"
-            } scroll-smooth`}
+            className={`flex min-h-0 flex-1 flex-col overflow-visible pt-4 sm:overflow-y-auto sm:overscroll-contain sm:[-webkit-overflow-scrolling:touch] scroll-smooth ${
+              transition === "exit"
+                ? "tab-exit"
+                : transition === "enter"
+                  ? "tab-enter"
+                  : ""
+            }`}
           >
             {bodyNavItems.length > 0 ? (
               <>
@@ -195,7 +277,12 @@ export function HeroGuideConsole({
             ) : null}
 
             {activeTab.body && activeTab.body.length > 0 ? (
-              <HeroGuideBody blocks={activeTab.body} anchorPrefix={bodyAnchorPrefix} />
+              <HeroGuideBody
+                blocks={activeTab.body}
+                anchorPrefix={bodyAnchorPrefix}
+                abilityLookup={abilityLookup}
+                heroPortraits={heroPortraits}
+              />
             ) : (
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>

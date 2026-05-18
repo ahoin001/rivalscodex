@@ -44,10 +44,58 @@ const abilitySchema = z.object({
   siteFormIndex: z.number().int().optional(),
 });
 
+export const comboModifierSchema = z.enum([
+  "tap",
+  "hold",
+  "buffer",
+  "animation-cancel",
+  "dash-cancel",
+  "jump-cancel",
+  "melee-weave",
+  "instant",
+]);
+
+export type ComboModifier = z.infer<typeof comboModifierSchema>;
+
+export const comboStepSchema = z.discriminatedUnion("kind", [
+  z.object({
+    kind: z.literal("ability"),
+    abilityRef: z.string(),
+    modifier: comboModifierSchema.optional(),
+  }),
+  z.object({
+    kind: z.literal("action"),
+    label: z.string().max(60),
+    modifier: comboModifierSchema.optional(),
+  }),
+]);
+
+export type ComboStep = z.infer<typeof comboStepSchema>;
+
+export const comboDifficultySchema = z.enum([
+  "bread-and-butter",
+  "intermediate",
+  "advanced",
+  "team",
+]);
+
+export type ComboDifficulty = z.infer<typeof comboDifficultySchema>;
+
+const comboResourceCostSchema = z.object({
+  resourceName: z.string(),
+  startingAmount: z.number(),
+  perStepDelta: z.array(z.number()).optional(),
+});
+
+export type ComboResourceCost = z.infer<typeof comboResourceCostSchema>;
+
 const comboSchema = z.object({
   id: z.string(),
   name: z.string(),
   steps: z.array(z.string()).min(1),
+  structuredSteps: z.array(comboStepSchema).optional(),
+  difficulty: comboDifficultySchema.optional(),
+  resourceCost: comboResourceCostSchema.optional(),
   teamUp: z.string().optional(),
 });
 

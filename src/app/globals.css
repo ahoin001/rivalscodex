@@ -47,6 +47,22 @@
   --rivals-strategist: #2dd4bf;
   --rivals-duelist: #ef4444;
   --rivals-vanguard: #38bdf8;
+
+  /* ----------------------------------------------------------------
+   * Motion tokens — shared timing/easing for all guide transitions.
+   * Components should reference these instead of hardcoding ms values
+   * so the entire app retunes from one place.
+   * ---------------------------------------------------------------- */
+  --motion-instant: 80ms;
+  --motion-fast: 140ms;
+  --motion-medium: 240ms;
+  --motion-slow: 380ms;
+  --motion-stagger: 40ms;
+
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: ease-out;
+  --ease-in: ease-in;
+  --ease-in-out: ease-in-out;
 }
 
 @theme inline {
@@ -314,7 +330,174 @@ a {
 }
 
 .fade-slide-in {
-  animation: fadeSlideIn 220ms ease-out;
+  animation: fadeSlideIn var(--motion-medium) var(--ease-out);
+}
+
+@keyframes clipReveal {
+  from {
+    clip-path: inset(50% 50% 50% 50%);
+    opacity: 0;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
+.clip-reveal {
+  animation: clipReveal var(--motion-slow) var(--ease-out-soft) both;
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in-left {
+  animation: slideInFromLeft var(--motion-medium) var(--ease-out) both;
+}
+
+.slide-in-right {
+  animation: slideInFromRight var(--motion-medium) var(--ease-out) both;
+}
+
+@keyframes goldPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(var(--brand-gold-rgb) / 0%);
+  }
+  50% {
+    box-shadow: 0 0 12px 2px rgb(var(--brand-gold-rgb) / 30%);
+  }
+}
+
+.gold-pulse {
+  animation: goldPulse 2s ease-in-out infinite;
+}
+
+@keyframes scanLine {
+  from {
+    transform: translateY(-100%);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.scan-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgb(var(--brand-gold-rgb) / 12%) 48%,
+    transparent 100%
+  );
+  height: 3px;
+  pointer-events: none;
+  animation: scanLine var(--motion-slow) var(--ease-out);
+}
+
+@keyframes nodeReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Stagger pattern: each child gets `nodeReveal` with a delay derived from
+ * its sibling index. Components don't need to set --stagger-i manually --
+ * the nth-child rules below cover the schema's max of 12 nodes. If you ever
+ * need more, set `style={{ "--stagger-i": index }}` on the child. */
+.stagger-children > * {
+  --stagger-i: 0;
+  animation: nodeReveal var(--motion-medium) var(--ease-out-soft) both;
+  animation-delay: calc(var(--stagger-i) * var(--motion-stagger));
+}
+
+.stagger-children > *:nth-child(1)  { --stagger-i: 0; }
+.stagger-children > *:nth-child(2)  { --stagger-i: 1; }
+.stagger-children > *:nth-child(3)  { --stagger-i: 2; }
+.stagger-children > *:nth-child(4)  { --stagger-i: 3; }
+.stagger-children > *:nth-child(5)  { --stagger-i: 4; }
+.stagger-children > *:nth-child(6)  { --stagger-i: 5; }
+.stagger-children > *:nth-child(7)  { --stagger-i: 6; }
+.stagger-children > *:nth-child(8)  { --stagger-i: 7; }
+.stagger-children > *:nth-child(9)  { --stagger-i: 8; }
+.stagger-children > *:nth-child(10) { --stagger-i: 9; }
+.stagger-children > *:nth-child(11) { --stagger-i: 10; }
+.stagger-children > *:nth-child(12) { --stagger-i: 11; }
+
+@keyframes connectorDraw {
+  from {
+    stroke-dashoffset: 60;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity var(--motion-slow) var(--ease-out),
+    transform var(--motion-slow) var(--ease-out);
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes tabSlideOut {
+  to {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.99);
+  }
+}
+
+@keyframes tabSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-exit {
+  animation: tabSlideOut var(--motion-fast) var(--ease-in) forwards;
+}
+
+.tab-enter {
+  animation: tabSlideIn var(--motion-medium) var(--ease-out-soft) both;
 }
 
 @media (max-width: 768px) {

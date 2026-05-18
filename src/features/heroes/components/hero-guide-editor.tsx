@@ -8,6 +8,7 @@ import {
   heroGuideTabsSchema,
 } from "@/features/heroes/hero-guide-schema";
 import { HeroGuideBodyEditor } from "@/features/heroes/components/hero-guide-body-editor";
+import type { ResolvedAbilityRef } from "@/features/heroes/ability-lookup";
 import {
   publishHeroGuideTabsAction,
   saveHeroGuideDraftAction,
@@ -27,6 +28,7 @@ type HeroGuideEditorProps = {
   heroName: string;
   initialTabs: HeroGuideTabContent[];
   publishedTabs: HeroGuideTabContent[] | null;
+  abilityLookup?: Map<string, ResolvedAbilityRef>;
 };
 
 export function HeroGuideEditor({
@@ -34,6 +36,7 @@ export function HeroGuideEditor({
   heroName,
   initialTabs,
   publishedTabs,
+  abilityLookup,
 }: HeroGuideEditorProps) {
   const [tabs, setTabs] = useState<HeroGuideTabContent[]>(() =>
     normalizeTabs(initialTabs),
@@ -228,6 +231,7 @@ export function HeroGuideEditor({
           onChange={(body) =>
             updateActive({ body: body && body.length > 0 ? body : undefined })
           }
+          abilityLookup={abilityLookup}
         />
 
         <LinksEditor

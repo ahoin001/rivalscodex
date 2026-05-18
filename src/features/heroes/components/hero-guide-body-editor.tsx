@@ -2,10 +2,13 @@
 
 import { useCallback } from "react";
 import type { HeroGuideBlock } from "@/features/heroes/hero-guide-schema";
+import type { ResolvedAbilityRef } from "@/features/heroes/ability-lookup";
+import { ComboBuilderEditor } from "@/features/heroes/components/combo-builder-editor";
 
 type HeroGuideBodyEditorProps = {
   blocks: HeroGuideBlock[];
   onChange: (next: HeroGuideBlock[] | undefined) => void;
+  abilityLookup?: Map<string, ResolvedAbilityRef>;
 };
 
 function linesToItems(text: string): string[] {
@@ -19,7 +22,7 @@ function itemsToLines(items: string[]): string {
   return items.join("\n");
 }
 
-export function HeroGuideBodyEditor({ blocks, onChange }: HeroGuideBodyEditorProps) {
+export function HeroGuideBodyEditor({ blocks, onChange, abilityLookup }: HeroGuideBodyEditorProps) {
   const replaceAt = useCallback(
     (index: number, block: HeroGuideBlock) => {
       const next = blocks.map((b, i) => (i === index ? block : b));
@@ -152,7 +155,7 @@ export function HeroGuideBodyEditor({ blocks, onChange }: HeroGuideBodyEditorPro
                   </button>
                 </div>
               </div>
-              <BlockFields block={block} onReplace={(next) => replaceAt(index, next)} />
+              <BlockFields block={block} onReplace={(next) => replaceAt(index, next)} abilityLookup={abilityLookup} />
             </li>
           ))}
         </ul>
@@ -176,9 +179,11 @@ function MiniAdd({ label, onClick }: { label: string; onClick: () => void }) {
 function BlockFields({
   block,
   onReplace,
+  abilityLookup,
 }: {
   block: HeroGuideBlock;
   onReplace: (next: HeroGuideBlock) => void;
+  abilityLookup?: Map<string, ResolvedAbilityRef>;
 }) {
   switch (block.type) {
     case "callout":
@@ -290,6 +295,15 @@ function BlockFields({
         </div>
       );
     case "combo":
+      if (abilityLookup && abilityLookup.size > 0) {
+        return (
+          <ComboBuilderEditor
+            block={block}
+            abilityLookup={abilityLookup}
+            onReplace={(next) => onReplace(next)}
+          />
+        );
+      }
       return (
         <div className="grid gap-2">
           <input
