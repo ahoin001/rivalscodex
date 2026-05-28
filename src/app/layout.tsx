@@ -50,7 +50,10 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${barlowCondensed.variable} h-full antialiased`}
     >
-      <body className="min-h-full font-sans text-foreground">
+      <body
+        suppressHydrationWarning
+        className="min-h-full font-sans text-foreground"
+      >
         <Script id="palette-bootstrap" strategy="beforeInteractive">
           {paletteBootstrapScript}
         </Script>

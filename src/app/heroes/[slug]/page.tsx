@@ -111,16 +111,13 @@ export default async function HeroPage({ params, searchParams }: HeroPageProps) 
       </section>
 
       <AbilityLookupProvider entries={abilityEntries}>
-        {(abilityLookup) => (
-          <HeroGuideConsole
-            heroName={hero.name}
-            stackLogoUrl={hero.stackLogoImage}
-            tabs={guideTabs}
-            defaultTabId="overview"
-            abilityLookup={abilityLookup}
-            heroPortraits={heroPortraits}
-          />
-        )}
+        <HeroGuideConsole
+          heroName={hero.name}
+          stackLogoUrl={hero.stackLogoImage}
+          tabs={guideTabs}
+          defaultTabId="overview"
+          heroPortraits={heroPortraits}
+        />
       </AbilityLookupProvider>
       <HeroGuideAdminLink heroSlug={hero.slug} />
     </div>

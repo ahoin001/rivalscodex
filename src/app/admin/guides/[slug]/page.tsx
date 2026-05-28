@@ -35,15 +35,12 @@ export default async function AdminGuideEditPage({ params }: AdminGuideEditPageP
       </Link>
       <div className="mt-6 rounded border border-rivals-light-300 bg-white p-4 sm:p-6">
         <AbilityLookupProvider entries={abilityEntries}>
-          {(lookup) => (
-            <HeroGuideEditor
-              heroSlug={state.hero.slug}
-              heroName={state.hero.name}
-              initialTabs={state.initialTabs}
-              publishedTabs={state.publishedTabs}
-              abilityLookup={lookup}
-            />
-          )}
+          <HeroGuideEditor
+            heroSlug={state.hero.slug}
+            heroName={state.hero.name}
+            initialTabs={state.initialTabs}
+            publishedTabs={state.publishedTabs}
+          />
         </AbilityLookupProvider>
       </div>
     </div>

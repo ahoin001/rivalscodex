@@ -9,6 +9,7 @@ import {
 } from "@/features/heroes/hero-guide-schema";
 import { HeroGuideBodyEditor } from "@/features/heroes/components/hero-guide-body-editor";
 import type { ResolvedAbilityRef } from "@/features/heroes/ability-lookup";
+import { useOptionalAbilityLookup } from "@/features/heroes/components/ability-lookup-provider";
 import {
   publishHeroGuideTabsAction,
   saveHeroGuideDraftAction,
@@ -36,8 +37,9 @@ export function HeroGuideEditor({
   heroName,
   initialTabs,
   publishedTabs,
-  abilityLookup,
+  abilityLookup: abilityLookupProp,
 }: HeroGuideEditorProps) {
+  const abilityLookup = abilityLookupProp ?? useOptionalAbilityLookup();
   const [tabs, setTabs] = useState<HeroGuideTabContent[]>(() =>
     normalizeTabs(initialTabs),
   );

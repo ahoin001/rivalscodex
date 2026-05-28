@@ -19,6 +19,7 @@ import {
   type HeroPortraitEntry,
 } from "@/features/heroes/components/hero-guide-body";
 import type { ResolvedAbilityRef } from "@/features/heroes/ability-lookup";
+import { useOptionalAbilityLookup } from "@/features/heroes/components/ability-lookup-provider";
 import lunaStackLogoImage from "../../../../rivals-assets/heros/luna/luna-stack-logo.png";
 
 type HeroGuideConsoleProps = {
@@ -55,10 +56,11 @@ export function HeroGuideConsole({
   subtitle,
   tabs,
   defaultTabId,
-  abilityLookup,
+  abilityLookup: abilityLookupProp,
   heroPortraits,
   className = "",
 }: HeroGuideConsoleProps) {
+  const abilityLookup = abilityLookupProp ?? useOptionalAbilityLookup();
   const initialTabId = defaultTabId ?? tabs[0]?.id;
   const [activeTabId, setActiveTabId] = useState<HeroGuideTabId>(
     (initialTabId ?? "abilities") as HeroGuideTabId,
