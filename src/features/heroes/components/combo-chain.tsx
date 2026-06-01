@@ -11,6 +11,7 @@ import {
   getDifficultyTier,
   getModifierDescriptor,
 } from "@/features/heroes/combo-display";
+import { AbilityTooltip } from "@/features/heroes/components/ability-tooltip";
 
 type ComboChainProps = {
   name: string;
@@ -19,6 +20,7 @@ type ComboChainProps = {
   difficulty?: ComboDifficulty;
   resourceCost?: ComboResourceCost;
   condition?: string;
+  notes?: string;
   className?: string;
 };
 
@@ -49,24 +51,26 @@ function AbilityNode({
   resourceDelta?: number;
 }) {
   return (
-    <div className="flex shrink-0 flex-col items-center gap-1.5" style={{ minWidth: "4.5rem" }}>
-      <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-lg border border-brand-gold/45 bg-[#1a1f2e] shadow-[0_0_8px_rgba(201,162,93,0.12)] transition-all duration-200 hover:border-brand-gold hover:shadow-[0_0_16px_rgba(201,162,93,0.25)] hover:-translate-y-0.5">
-        {resolved.iconUrl ? (
-          <Image
-            src={resolved.iconUrl}
-            alt={resolved.name}
-            width={40}
-            height={40}
-            className="h-9 w-9 object-contain"
-          />
-        ) : (
-          <span className="text-[10px] font-bold uppercase text-white/60">
-            {resolved.name.slice(0, 3)}
-          </span>
-        )}
-      </div>
+    <div className="flex shrink-0 flex-col items-center gap-1" style={{ minWidth: "4.5rem" }}>
+      <AbilityTooltip ability={resolved}>
+        <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-lg border border-brand-gold/45 bg-[#1a1f2e] shadow-[0_0_8px_rgba(201,162,93,0.12)] transition-all duration-200 hover:border-brand-gold hover:shadow-[0_0_16px_rgba(201,162,93,0.25)] hover:-translate-y-0.5">
+          {resolved.iconUrl ? (
+            <Image
+              src={resolved.iconUrl}
+              alt=""
+              width={40}
+              height={40}
+              className="h-9 w-9 object-contain"
+            />
+          ) : (
+            <span className="text-[10px] font-bold uppercase text-white/60">
+              {resolved.name.slice(0, 3)}
+            </span>
+          )}
+        </div>
+      </AbilityTooltip>
 
-      <span className="max-w-[5rem] truncate text-center font-display text-[10px] uppercase leading-tight tracking-wide text-white/80 sm:text-[11px]">
+      <span className="line-clamp-2 max-w-[5rem] text-center font-display text-[9px] uppercase leading-tight tracking-wide text-white/80 sm:text-[10px]">
         {resolved.name}
       </span>
 
@@ -130,6 +134,7 @@ export function ComboChain({
   difficulty,
   resourceCost,
   condition,
+  notes,
   className = "",
 }: ComboChainProps) {
   const resolvedSteps = useMemo(
@@ -174,10 +179,15 @@ export function ComboChain({
         ) : null}
       </div>
 
-      {condition ? (
-        <p className="border-b border-white/6 px-4 py-2 text-xs leading-5 text-white/50 sm:px-5">
-          {condition}
-        </p>
+      {condition || notes ? (
+        <div className="space-y-1 border-b border-white/6 px-4 py-2 sm:px-5">
+          {condition ? (
+            <p className="text-xs leading-5 text-white/50">{condition}</p>
+          ) : null}
+          {notes ? (
+            <p className="text-xs leading-5 text-white/65">{notes}</p>
+          ) : null}
+        </div>
       ) : null}
 
       {/* Chain body with horizontal scroll on mobile */}

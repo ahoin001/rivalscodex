@@ -31,6 +31,7 @@ export function BlockCombo({
         steps={block.steps}
         difficulty={block.difficulty}
         condition={block.condition}
+        notes={block.notes}
         clip={resolvedClip}
       />
     );
@@ -46,6 +47,7 @@ export function BlockCombo({
           difficulty={block.difficulty}
           resourceCost={block.resourceCost}
           condition={block.condition}
+          notes={block.notes}
         />
         <div className="overflow-hidden rounded-lg border border-rivals-ink/10 bg-white/60">
           <p className="border-b border-rivals-light-300 px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-rivals-ink-muted">
@@ -67,6 +69,7 @@ export function BlockCombo({
       difficulty={block.difficulty}
       resourceCost={block.resourceCost}
       condition={block.condition}
+      notes={block.notes}
     />
   );
 }
@@ -88,12 +91,14 @@ function BlockComboLegacy({
   steps,
   difficulty,
   condition,
+  notes,
   clip,
 }: {
   name: string;
   steps: string[];
   difficulty?: string;
   condition?: string;
+  notes?: string;
   clip?: { label: string; href: string };
 }) {
   return (
@@ -106,6 +111,9 @@ function BlockComboLegacy({
       </div>
       {condition ? (
         <p className="mt-1 text-xs leading-5 text-rivals-ink-muted">{condition}</p>
+      ) : null}
+      {notes ? (
+        <p className="mt-1 text-xs leading-5 text-rivals-ink-soft">{notes}</p>
       ) : null}
       <ol className="mt-2 list-decimal space-y-1 pl-4 text-sm leading-6 text-rivals-ink-soft sm:text-[15px]">
         {steps.map((step) => (

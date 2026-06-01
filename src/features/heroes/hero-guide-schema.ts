@@ -63,6 +63,8 @@ export const heroGuideBlockSchema = z.discriminatedUnion("type", [
     steps: z.array(z.string().trim().min(1).max(400)).min(1).max(12),
     structuredSteps: z.array(comboStepSchema).optional(),
     difficulty: comboDifficultySchema.optional(),
+    tags: z.array(z.string().trim().min(1).max(24)).max(4).optional(),
+    notes: z.string().trim().max(800).optional(),
     resourceCost: z.object({
       resourceName: z.string().trim().min(1).max(60),
       startingAmount: z.number(),

@@ -2,6 +2,7 @@ import "server-only";
 
 import type { User } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { isPersonalGuideEdit } from "@/lib/guide-edit-policy";
 
 export type GuideEditorDenialCode = "UNAUTHORIZED" | "FORBIDDEN";
 
@@ -13,6 +14,10 @@ export async function canEditHeroGuides(
   supabase: SupabaseClient,
   user: User | null,
 ): Promise<boolean> {
+  if (isPersonalGuideEdit()) {
+    return true;
+  }
+
   if (!user) {
     return false;
   }

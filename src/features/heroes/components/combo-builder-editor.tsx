@@ -11,6 +11,7 @@ import {
   DIFFICULTY_TIERS,
   MODIFIER_DESCRIPTORS,
 } from "@/features/heroes/combo-display";
+import { AbilityTooltip } from "@/features/heroes/components/ability-tooltip";
 import { ComboChain } from "@/features/heroes/components/combo-chain";
 
 type ComboBuilderEditorProps = {
@@ -172,8 +173,44 @@ export function ComboBuilderEditor({
             condition: e.target.value.trim() ? e.target.value : undefined,
           })
         }
-        placeholder="Condition / prereq note (optional)"
+        placeholder="Condition / prereq (short, optional)"
       />
+
+      <label className="grid gap-1 text-[11px]">
+        <span className="text-rivals-ink-muted">Tags (comma-separated, max 4)</span>
+        <input
+          className="rounded border border-rivals-light-300 px-2 py-1 text-sm"
+          value={(block.tags ?? []).join(", ")}
+          onChange={(e) => {
+            const tags = e.target.value
+              .split(",")
+              .map((t) => t.trim())
+              .filter((t) => t.length > 0)
+              .slice(0, 4);
+            onReplace({
+              ...block,
+              tags: tags.length > 0 ? tags : undefined,
+            });
+          }}
+          placeholder="275, Burst, Anti-dive"
+        />
+      </label>
+
+      <label className="grid gap-1 text-[11px]">
+        <span className="text-rivals-ink-muted">Notes (optional)</span>
+        <textarea
+          rows={2}
+          className="rounded border border-rivals-light-300 px-2 py-1 text-sm"
+          value={block.notes ?? ""}
+          onChange={(e) =>
+            onReplace({
+              ...block,
+              notes: e.target.value.trim() ? e.target.value : undefined,
+            })
+          }
+          placeholder="When to use this route, matchup context, etc."
+        />
+      </label>
 
       {/* Resource cost */}
       <details className="rounded border border-rivals-light-300 bg-rivals-light-50 px-3 py-2">
@@ -261,32 +298,36 @@ export function ComboBuilderEditor({
         </div>
         <div className="grid grid-cols-[repeat(auto-fill,minmax(5rem,1fr))] gap-2">
           {filteredAbilities.map(([slug, ref]) => (
-            <button
-              key={slug}
-              type="button"
-              onClick={() => addAbilityStep(slug)}
-              className="flex flex-col items-center gap-1 rounded border border-rivals-light-300 bg-rivals-light-50 p-2 text-center transition-all hover:-translate-y-0.5 hover:border-brand-gold/40 hover:shadow-sm"
-            >
-              {ref.iconUrl ? (
-                <Image
-                  src={ref.iconUrl}
-                  alt={ref.name}
-                  width={28}
-                  height={28}
-                  className="h-7 w-7 object-contain"
-                />
-              ) : (
-                <div className="flex h-7 w-7 items-center justify-center rounded bg-rivals-light-200 text-[8px] font-bold uppercase text-rivals-ink-muted">
-                  {ref.name.slice(0, 3)}
-                </div>
-              )}
-              <span className="text-[9px] font-semibold uppercase leading-tight text-rivals-ink-soft">
-                {formatKeybindLabel(ref.keybind)}
-              </span>
-              <span className="max-w-full truncate text-[9px] leading-tight text-rivals-ink-muted">
-                {ref.name}
-              </span>
-            </button>
+            <AbilityTooltip key={slug} ability={ref}>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  addAbilityStep(slug);
+                }}
+                className="flex w-full flex-col items-center gap-1 rounded border border-rivals-light-300 bg-rivals-light-50 p-2 text-center transition-all hover:-translate-y-0.5 hover:border-brand-gold/40 hover:shadow-sm"
+              >
+                {ref.iconUrl ? (
+                  <Image
+                    src={ref.iconUrl}
+                    alt=""
+                    width={28}
+                    height={28}
+                    className="h-7 w-7 object-contain"
+                  />
+                ) : (
+                  <div className="flex h-7 w-7 items-center justify-center rounded bg-rivals-light-200 text-[8px] font-bold uppercase text-rivals-ink-muted">
+                    {ref.name.slice(0, 3)}
+                  </div>
+                )}
+                <span className="text-[9px] font-semibold uppercase leading-tight text-rivals-ink-soft">
+                  {formatKeybindLabel(ref.keybind)}
+                </span>
+                <span className="max-w-full truncate text-[9px] leading-tight text-rivals-ink-muted">
+                  {ref.name}
+                </span>
+              </button>
+            </AbilityTooltip>
           ))}
         </div>
         <button
@@ -425,6 +466,7 @@ export function ComboBuilderEditor({
             difficulty={block.difficulty}
             resourceCost={block.resourceCost}
             condition={block.condition}
+            notes={block.notes}
           />
         </div>
       ) : null}

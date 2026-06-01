@@ -29,6 +29,15 @@ Logged-out users keep full access to public hero pages; personalization is optio
 - **Policy:** **Last write wins.** Two editors saving the same hero overwrite the previous draft/published payload for that scope; there is no optimistic locking or version column.
 - **UI:** Hint copy on the guide editor reminds editors of this behavior.
 
+## Personal vs admin guide editing
+
+| `NEXT_PUBLIC_GUIDE_EDIT_POLICY` | Reader experience | Saving |
+|--------------------------------|-------------------|--------|
+| `personal` (default) | Inline **Edit combos** on `/heroes/[slug]` Combos tab; route cards + combo builder | Debounced auto-save to **published** (~1.5s). Uses `SUPABASE_SERVICE_ROLE_KEY` on the server when set. |
+| `admin` | No inline editor; use `/admin/guides` (login + `profiles.is_guide_editor` in production) | Draft + Publish buttons in admin UI |
+
+When Supabase is off, personal-mode edits persist in **localStorage** only (`rivalscodex.guide-tabs.v1.{slug}`).
+
 ## Environment and feature flags
 
 Keep **documented env vars** in [`.env.example`](../.env.example) aligned with each deployment. Summary:
@@ -37,6 +46,7 @@ Keep **documented env vars** in [`.env.example`](../.env.example) aligned with e
 |------------|---------|
 | `NEXT_PUBLIC_ENABLE_SUPABASE` | Enables Supabase reads (guides, editorial, etc.). When false, guide content uses bundled fallbacks. |
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Browser/server Supabase client. |
+| `NEXT_PUBLIC_GUIDE_EDIT_POLICY` | `personal` (default) or `admin` — see [Personal vs admin guide editing](#personal-vs-admin-guide-editing). |
 | `NEXT_PUBLIC_ALLOW_DEV_GUIDE_EDIT` | When `false` in development, guide edits require `profiles.is_guide_editor` like production (see [`guide-editor.ts`](../src/lib/auth/guide-editor.ts)). |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-only; snapshot sync and privileged writes. Never expose to the client. |
 | `SUPABASE_USE_ROSTER_SNAPSHOT` | Prefer Postgres roster snapshot over live HTTP when available. |

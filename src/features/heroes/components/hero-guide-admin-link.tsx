@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { canEditHeroGuides } from "@/lib/auth/guide-editor";
+import { isAdminGuideEdit } from "@/lib/guide-edit-policy";
 import { isSupabaseEnabled } from "@/lib/supabase/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server-client";
 
@@ -9,6 +10,10 @@ type HeroGuideAdminLinkProps = {
 
 /** Shows an edit link when Supabase is on and the viewer may edit guides (dev or profiles flag). */
 export async function HeroGuideAdminLink({ heroSlug }: HeroGuideAdminLinkProps) {
+  if (!isAdminGuideEdit()) {
+    return null;
+  }
+
   if (!isSupabaseEnabled()) {
     return null;
   }

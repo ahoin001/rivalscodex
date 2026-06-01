@@ -7,8 +7,10 @@ import {
   type GuideEditorDenialCode,
 } from "@/lib/auth/guide-editor";
 import { revalidatePath, updateTag } from "next/cache";
+import { isPersonalGuideEdit } from "@/lib/guide-edit-policy";
 import { isSupabaseEnabled } from "@/lib/supabase/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server-client";
+import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role-client";
 import { upsertHeroGuideTabsToEditorial } from "@/lib/supabase/hero-guide-editorial";
 import { heroGuidePublishedTag } from "@/lib/supabase/hero-guide-cached";
 export type HeroGuideEditorialActionResult =
@@ -28,7 +30,7 @@ export async function upsertHeroGuideTabsAction(input: {
     };
   }
 
-  const supabase = await createSupabaseServerClient();
+  let supabase = await createSupabaseServerClient();
   if (!supabase) {
     return { ok: false, code: "CLIENT_ERROR", error: "Supabase client could not be created." };
   }
@@ -36,7 +38,12 @@ export async function upsertHeroGuideTabsAction(input: {
   const { data } = await supabase.auth.getUser();
   const user = data.user;
 
-  if (!(await canEditHeroGuides(supabase, user))) {
+  if (isPersonalGuideEdit()) {
+    const service = createSupabaseServiceRoleClient();
+    if (service) {
+      supabase = service;
+    }
+  } else if (!(await canEditHeroGuides(supabase, user))) {
     const denial = describeGuideEditorDenial(user);
     return { ok: false, code: denial.code, error: denial.message };
   }

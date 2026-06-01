@@ -15,14 +15,15 @@ import { BlockCallout } from "./hero-guide-body/block-callout";
 import { BlockBullets } from "./hero-guide-body/block-bullets";
 import { BlockTwoColumn } from "./hero-guide-body/block-two-column";
 import { BlockCombo } from "./hero-guide-body/block-combo";
+import { ComboRouteCard } from "./hero-guide-body/combo-route-card";
 import { BlockMatchup } from "./hero-guide-body/block-matchup";
 import { BlockVideo } from "./hero-guide-body/block-video";
 import {
   ComboFilterPills,
   DifficultyGroupHeader,
+  TagFilterPills,
 } from "./hero-guide-body/combo-groups";
 
-// Re-export public types and helpers so existing callers don't break.
 export type { HeroGuideBodyNavItem, HeroPortraitEntry };
 export { buildHeroGuideBodyNavItems };
 
@@ -33,11 +34,6 @@ type IndexedComboBlock = {
   index: number;
 };
 
-/**
- * Section wrapper applied to every rendered block. Adds the scroll anchor
- * + the reveal-on-scroll animation hook. Pulled out so each block-render
- * site stays tiny and consistent.
- */
 function GuideSection({
   id,
   children,
@@ -52,11 +48,36 @@ function GuideSection({
   );
 }
 
+function comboPassesFilters(
+  block: ComboBlock,
+  difficultyFilter: string,
+  tagFilter: string,
+): boolean {
+  if (difficultyFilter !== "all" && block.difficulty !== difficultyFilter) {
+    return false;
+  }
+  if (tagFilter !== "all") {
+    const tags = block.tags ?? [];
+    if (!tags.some((t) => t.toLowerCase() === tagFilter.toLowerCase())) {
+      return false;
+    }
+  }
+  return true;
+}
+
 type HeroGuideBodyProps = {
   blocks: HeroGuideBlock[];
   anchorPrefix: string;
   abilityLookup?: Map<string, ResolvedAbilityRef>;
   heroPortraits?: HeroPortraitEntry[];
+  comboEditMode?: boolean;
+  editingComboBlockIndex?: number | null;
+  onComboBlockReplace?: (index: number, next: ComboBlock) => void;
+  onComboBlockDuplicate?: (index: number) => void;
+  onComboBlockDelete?: (index: number) => void;
+  onComboBlockMove?: (index: number, dir: -1 | 1) => void;
+  onComboStartEdit?: (index: number) => void;
+  onComboStopEdit?: () => void;
 };
 
 export function HeroGuideBody({
@@ -64,8 +85,17 @@ export function HeroGuideBody({
   anchorPrefix,
   abilityLookup,
   heroPortraits,
+  comboEditMode = false,
+  editingComboBlockIndex = null,
+  onComboBlockReplace,
+  onComboBlockDuplicate,
+  onComboBlockDelete,
+  onComboBlockMove,
+  onComboStartEdit,
+  onComboStopEdit,
 }: HeroGuideBodyProps) {
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
+  const [tagFilter, setTagFilter] = useState<string>("all");
 
   const navItems = useMemo(
     () => buildHeroGuideBodyNavItems(blocks, anchorPrefix),
@@ -77,54 +107,93 @@ export function HeroGuideBody({
     [heroPortraits],
   );
 
-  // Compute combo grouping once per blocks change. `groupedCombos` is null
-  // unless there are ≥2 tagged combos -- below that threshold we render
-  // each combo inline like the other block types so single-combo tabs
-  // don't pick up an unnecessary section header.
   const comboMeta = useMemo(() => {
     const indexed: IndexedComboBlock[] = [];
     blocks.forEach((block, index) => {
       if (block.type === "combo") indexed.push({ block, index });
     });
 
-    const taggedCount = indexed.filter((c) => c.block.difficulty).length;
-    const hasDifficultyTags = taggedCount >= 2;
-
-    if (!hasDifficultyTags) {
-      return {
-        hasDifficultyTags: false,
-        renderedComboIndices: new Set<number>(),
-        availableDifficulties: new Set<string>(),
-        groups: null,
-        untagged: [] as IndexedComboBlock[],
-      };
-    }
+    const taggedDifficultyCount = indexed.filter((c) => c.block.difficulty).length;
+    const hasDifficultyTags = taggedDifficultyCount >= 2;
 
     const availableDifficulties = new Set<string>();
+    const availableTags = new Set<string>();
     for (const c of indexed) {
       if (c.block.difficulty) availableDifficulties.add(c.block.difficulty);
+      for (const tag of c.block.tags ?? []) {
+        availableTags.add(tag);
+      }
     }
 
-    const groups = DIFFICULTY_TIERS
-      .filter((tier) => availableDifficulties.has(tier.key))
-      .map((tier) => ({
-        tier,
-        combos: indexed.filter((c) => c.block.difficulty === tier.key),
-      }));
+    const groups = hasDifficultyTags
+      ? DIFFICULTY_TIERS.filter((tier) => availableDifficulties.has(tier.key)).map(
+          (tier) => ({
+            tier,
+            combos: indexed.filter((c) => c.block.difficulty === tier.key),
+          }),
+        )
+      : null;
 
     const untagged = indexed.filter((c) => !c.block.difficulty);
-    const renderedComboIndices = new Set<number>(indexed.map((c) => c.index));
+    const renderedComboIndices = hasDifficultyTags
+      ? new Set<number>(indexed.map((c) => c.index))
+      : new Set<number>();
+
+    const comboOnlyIndices = indexed.map((c) => c.index);
+    const comboCount = indexed.length;
 
     return {
-      hasDifficultyTags: true,
+      indexed,
+      hasDifficultyTags,
       renderedComboIndices,
       availableDifficulties,
+      availableTags,
       groups,
       untagged,
+      comboOnlyIndices,
+      comboCount,
     };
   }, [blocks]);
 
+  const renderComboBlock = (block: ComboBlock, index: number): ReactNode => {
+    const navItem = navItems[index];
+    const useRouteCard =
+      !!abilityLookup &&
+      !!block.structuredSteps &&
+      block.structuredSteps.length > 0;
+
+    const comboOnlyPos = comboMeta.comboOnlyIndices.indexOf(index);
+    const canMoveUp = comboOnlyPos > 0;
+    const canMoveDown = comboOnlyPos >= 0 && comboOnlyPos < comboMeta.comboCount - 1;
+
+    const card = useRouteCard ? (
+      <ComboRouteCard
+        block={block}
+        blockIndex={index}
+        abilityLookup={abilityLookup}
+        editMode={comboEditMode}
+        isEditing={editingComboBlockIndex === index}
+        onStartEdit={() => onComboStartEdit?.(index)}
+        onStopEdit={onComboStopEdit}
+        onReplace={(next) => onComboBlockReplace?.(index, next)}
+        onDuplicate={() => onComboBlockDuplicate?.(index)}
+        onDelete={() => onComboBlockDelete?.(index)}
+        onMove={(dir) => onComboBlockMove?.(index, dir)}
+        canMoveUp={canMoveUp}
+        canMoveDown={canMoveDown}
+      />
+    ) : (
+      <BlockCombo block={block} abilityLookup={abilityLookup} clip={block.clip} />
+    );
+
+    return <GuideSection id={navItem.id}>{card}</GuideSection>;
+  };
+
   const renderBlock = (block: HeroGuideBlock, index: number): ReactNode => {
+    if (block.type === "combo") {
+      return renderComboBlock(block, index);
+    }
+
     const navItem = navItems[index];
 
     switch (block.type) {
@@ -151,12 +220,6 @@ export function HeroGuideBody({
             />
           </GuideSection>
         );
-      case "combo":
-        return (
-          <GuideSection id={navItem.id}>
-            <BlockCombo block={block} abilityLookup={abilityLookup} clip={block.clip} />
-          </GuideSection>
-        );
       case "matchup":
         return (
           <GuideSection id={navItem.id}>
@@ -178,51 +241,65 @@ export function HeroGuideBody({
     }
   };
 
+  const filterCombo = (entry: IndexedComboBlock) =>
+    comboPassesFilters(entry.block, difficultyFilter, tagFilter);
+
   let comboGroupInserted = false;
 
   return (
     <div className="space-y-6 pb-1 sm:space-y-5">
+      {comboMeta.indexed.length >= 2 ? (
+        <div className="space-y-2 rounded-lg border border-rivals-light-300/80 bg-rivals-light-50/60 px-3 py-2">
+          <ComboFilterPills
+            active={difficultyFilter}
+            onChange={setDifficultyFilter}
+            availableDifficulties={comboMeta.availableDifficulties}
+          />
+          <TagFilterPills
+            active={tagFilter}
+            onChange={setTagFilter}
+            availableTags={comboMeta.availableTags}
+          />
+        </div>
+      ) : null}
+
       {blocks.map((block, index) => {
-        // When difficulty tags are present, all combo blocks render together
-        // inside a single grouped section in place of the first combo block.
         if (comboMeta.hasDifficultyTags && comboMeta.renderedComboIndices.has(index)) {
           if (comboGroupInserted) return null;
           comboGroupInserted = true;
 
           return (
             <div key="combo-groups" className="space-y-6">
-              <ComboFilterPills
-                active={difficultyFilter}
-                onChange={setDifficultyFilter}
-                availableDifficulties={comboMeta.availableDifficulties}
-              />
-
               {comboMeta.groups?.map(({ tier, combos }) => {
-                if (difficultyFilter !== "all" && difficultyFilter !== tier.key) {
-                  return null;
-                }
-                if (combos.length === 0) return null;
+                const visible = combos.filter(filterCombo);
+                if (visible.length === 0) return null;
                 return (
                   <div key={tier.key} className="scroll-reveal space-y-4">
                     <DifficultyGroupHeader label={tier.label} className={tier.lightClass} />
-                    {combos.map(({ block: comboBlock, index: comboIndex }) => (
+                    {visible.map(({ block: comboBlock, index: comboIndex }) => (
                       <div key={`combo-${comboIndex}`}>
-                        {renderBlock(comboBlock, comboIndex)}
+                        {renderComboBlock(comboBlock, comboIndex)}
                       </div>
                     ))}
                   </div>
                 );
               })}
 
-              {comboMeta.untagged.length > 0 && difficultyFilter === "all"
-                ? comboMeta.untagged.map(({ block: comboBlock, index: comboIndex }) => (
-                    <div key={`combo-untagged-${comboIndex}`}>
-                      {renderBlock(comboBlock, comboIndex)}
-                    </div>
-                  ))
-                : null}
+              {comboMeta.untagged.filter(filterCombo).map(({ block: comboBlock, index: comboIndex }) => (
+                <div key={`combo-untagged-${comboIndex}`}>
+                  {renderComboBlock(comboBlock, comboIndex)}
+                </div>
+              ))}
             </div>
           );
+        }
+
+        if (block.type === "combo" && comboMeta.hasDifficultyTags) {
+          return null;
+        }
+
+        if (block.type === "combo" && !filterCombo({ block, index })) {
+          return null;
         }
 
         return <div key={`block-${index}-${block.type}`}>{renderBlock(block, index)}</div>;

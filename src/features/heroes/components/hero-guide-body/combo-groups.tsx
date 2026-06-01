@@ -18,41 +18,6 @@ export function DifficultyGroupHeader({
   );
 }
 
-export function ComboFilterPills({
-  active,
-  onChange,
-  availableDifficulties,
-}: {
-  active: string;
-  onChange: (value: string) => void;
-  availableDifficulties: Set<string>;
-}) {
-  return (
-    <div
-      className="flex gap-1.5 overflow-x-auto pb-2 sm:hidden"
-      style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
-    >
-      <FilterPill
-        active={active === "all"}
-        onClick={() => onChange("all")}
-        activeClass="border-brand-gold bg-brand-gold/15 text-brand-gold"
-      >
-        All
-      </FilterPill>
-      {DIFFICULTY_TIERS.filter((t) => availableDifficulties.has(t.key)).map((tier) => (
-        <FilterPill
-          key={tier.key}
-          active={active === tier.key}
-          onClick={() => onChange(tier.key)}
-          activeClass={tier.lightClass}
-        >
-          {tier.label}
-        </FilterPill>
-      ))}
-    </div>
-  );
-}
-
 function FilterPill({
   active,
   onClick,
@@ -77,5 +42,90 @@ function FilterPill({
     >
       {children}
     </button>
+  );
+}
+
+function FilterRow({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className="flex gap-1.5 overflow-x-auto pb-2"
+      style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
+    >
+      {children}
+    </div>
+  );
+}
+
+export function ComboFilterPills({
+  active,
+  onChange,
+  availableDifficulties,
+}: {
+  active: string;
+  onChange: (value: string) => void;
+  availableDifficulties: Set<string>;
+}) {
+  if (availableDifficulties.size === 0) return null;
+
+  return (
+    <FilterRow>
+      <FilterPill
+        active={active === "all"}
+        onClick={() => onChange("all")}
+        activeClass="border-brand-gold bg-brand-gold/15 text-brand-gold"
+      >
+        All tiers
+      </FilterPill>
+      {DIFFICULTY_TIERS.filter((t) => availableDifficulties.has(t.key)).map((tier) => (
+        <FilterPill
+          key={tier.key}
+          active={active === tier.key}
+          onClick={() => onChange(tier.key)}
+          activeClass={tier.lightClass}
+        >
+          {tier.label}
+        </FilterPill>
+      ))}
+    </FilterRow>
+  );
+}
+
+export function TagFilterPills({
+  active,
+  onChange,
+  availableTags,
+}: {
+  active: string;
+  onChange: (value: string) => void;
+  availableTags: Set<string>;
+}) {
+  if (availableTags.size < 2) return null;
+
+  const sorted = Array.from(availableTags).sort((a, b) => a.localeCompare(b));
+
+  return (
+    <FilterRow>
+      <FilterPill
+        active={active === "all"}
+        onClick={() => onChange("all")}
+        activeClass="border-brand-gold bg-brand-gold/15 text-brand-gold"
+      >
+        All tags
+      </FilterPill>
+      {sorted.map((tag) => (
+        <FilterPill
+          key={tag}
+          active={active === tag}
+          onClick={() => onChange(tag)}
+          activeClass="border-rivals-ink/25 bg-rivals-light-200 text-rivals-ink"
+        >
+          {tag}
+        </FilterPill>
+      ))}
+    </FilterRow>
   );
 }

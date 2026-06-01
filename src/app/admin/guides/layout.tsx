@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server-client";
 import { isSupabaseEnabled } from "@/lib/supabase/env";
 import { canEditHeroGuides } from "@/lib/auth/guide-editor";
+import { isPersonalGuideEdit } from "@/lib/guide-edit-policy";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,7 @@ export default async function AdminGuidesLayout({ children }: { children: ReactN
   const { data } = await supabase.auth.getUser();
   const user = data.user;
 
-  if (!user) {
+  if (!user && !isPersonalGuideEdit()) {
     redirect("/admin/login?next=/admin/guides");
   }
 

@@ -4,14 +4,14 @@ import { notFound } from "next/navigation";
 import { HeroFormAbilitiesPanel } from "@/features/heroes/components/hero-form-abilities-panel";
 import { HeroLabShowcaseCard } from "@/features/heroes/components/hero-lab-showcase-card";
 import { DraftPreviewAuthBanner } from "@/features/heroes/components/draft-preview-auth-banner";
-import { HeroGuideConsole } from "@/features/heroes/components/hero-guide-console";
+import { HeroGuideInlineShell } from "@/features/heroes/components/hero-guide-inline-shell";
 import { HeroGuideAdminLink } from "@/features/heroes/components/hero-guide-admin-link";
 import { buildHeroGuideTabsFromHero, mapHeroToExternalHero } from "@/features/heroes/hero-lab-data";
 import { resolveHeroGuideTabs } from "@/features/heroes/hero-guide-content";
 import { getHeroBySlug, getHeroSlugs, getHeroes } from "@/lib/content-adapter";
 import { buildAbilityLookup } from "@/features/heroes/ability-lookup";
 import { buildHeroPortraitEntries } from "@/features/heroes/hero-portrait-map";
-import { AbilityLookupProvider } from "@/features/heroes/components/ability-lookup-provider";
+import { isSupabaseEnabled } from "@/lib/supabase/env";
 import abilitiesBackgroundImage from "../../../../rivals-assets/frames/abilities-section.jpg";
 
 type HeroPageProps = {
@@ -110,15 +110,16 @@ export default async function HeroPage({ params, searchParams }: HeroPageProps) 
         </div>
       </section>
 
-      <AbilityLookupProvider entries={abilityEntries}>
-        <HeroGuideConsole
-          heroName={hero.name}
-          stackLogoUrl={hero.stackLogoImage}
-          tabs={guideTabs}
-          defaultTabId="overview"
-          heroPortraits={heroPortraits}
-        />
-      </AbilityLookupProvider>
+      <HeroGuideInlineShell
+        heroSlug={hero.slug}
+        heroName={hero.name}
+        stackLogoUrl={hero.stackLogoImage}
+        guideTabs={guideTabs}
+        abilityEntries={abilityEntries}
+        heroPortraits={heroPortraits}
+        defaultTabId="overview"
+        supabaseEnabled={isSupabaseEnabled()}
+      />
       <HeroGuideAdminLink heroSlug={hero.slug} />
     </div>
   );

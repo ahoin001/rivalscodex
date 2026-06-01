@@ -18,6 +18,7 @@ import {
   HeroGuideBody,
   type HeroPortraitEntry,
 } from "@/features/heroes/components/hero-guide-body";
+import { CombosTabPanel } from "@/features/heroes/components/combos-tab-panel";
 import type { ResolvedAbilityRef } from "@/features/heroes/ability-lookup";
 import { useOptionalAbilityLookup } from "@/features/heroes/components/ability-lookup-provider";
 import lunaStackLogoImage from "../../../../rivals-assets/heros/luna/luna-stack-logo.png";
@@ -32,6 +33,8 @@ type HeroGuideConsoleProps = {
   abilityLookup?: Map<string, ResolvedAbilityRef>;
   heroPortraits?: HeroPortraitEntry[];
   className?: string;
+  /** Personal-mode inline editing for combos tab. */
+  inlineEdit?: boolean;
 };
 
 /** Alpha mask: soft left edge into art, soften far right so emblem doesn’t glare behind copy. */
@@ -59,6 +62,7 @@ export function HeroGuideConsole({
   abilityLookup: abilityLookupProp,
   heroPortraits,
   className = "",
+  inlineEdit = false,
 }: HeroGuideConsoleProps) {
   const abilityLookup = abilityLookupProp ?? useOptionalAbilityLookup();
   const initialTabId = defaultTabId ?? tabs[0]?.id;
@@ -279,12 +283,20 @@ export function HeroGuideConsole({
             ) : null}
 
             {activeTab.body && activeTab.body.length > 0 ? (
-              <HeroGuideBody
-                blocks={activeTab.body}
-                anchorPrefix={bodyAnchorPrefix}
-                abilityLookup={abilityLookup}
-                heroPortraits={heroPortraits}
-              />
+              inlineEdit && activeTabId === "combos" ? (
+                <CombosTabPanel
+                  bodyBlocks={activeTab.body}
+                  anchorPrefix={bodyAnchorPrefix}
+                  heroPortraits={heroPortraits}
+                />
+              ) : (
+                <HeroGuideBody
+                  blocks={activeTab.body}
+                  anchorPrefix={bodyAnchorPrefix}
+                  abilityLookup={abilityLookup}
+                  heroPortraits={heroPortraits}
+                />
+              )
             ) : (
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>

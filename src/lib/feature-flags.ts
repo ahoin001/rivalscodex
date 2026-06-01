@@ -1,6 +1,16 @@
+import {
+  guideEditPolicy,
+  inlineGuideEditEnabled,
+  isAdminGuideEdit,
+  isPersonalGuideEdit,
+} from "@/lib/guide-edit-policy";
 import { isSupabaseEnabled } from "@/lib/supabase/env";
 
 export const featureFlags = {
+  guideEditPolicy: guideEditPolicy(),
+  isPersonalGuideEdit: isPersonalGuideEdit(),
+  isAdminGuideEdit: isAdminGuideEdit(),
+  inlineGuideEditEnabled: inlineGuideEditEnabled(),
   enableExternalApis: process.env.NEXT_PUBLIC_ENABLE_EXTERNAL_APIS === "true",
   preferApiContent: process.env.NEXT_PUBLIC_PREFER_API_CONTENT === "true",
   allowImageRecache: process.env.NEXT_PUBLIC_ALLOW_IMAGE_RECACHE === "true",

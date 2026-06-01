@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isPersonalGuideEdit } from "@/lib/guide-edit-policy";
 import { getSupabasePublicConfig } from "@/lib/supabase/env";
 
 export async function proxy(request: NextRequest) {
@@ -32,7 +33,11 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (request.nextUrl.pathname.startsWith("/admin/guides") && !user) {
+  if (
+    request.nextUrl.pathname.startsWith("/admin/guides") &&
+    !user &&
+    !isPersonalGuideEdit()
+  ) {
     const redirectUrl = new URL("/admin/login", request.url);
     redirectUrl.searchParams.set(
       "next",
