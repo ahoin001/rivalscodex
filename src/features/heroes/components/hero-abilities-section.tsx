@@ -8,8 +8,7 @@ import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { ClippedPanel } from "@/components/ui";
 import { ExternalHero } from "@/lib/api/marvel-rivals";
-import lmbIcon from "../../../../rivals-assets/icons/LMB-icon.png";
-import rmbIcon from "../../../../rivals-assets/icons/RMB-icon.png";
+import { RIVALS_ICONS } from "@/lib/rivals-assets-paths";
 
 type HeroAbilitiesSectionProps = {
   hero: ExternalHero | null;
@@ -176,11 +175,11 @@ function getKeyDisplay(rawKey: string | undefined): string {
 
 function getKeyIconSource(keyDisplay: string) {
   if (keyDisplay === "LMB") {
-    return lmbIcon;
+    return RIVALS_ICONS.lmb;
   }
 
   if (keyDisplay === "RMB") {
-    return rmbIcon;
+    return RIVALS_ICONS.rmb;
   }
 
   return null;

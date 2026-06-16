@@ -16,7 +16,7 @@ export const HERO_GUIDE_TAB_ORDER = [
   "overview",
   "abilities",
   "combos",
-  "playstyle",
+  "matchups",
   "resources",
   "notes",
 ] as const;
@@ -37,6 +37,13 @@ export const heroGuideClipSchema = z.object({
 });
 
 export type HeroGuideClip = z.infer<typeof heroGuideClipSchema>;
+
+export const heroGuideProConItemSchema = z.object({
+  title: z.string().trim().min(1).max(160),
+  detail: z.string().trim().max(900).optional(),
+});
+
+export type HeroGuideProConItem = z.infer<typeof heroGuideProConItemSchema>;
 
 export const heroGuideBlockSchema = z.discriminatedUnion("type", [
   z.object({
@@ -74,8 +81,16 @@ export const heroGuideBlockSchema = z.discriminatedUnion("type", [
     clip: heroGuideClipSchema.optional(),
   }),
   z.object({
+    type: z.literal("abilityTip"),
+    abilityRef: z.string().trim().min(1).max(120),
+    title: z.string().trim().max(120).optional(),
+    body: z.string().trim().min(1).max(1200),
+    clip: heroGuideClipSchema.optional(),
+    tags: z.array(z.string().trim().min(1).max(24)).max(4).optional(),
+  }),
+  z.object({
     type: z.literal("matchup"),
-    disposition: z.enum(["target", "threat"]),
+    disposition: z.enum(["target", "even", "threat"]),
     opponent: z.string().trim().min(1).max(80),
     summary: z.string().trim().min(1).max(800),
     clip: heroGuideClipSchema.optional(),
@@ -84,6 +99,12 @@ export const heroGuideBlockSchema = z.discriminatedUnion("type", [
     type: z.literal("video"),
     title: z.string().trim().min(1).max(160),
     watchUrl: z.string().trim().url(),
+  }),
+  z.object({
+    type: z.literal("strengthsWeaknesses"),
+    title: z.string().trim().max(120).optional(),
+    strengths: z.array(heroGuideProConItemSchema).min(1).max(8),
+    weaknesses: z.array(heroGuideProConItemSchema).min(1).max(8),
   }),
 ]);
 
@@ -100,6 +121,9 @@ export const heroGuideTabContentSchema = z
     body: z.array(heroGuideBlockSchema).max(32).optional(),
   })
   .superRefine((tab, ctx) => {
+    if (tab.id === "notes" || tab.id === "abilities" || tab.id === "matchups") {
+      return;
+    }
     const primaryLen = tab.primaryPoints?.length ?? 0;
     const bodyLen = tab.body?.length ?? 0;
     if (primaryLen < 1 && bodyLen < 1) {

@@ -1,8 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { MouseEvent } from "react";
 import { Hero, HeroRole } from "@/data/schema";
 import { ClippedPanel } from "@/components/ui/clipped-panel";
 import { roleColorClass } from "@/features/heroes/role-utils";
+import { saveHeroRouteTransition } from "@/features/heroes/transition/hero-route-transition";
 
 type HeroCardProps = {
   hero: Hero;
@@ -64,17 +66,35 @@ export function HeroCard({
   onToggleFavorite,
 }: HeroCardProps) {
   const href = `/heroes/${hero.slug}`;
+  const handleRouteTransitionSeed = (
+    event: MouseEvent<HTMLAnchorElement>,
+  ) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    saveHeroRouteTransition({
+      slug: hero.slug,
+      name: hero.name,
+      portraitImage: hero.portraitImage,
+      role: hero.role,
+      rect: {
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height,
+      },
+    });
+  };
 
   return (
     <article className="group relative">
       <Link
         href={href}
+        onClickCapture={handleRouteTransitionSeed}
         className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         aria-label={`View ${hero.name} dossier`}
       >
         <ClippedPanel
           tone="sheet"
-          className="brand-glow relative overflow-hidden transition-[transform,box-shadow] duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_0_0_1px_rgb(var(--brand-gold-rgb)/55%),0_16px_40px_rgb(6_8_18/55%),0_0_42px_rgb(var(--brand-gold-rgb)/28%)]"
+          className="brand-glow relative overflow-hidden transition-[transform,box-shadow,filter] duration-[var(--motion-medium)] ease-[var(--ease-out-soft)] group-hover:-translate-y-1 group-hover:shadow-[0_0_0_1px_rgb(var(--brand-gold-rgb)/55%),0_16px_40px_rgb(6_8_18/55%),0_0_42px_rgb(var(--brand-gold-rgb)/28%)] group-hover:brightness-[1.04] group-active:translate-y-0 group-active:scale-[0.995]"
         >
         <span
           className={`pointer-events-none absolute inset-y-0 left-0 z-20 w-1 ${roleAccentBar[hero.role]}`}
@@ -90,7 +110,7 @@ export function HeroCard({
             quality={60}
             loading={prioritizeImage ? "eager" : "lazy"}
             fetchPriority={prioritizeImage ? "high" : "auto"}
-            className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+            className="object-cover object-top transition-transform duration-[var(--motion-slow)] ease-[var(--ease-out-soft)] group-hover:scale-[1.06]"
           />
 
           <div
@@ -98,12 +118,12 @@ export function HeroCard({
             aria-hidden
           />
           <div
-            className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-brand-gold/20 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-brand-gold/20 opacity-0 transition-opacity duration-[var(--motion-medium)] group-hover:opacity-100"
             aria-hidden
           />
 
           <div
-            className="pointer-events-none absolute right-3 top-14 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-black/35 text-brand-gold opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:opacity-100"
+            className="pointer-events-none absolute right-3 top-14 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-black/35 text-brand-gold opacity-0 backdrop-blur-sm transition-all duration-[var(--motion-medium)] group-hover:opacity-100 group-hover:translate-x-0.5"
             aria-hidden
           >
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
@@ -146,7 +166,7 @@ export function HeroCard({
         onClick={() => onToggleFavorite(hero.id)}
         aria-label={isFavorite ? `Remove ${hero.name} from favorites` : `Add ${hero.name} to favorites`}
         aria-pressed={isFavorite}
-        className={`absolute right-3 top-3 z-30 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-sm transition ${
+        className={`absolute right-3 top-3 z-30 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-sm transition-all duration-[var(--motion-fast)] active:scale-95 ${
           isFavorite
             ? "border-brand-gold bg-brand-gold/95 shadow-[0_0_14px_rgb(var(--brand-gold-rgb)/50%)]"
             : "border-white/25 bg-black/45 hover:border-brand-gold hover:bg-black/65"

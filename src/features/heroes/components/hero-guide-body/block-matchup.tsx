@@ -6,7 +6,7 @@ import Link from "next/link";
 import type { HeroPortraitEntry } from "./types";
 import { GuideClip } from "./guide-clip";
 
-type Disposition = "target" | "threat";
+type Disposition = "target" | "even" | "threat";
 
 const TONE: Record<
   Disposition,
@@ -24,6 +24,13 @@ const TONE: Record<
     badge: "border-emerald-600/30 bg-emerald-100/60 text-emerald-800",
     accentBar: "bg-emerald-500",
     label: "Target",
+  },
+  even: {
+    shell: "border-amber-500/30 bg-amber-50/40",
+    title: "text-amber-900/80",
+    badge: "border-amber-500/35 bg-amber-100/70 text-amber-800",
+    accentBar: "bg-amber-500",
+    label: "Even",
   },
   threat: {
     shell: "border-rose-500/30 bg-rose-50/45",

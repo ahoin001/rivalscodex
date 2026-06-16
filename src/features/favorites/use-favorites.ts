@@ -27,8 +27,15 @@ function loadInitialFavorites(): string[] {
 }
 
 export function useFavorites() {
-  const [favorites, setFavorites] = useState<string[]>(loadInitialFavorites);
-  const hydrated = true;
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      setFavorites(loadInitialFavorites());
+      setHydrated(true);
+    });
+  }, []);
 
   useEffect(() => {
     if (!hydrated) {

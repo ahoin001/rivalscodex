@@ -10,6 +10,7 @@ import {
   normalizeKeybindText,
   resolveCanonicalKeybindIcon,
 } from "@/lib/marvel-keybind-icons";
+import { heroAssetPaths as buildHeroAssetPaths } from "@/lib/rivals-assets-paths";
 import { assertHttpsAllowedImageUrl } from "@/lib/marvel-site-import-url";
 import { normalizeMarvelSlug } from "@/lib/marvel-official-html";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role-client";
@@ -82,6 +83,7 @@ const applySkeletonBodySchema = z
     realName: z.string().optional(),
     summary: z.string().min(1),
     downloadAssets: z.boolean().optional().default(true),
+    forceRefreshAssets: z.boolean().optional().default(false),
     urls: heroImageUrlsSchema,
     abilities: z.array(abilityInputSchema).default([]),
     /** When non-empty, stored on the hero and used to derive `health` from a HEALTH row. */
@@ -238,27 +240,28 @@ async function mirrorAssetToSupabaseStorage(
 type DownloadResult = {
   webPath: string;
   writtenFiles: string[];
-  skipped: boolean;
+  status: "written" | "refreshed" | "skipped";
 };
 
 /**
  * Persist a remote image into `public/rivals-assets/...` so the returned web
  * path resolves at runtime through Next's static file serving. Optionally
  * mirrors to a Supabase Storage bucket when `SUPABASE_HERO_ASSET_BUCKET` is
- * configured. There is no longer a duplicate copy under `rivals-assets/` —
- * the codex describes everything and the public folder is the only on-disk
- * runtime source.
+ * configured. All runtime assets live under `public/rivals-assets/`.
  */
 async function downloadAssetWithCache(
   remoteUrl: string,
   relativePathParts: string[],
+  forceRefresh = false,
 ): Promise<DownloadResult> {
   const projectRoot = process.cwd();
   const publicPath = path.join(projectRoot, "public", "rivals-assets", ...relativePathParts);
   const webPath = `/rivals-assets/${relativePathParts.join("/")}`;
+  const relativeDiskPath = path.relative(projectRoot, publicPath);
+  const existed = existsSync(publicPath);
 
-  if (existsSync(publicPath)) {
-    return { webPath, writtenFiles: [], skipped: true };
+  if (existed && !forceRefresh) {
+    return { webPath, writtenFiles: [], status: "skipped" };
   }
 
   const buffer = await fetchBinary(remoteUrl);
@@ -268,8 +271,8 @@ async function downloadAssetWithCache(
 
   return {
     webPath,
-    writtenFiles: [path.relative(projectRoot, publicPath)],
-    skipped: false,
+    writtenFiles: [relativeDiskPath],
+    status: existed ? "refreshed" : "written",
   };
 }
 
@@ -288,9 +291,28 @@ function fileExtensionFromUrl(url: string, fallback = ".png"): string {
   return fallback;
 }
 
+type AssetDownloadLedger = {
+  writtenFiles: string[];
+  refreshedFiles: string[];
+  skippedCount: number;
+};
+
+function recordAssetDownload(ledger: AssetDownloadLedger, result: DownloadResult) {
+  if (result.status === "skipped") {
+    ledger.skippedCount += 1;
+    return;
+  }
+  if (result.status === "refreshed") {
+    ledger.refreshedFiles.push(...result.writtenFiles);
+    return;
+  }
+  ledger.writtenFiles.push(...result.writtenFiles);
+}
+
 async function downloadKeybindIcon(
   url: string,
-  writtenFiles: string[],
+  ledger: AssetDownloadLedger,
+  forceRefresh = false,
 ): Promise<string> {
   assertHttpsAllowedImageUrl(url);
   const canonical = resolveCanonicalKeybindIcon(url);
@@ -300,8 +322,8 @@ async function downloadKeybindIcon(
       return base.replace(/[^a-zA-Z0-9._-]/g, "-");
     })();
 
-  const result = await downloadAssetWithCache(url, ["icons", filename]);
-  writtenFiles.push(...result.writtenFiles);
+  const result = await downloadAssetWithCache(url, ["icons", filename], forceRefresh);
+  recordAssetDownload(ledger, result);
   return result.webPath;
 }
 
@@ -309,22 +331,19 @@ async function downloadAbilityIcon(
   url: string,
   slug: string,
   abilitySlug: string,
-  writtenFiles: string[],
+  ledger: AssetDownloadLedger,
   formId?: string,
+  forceRefresh = false,
 ): Promise<string> {
   assertHttpsAllowedImageUrl(url);
   const ext = fileExtensionFromUrl(url);
-  // Multi-form heroes share many abilities across forms — keep ability art in
-  // the per-form folder so the importer never overwrites another form's icon
-  // if their abilities happen to share a name slug.
   const filename = formId ? `${formId}-${abilitySlug}${ext}` : `${abilitySlug}${ext}`;
-  const result = await downloadAssetWithCache(url, [
-    "heros",
-    slug,
-    "icons",
-    filename,
-  ]);
-  writtenFiles.push(...result.writtenFiles);
+  const result = await downloadAssetWithCache(
+    url,
+    ["heros", slug, "icons", filename],
+    forceRefresh,
+  );
+  recordAssetDownload(ledger, result);
   return result.webPath;
 }
 
@@ -332,28 +351,33 @@ async function downloadHeroAsset(
   url: string,
   slug: string,
   filename: string,
-  writtenFiles: string[],
+  ledger: AssetDownloadLedger,
+  forceRefresh = false,
 ): Promise<void> {
   assertHttpsAllowedImageUrl(url);
-  const result = await downloadAssetWithCache(url, ["heros", slug, filename]);
-  writtenFiles.push(...result.writtenFiles);
+  const result = await downloadAssetWithCache(
+    url,
+    ["heros", slug, filename],
+    forceRefresh,
+  );
+  recordAssetDownload(ledger, result);
 }
 
 async function downloadFormPortrait(
   url: string,
   slug: string,
   formId: string,
-  writtenFiles: string[],
+  ledger: AssetDownloadLedger,
+  forceRefresh = false,
 ): Promise<string> {
   assertHttpsAllowedImageUrl(url);
   const ext = fileExtensionFromUrl(url);
-  const result = await downloadAssetWithCache(url, [
-    "heros",
-    slug,
-    "forms",
-    `${formId}${ext}`,
-  ]);
-  writtenFiles.push(...result.writtenFiles);
+  const result = await downloadAssetWithCache(
+    url,
+    ["heros", slug, "forms", `${formId}${ext}`],
+    forceRefresh,
+  );
+  recordAssetDownload(ledger, result);
   return result.webPath;
 }
 
@@ -533,10 +557,7 @@ async function buildNewHeroFromTemplate(
     difficulty: typeof raw.difficulty === "number" ? raw.difficulty : 3,
     health: typeof raw.health === "number" ? raw.health : 650,
     // Canonical local asset paths for codex heroes.
-    portraitImage: `/rivals-assets/heros/${slug}/${slug}.png`,
-    splashImage: `/rivals-assets/heros/${slug}/${slug}.png`,
-    frameImage: `/rivals-assets/heros/${slug}/${slug}-frame.png`,
-    stackLogoImage: `/rivals-assets/heros/${slug}/${slug}-stack-logo.png`,
+    ...buildHeroAssetPaths(slug),
     summary: fields.summary,
     abilities: [
       {
@@ -598,10 +619,11 @@ async function buildAbilitiesFromInput(args: {
   heroSlug: string;
   formId?: string;
   abilityInputs: z.infer<typeof abilityInputSchema>[];
-  writtenFiles: string[];
+  ledger: AssetDownloadLedger;
   warnings: string[];
+  forceRefresh?: boolean;
 }): Promise<HeroAbility[]> {
-  const { heroSlug, formId, abilityInputs, writtenFiles, warnings } = args;
+  const { heroSlug, formId, abilityInputs, ledger, warnings, forceRefresh = false } = args;
 
   const duplicateNameKeys = new Set<string>();
   const seenNameKeys = new Set<string>();
@@ -626,8 +648,9 @@ async function buildAbilitiesFromInput(args: {
           ability.iconUrl,
           heroSlug,
           abilitySlug,
-          writtenFiles,
+          ledger,
           formId,
+          forceRefresh,
         );
       } catch (e) {
         warnings.push(
@@ -646,7 +669,8 @@ async function buildAbilitiesFromInput(args: {
         }
         const downloaded = await downloadKeybindIcon(
           ability.keybindIconUrl,
-          writtenFiles,
+          ledger,
+          forceRefresh,
         );
         keybindIconWebPath = keybindIconWebPath ?? downloaded;
       } catch (e) {
@@ -675,8 +699,13 @@ async function buildAbilitiesFromInput(args: {
 async function handleApplySkeleton(
   body: z.infer<typeof applySkeletonBodySchema>,
 ): Promise<Response> {
-  const writtenFiles: string[] = [];
+  const ledger: AssetDownloadLedger = {
+    writtenFiles: [],
+    refreshedFiles: [],
+    skippedCount: 0,
+  };
   const warnings: string[] = [];
+  const forceRefresh = body.forceRefreshAssets ?? false;
 
   const existingLookup = await findExistingHero(body.slug);
   const existing: Hero | undefined = existingLookup.hero;
@@ -684,12 +713,7 @@ async function handleApplySkeleton(
     warnings.push(existingLookup.warning);
   }
 
-  const heroAssetPaths = {
-    portraitImage: `/rivals-assets/heros/${body.slug}/${body.slug}.png`,
-    splashImage: `/rivals-assets/heros/${body.slug}/${body.slug}.png`,
-    frameImage: `/rivals-assets/heros/${body.slug}/${body.slug}-frame.png`,
-    stackLogoImage: `/rivals-assets/heros/${body.slug}/${body.slug}-stack-logo.png`,
-  };
+  const codexAssetPaths = buildHeroAssetPaths(body.slug);
 
   if (body.downloadAssets) {
     const pairs: { url: string; filename: string }[] = [
@@ -699,7 +723,7 @@ async function handleApplySkeleton(
     ];
     for (const { url, filename } of pairs) {
       try {
-        await downloadHeroAsset(url, body.slug, filename, writtenFiles);
+        await downloadHeroAsset(url, body.slug, filename, ledger, forceRefresh);
       } catch (e) {
         return NextResponse.json(
           {
@@ -720,12 +744,10 @@ async function handleApplySkeleton(
         role: body.role,
         realName: body.realName?.trim() || undefined,
         summary: body.summary,
-        // Canonical asset paths come from convention, not editor input — keeps
-        // the codex aligned with what the importer actually wrote to disk.
-        portraitImage: heroAssetPaths.portraitImage,
-        splashImage: heroAssetPaths.splashImage,
-        frameImage: heroAssetPaths.frameImage,
-        stackLogoImage: heroAssetPaths.stackLogoImage,
+        portraitImage: codexAssetPaths.portraitImage,
+        splashImage: codexAssetPaths.splashImage,
+        frameImage: codexAssetPaths.frameImage,
+        stackLogoImage: codexAssetPaths.stackLogoImage,
         updatedAt: todayIsoDate(),
       }
     : await buildNewHeroFromTemplate(body.slug, {
@@ -774,7 +796,8 @@ async function handleApplySkeleton(
             formInput.portraitUrl,
             body.slug,
             formInput.formId,
-            writtenFiles,
+            ledger,
+            forceRefresh,
           );
         } catch (e) {
           warnings.push(
@@ -789,8 +812,9 @@ async function handleApplySkeleton(
         heroSlug: body.slug,
         formId: formInput.formId,
         abilityInputs: formInput.abilities,
-        writtenFiles,
+        ledger,
         warnings,
+        forceRefresh,
       });
 
       const formAbilities = formAbilitiesRaw.map((record) =>
@@ -828,8 +852,9 @@ async function handleApplySkeleton(
     const built = await buildAbilitiesFromInput({
       heroSlug: body.slug,
       abilityInputs: body.abilities,
-      writtenFiles,
+      ledger,
       warnings,
+      forceRefresh,
     });
     newAbilities = built.map((record) =>
       mergeWithExisting(
@@ -902,7 +927,9 @@ async function handleApplySkeleton(
       abilitiesCount: allAbilities.length,
       abilityDetailsCount: detailsCount,
       baseStatRowsCount: validation.data.baseStatRows?.length ?? 0,
-      writtenFilesCount: writtenFiles.length,
+      writtenFilesCount: ledger.writtenFiles.length,
+      refreshedFilesCount: ledger.refreshedFiles.length,
+      skippedFilesCount: ledger.skippedCount,
       warnings,
       supabaseStatus: persist.supabaseStatus,
     },
@@ -917,7 +944,10 @@ async function handleApplySkeleton(
     abilityDetailsCount: detailsCount,
     baseStatRowsCount: validation.data.baseStatRows?.length ?? 0,
     downloadAssets: body.downloadAssets,
-    writtenFiles,
+    forceRefreshAssets: body.forceRefreshAssets ?? false,
+    writtenFiles: ledger.writtenFiles,
+    refreshedFiles: ledger.refreshedFiles,
+    skippedFilesCount: ledger.skippedCount,
     warnings,
     supabase: { status: persist.supabaseStatus, error: persist.supabaseError },
     message: "Hero codex written.",

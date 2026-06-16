@@ -2,6 +2,8 @@
 
 import {
   type CSSProperties,
+  type RefObject,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -19,11 +21,18 @@ import {
   type HeroPortraitEntry,
 } from "@/features/heroes/components/hero-guide-body";
 import { CombosTabPanel } from "@/features/heroes/components/combos-tab-panel";
+import { MatchupsTabPanel } from "@/features/heroes/components/matchups-tab-panel";
+import { KitTabPanel } from "@/features/heroes/components/kit-tab-panel";
+import { NotesTabPanel } from "@/features/heroes/components/notes-tab-panel";
+import { GuideTabFallback } from "@/features/heroes/components/guide-tab-fallback";
 import type { ResolvedAbilityRef } from "@/features/heroes/ability-lookup";
 import { useOptionalAbilityLookup } from "@/features/heroes/components/ability-lookup-provider";
-import lunaStackLogoImage from "../../../../rivals-assets/heros/luna/luna-stack-logo.png";
+import { RIVALS_LUNA } from "@/lib/rivals-assets-paths";
+import { HeroGuideFullEditorLink } from "@/features/heroes/components/hero-guide-full-editor-link";
+import { scrollTargetIntoPanel } from "@/features/heroes/components/guide-panel-scroll";
 
 type HeroGuideConsoleProps = {
+  heroId: string;
   heroName: string;
   /** Per-hero stack-logo backdrop URL from the codex. Falls back to the Luna chrome asset. */
   stackLogoUrl?: string;
@@ -33,8 +42,8 @@ type HeroGuideConsoleProps = {
   abilityLookup?: Map<string, ResolvedAbilityRef>;
   heroPortraits?: HeroPortraitEntry[];
   className?: string;
-  /** Personal-mode inline editing for combos tab. */
-  inlineEdit?: boolean;
+  /** When set, shows “Open full tab editor” in the guide section header. */
+  fullTabEditorHref?: string | null;
 };
 
 /** Alpha mask: soft left edge into art, soften far right so emblem doesn’t glare behind copy. */
@@ -49,11 +58,95 @@ const stackBackdropMaskStyle: CSSProperties = {
   maskRepeat: "no-repeat",
 };
 
-/** Duration tokens — kept in sync with `--motion-*` in globals.css. */
-const TAB_EXIT_MS = 140;
-const TAB_ENTER_MS = 240;
+const GUIDE_SECTION_NAV_CHIP =
+  "inline-flex min-h-9 items-center rounded-full border border-rivals-light-300 bg-white/70 px-3 py-1 text-[11px] font-display font-semibold uppercase tracking-[0.14em] text-rivals-ink-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-rivals-yellow-500/55 hover:text-rivals-ink";
+
+function GuideSectionNav({
+  items,
+  scrollContainerRef,
+  topLabel = "Top",
+  onScrollTop,
+  variant,
+}: {
+  items: { id: string; label: string }[];
+  scrollContainerRef: RefObject<HTMLElement | null>;
+  topLabel?: string;
+  onScrollTop: () => void;
+  variant: "mobile" | "desktop";
+}) {
+  const scrollToSection = useCallback(
+    (id: string) => {
+      const target = document.getElementById(id);
+      scrollTargetIntoPanel(target, {
+        container: scrollContainerRef.current,
+        offset: 48,
+        behavior: "smooth",
+      });
+    },
+    [scrollContainerRef],
+  );
+
+  if (variant === "mobile") {
+    return (
+      <details className="group mb-3 rounded-lg border border-rivals-light-300/80 bg-white/65 px-3 py-2 sm:hidden">
+        <summary className="cursor-pointer list-none font-display text-[11px] font-bold uppercase italic tracking-[0.18em] text-rivals-ink-muted">
+          Jump to section
+        </summary>
+        <div className="mt-2 grid gap-1.5">
+          {items.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => scrollToSection(item.id)}
+              className="rounded px-2 py-1.5 text-left text-xs font-semibold text-rivals-ink-soft transition-colors hover:bg-rivals-light-200 hover:text-rivals-ink"
+            >
+              {item.label}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={onScrollTop}
+            className="rounded px-2 py-1.5 text-left text-xs font-semibold text-rivals-ink-soft transition-colors hover:bg-rivals-light-200 hover:text-rivals-ink"
+          >
+            {topLabel === "Top" ? "Back to top" : topLabel}
+          </button>
+        </div>
+      </details>
+    );
+  }
+
+  return (
+    <div className="mb-3 hidden sm:block sm:sticky sm:top-0 sm:z-10 sm:border-b sm:border-rivals-light-300/70 sm:bg-rivals-light-100/95 sm:pb-3 sm:pt-1 sm:backdrop-blur">
+      <div className="flex flex-wrap gap-1.5">
+        {items.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => scrollToSection(item.id)}
+            className={GUIDE_SECTION_NAV_CHIP}
+          >
+            {item.label}
+          </button>
+        ))}
+        <button type="button" onClick={onScrollTop} className={GUIDE_SECTION_NAV_CHIP}>
+          {topLabel}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+const GUIDE_TAB_SHORT_LABELS: Record<HeroGuideTabId, string> = {
+  overview: "Overview",
+  abilities: "Kit",
+  combos: "Combos",
+  matchups: "Matchups",
+  resources: "Resources",
+  notes: "Notes",
+};
 
 export function HeroGuideConsole({
+  heroId,
   heroName,
   stackLogoUrl,
   subtitle,
@@ -62,21 +155,25 @@ export function HeroGuideConsole({
   abilityLookup: abilityLookupProp,
   heroPortraits,
   className = "",
-  inlineEdit = false,
+  fullTabEditorHref = null,
 }: HeroGuideConsoleProps) {
-  const abilityLookup = abilityLookupProp ?? useOptionalAbilityLookup();
+  const optionalAbilityLookup = useOptionalAbilityLookup();
+  const abilityLookup = abilityLookupProp ?? optionalAbilityLookup;
   const initialTabId = defaultTabId ?? tabs[0]?.id;
   const [activeTabId, setActiveTabId] = useState<HeroGuideTabId>(
-    (initialTabId ?? "abilities") as HeroGuideTabId,
+    (initialTabId ?? "overview") as HeroGuideTabId,
   );
 
-  const backdropImage = stackLogoUrl ?? lunaStackLogoImage;
+  const backdropImage = stackLogoUrl ?? RIVALS_LUNA.stackLogo;
   const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0];
   const heroSlugLike = useMemo(
     () => heroName.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
     [heroName],
   );
   const heroGuideTopId = `${heroSlugLike}-guide-top`;
+  const tabListIdBase = `${heroSlugLike}-guide-tabs`;
+  const activePanelId = `${tabListIdBase}-panel`;
+  const activeTabButtonId = `${tabListIdBase}-tab-${activeTabId}`;
   const bodyAnchorPrefix = `${heroSlugLike}-${activeTabId}`;
   const bodyNavItems = useMemo(
     () => (activeTab.body ? buildHeroGuideBodyNavItems(activeTab.body, bodyAnchorPrefix) : []),
@@ -84,34 +181,28 @@ export function HeroGuideConsole({
   );
 
   const tabBarItems: RivalsTab[] = useMemo(
-    () => tabs.map((tab) => ({ id: tab.id, label: tab.label })),
+    () =>
+      tabs.map((tab) => ({
+        id: tab.id,
+        label: tab.label,
+        shortLabel: GUIDE_TAB_SHORT_LABELS[tab.id],
+      })),
     [tabs],
   );
-
-  // Single state value drives the CSS class that plays the exit→enter
-  // tab animation. Both timers are tracked together so unmount/rerun
-  // clears all in-flight work.
-  const [transition, setTransition] = useState<"idle" | "exit" | "enter">("idle");
-
-  useEffect(() => {
-    setTransition("exit");
-    const exitTimer = setTimeout(() => {
-      setTransition("enter");
-    }, TAB_EXIT_MS);
-    const enterTimer = setTimeout(() => {
-      setTransition("idle");
-    }, TAB_EXIT_MS + TAB_ENTER_MS);
-    return () => {
-      clearTimeout(exitTimer);
-      clearTimeout(enterTimer);
-    };
-  }, [activeTabId]);
 
   // Parallax: write transform directly to the backdrop via ref + rAF.
   // Using setState here would re-render the entire console on every
   // scroll frame, which is wasteful and stutters on lower-end machines.
   const sectionRef = useRef<HTMLElement>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
+  const tabScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollPanelToTop = useCallback(() => {
+    tabScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  const showGenericSectionNav =
+    bodyNavItems.length > 0 && activeTabId !== "combos";
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -191,17 +282,22 @@ export function HeroGuideConsole({
       </div>
 
       <div className="relative z-10 mx-auto flex w-full max-w-[min(100%,1680px)] flex-col gap-6 px-4 pt-5 pb-0 sm:min-h-[30rem] sm:gap-8 sm:px-8 sm:pt-6 lg:min-h-[32rem] lg:gap-10 lg:px-12 lg:pt-7">
-        <header className="space-y-3 drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]">
-          <p className="text-[11px] uppercase tracking-[0.36em] text-white/75 sm:text-xs">
-            Hero Guide
-          </p>
-          <h2 className="slanted-title max-w-[18ch] font-display text-[clamp(2.2rem,12vw,4.25rem)] font-extrabold uppercase italic leading-[0.94] text-white sm:leading-[0.9]">
-            <span>{heroName}</span>
-          </h2>
-          {subtitle ? (
-            <p className="inline-flex border border-cyan-400/35 bg-black/45 px-3 py-1.5 font-display text-[11px] italic uppercase tracking-[0.24em] text-cyan-100 backdrop-blur-sm sm:text-xs">
-              {subtitle}
+        <header className="flex flex-wrap items-start justify-between gap-3 drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]">
+          <div className="min-w-0 space-y-3">
+            <p className="text-[11px] uppercase tracking-[0.36em] text-white/75 sm:text-xs">
+              Hero Guide
             </p>
+            <h2 className="slanted-title max-w-[18ch] font-display text-[clamp(2.2rem,12vw,4.25rem)] font-extrabold uppercase italic leading-[0.94] text-white sm:leading-[0.9]">
+              <span>{heroName}</span>
+            </h2>
+            {subtitle ? (
+              <p className="inline-flex border border-cyan-400/35 bg-black/45 px-3 py-1.5 font-display text-[11px] italic uppercase tracking-[0.24em] text-cyan-100 backdrop-blur-sm sm:text-xs">
+                {subtitle}
+              </p>
+            ) : null}
+          </div>
+          {fullTabEditorHref ? (
+            <HeroGuideFullEditorLink href={fullTabEditorHref} className="mt-1" />
           ) : null}
         </header>
 
@@ -209,6 +305,8 @@ export function HeroGuideConsole({
           tabs={tabBarItems}
           activeTabId={activeTabId}
           onChange={(tabId) => setActiveTabId(tabId as HeroGuideTabId)}
+          idBase={tabListIdBase}
+          getPanelId={() => activePanelId}
           className="-mx-1 px-1 sm:mx-0 sm:px-0"
         />
 
@@ -216,113 +314,75 @@ export function HeroGuideConsole({
         <article
           className="clip-reveal rivals-clip-row flex flex-col rounded-xl border border-white/15 bg-rivals-light-100/96 p-4 shadow-[0_8px_28px_rgba(0,0,0,0.26)] backdrop-blur-sm sm:min-h-[min(58vh,38rem)] sm:rounded-none sm:p-6 sm:shadow-[0_12px_48px_rgba(0,0,0,0.35)] lg:min-h-[min(52vh,40rem)]"
           aria-live="polite"
+          role="tabpanel"
+          id={activePanelId}
+          aria-labelledby={activeTabButtonId}
         >
           <header className="shrink-0 border-b border-rivals-light-300 pb-3">
             <h3 className="font-display text-[1.65rem] font-extrabold uppercase italic leading-tight text-rivals-ink sm:text-3xl">
               {activeTab.label}
             </h3>
-            <p className="mt-2 text-sm leading-6 text-rivals-ink-soft sm:text-[15px] sm:leading-7">
-              {activeTab.summary}
-            </p>
+            {activeTab.id !== "notes" ? (
+              <p className="mt-2 text-sm leading-6 text-rivals-ink-soft sm:text-[15px] sm:leading-7">
+                {activeTab.summary}
+              </p>
+            ) : null}
           </header>
 
           <div
-            className={`flex min-h-0 flex-1 flex-col overflow-visible pt-4 sm:overflow-y-auto sm:overscroll-contain sm:[-webkit-overflow-scrolling:touch] scroll-smooth ${
-              transition === "exit"
-                ? "tab-exit"
-                : transition === "enter"
-                  ? "tab-enter"
-                  : ""
+            ref={tabScrollRef}
+            key={activeTabId}
+            className={`flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden pt-4 sm:overflow-y-auto sm:overscroll-contain sm:[-webkit-overflow-scrolling:touch] scroll-smooth ${
+              "tab-enter"
             }`}
           >
-            {bodyNavItems.length > 0 ? (
+            {showGenericSectionNav ? (
               <>
-                <details className="group mb-3 rounded-lg border border-rivals-light-300/80 bg-white/65 px-3 py-2 sm:hidden">
-                  <summary className="cursor-pointer list-none font-display text-[11px] font-bold uppercase italic tracking-[0.18em] text-rivals-ink-muted">
-                    Jump to section
-                  </summary>
-                  <div className="mt-2 grid gap-1.5">
-                    {bodyNavItems.map((item) => (
-                      <a
-                        key={item.id}
-                        href={`#${item.id}`}
-                        className="rounded px-2 py-1.5 text-xs font-semibold text-rivals-ink-soft transition-colors hover:bg-rivals-light-200 hover:text-rivals-ink"
-                      >
-                        {item.label}
-                      </a>
-                    ))}
-                    <a
-                      href={`#${heroGuideTopId}`}
-                      className="rounded px-2 py-1.5 text-xs font-semibold text-rivals-ink-soft transition-colors hover:bg-rivals-light-200 hover:text-rivals-ink"
-                    >
-                      Back to top
-                    </a>
-                  </div>
-                </details>
-
-                <div className="mb-3 hidden sm:block sm:sticky sm:top-0 sm:z-10 sm:border-b sm:border-rivals-light-300/70 sm:bg-rivals-light-100/95 sm:pb-3 sm:pt-1 sm:backdrop-blur">
-                  <div className="flex flex-wrap gap-1.5">
-                    {bodyNavItems.map((item) => (
-                      <a
-                        key={item.id}
-                        href={`#${item.id}`}
-                        className="inline-flex min-h-9 items-center rounded-full border border-rivals-light-300 bg-white/70 px-3 py-1 text-[11px] font-display font-semibold uppercase tracking-[0.14em] text-rivals-ink-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-rivals-yellow-500/55 hover:text-rivals-ink"
-                      >
-                        {item.label}
-                      </a>
-                    ))}
-                    <a
-                      href={`#${heroGuideTopId}`}
-                      className="inline-flex min-h-9 items-center rounded-full border border-rivals-light-300 bg-white/70 px-3 py-1 text-[11px] font-display font-semibold uppercase tracking-[0.14em] text-rivals-ink-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-rivals-yellow-500/55 hover:text-rivals-ink"
-                    >
-                      Top
-                    </a>
-                  </div>
-                </div>
+                <GuideSectionNav
+                  items={bodyNavItems}
+                  scrollContainerRef={tabScrollRef}
+                  onScrollTop={scrollPanelToTop}
+                  variant="mobile"
+                />
+                <GuideSectionNav
+                  items={bodyNavItems}
+                  scrollContainerRef={tabScrollRef}
+                  onScrollTop={scrollPanelToTop}
+                  variant="desktop"
+                />
               </>
             ) : null}
 
-            {activeTab.body && activeTab.body.length > 0 ? (
-              inlineEdit && activeTabId === "combos" ? (
+            {activeTabId === "combos" ? (
                 <CombosTabPanel
-                  bodyBlocks={activeTab.body}
+                  bodyBlocks={activeTab.body ?? []}
                   anchorPrefix={bodyAnchorPrefix}
                   heroPortraits={heroPortraits}
+                  scrollContainerRef={tabScrollRef}
                 />
-              ) : (
+              ) : activeTabId === "notes" ? (
+                <NotesTabPanel heroId={heroId} heroName={heroName} />
+              ) : activeTabId === "matchups" ? (
+                <MatchupsTabPanel blocks={activeTab.body ?? []} heroPortraits={heroPortraits} />
+              ) : activeTabId === "abilities" ? (
+                <KitTabPanel
+                  blocks={activeTab.body ?? []}
+                  abilityLookup={abilityLookup}
+                  primaryPoints={activeTab.primaryPoints}
+                  secondaryPoints={activeTab.secondaryPoints}
+                />
+              ) : activeTab.body && activeTab.body.length > 0 ? (
                 <HeroGuideBody
                   blocks={activeTab.body}
                   anchorPrefix={bodyAnchorPrefix}
                   abilityLookup={abilityLookup}
                   heroPortraits={heroPortraits}
                 />
-              )
-            ) : (
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div>
-                  <p className="font-display text-[11px] uppercase tracking-[0.22em] text-rivals-ink-muted">
-                    Priority Cues
-                  </p>
-                  <ul className="mt-2 list-disc space-y-1.5 pl-4 text-sm leading-6 text-rivals-ink-soft sm:text-[15px]">
-                    {(activeTab.primaryPoints ?? []).map((point) => (
-                      <li key={point}>{point}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                {activeTab.secondaryPoints && activeTab.secondaryPoints.length > 0 ? (
-                  <div>
-                    <p className="font-display text-[11px] uppercase tracking-[0.22em] text-rivals-ink-muted">
-                      Secondary Cues
-                    </p>
-                    <ul className="mt-2 list-disc space-y-1.5 pl-4 text-sm leading-6 text-rivals-ink-soft sm:text-[15px]">
-                      {activeTab.secondaryPoints.map((point) => (
-                        <li key={point}>{point}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-              </div>
+              ) : (
+              <GuideTabFallback
+                primaryPoints={activeTab.primaryPoints}
+                secondaryPoints={activeTab.secondaryPoints}
+              />
             )}
 
             {activeTab.links && activeTab.links.length > 0 ? (

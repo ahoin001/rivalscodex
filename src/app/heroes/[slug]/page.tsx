@@ -5,14 +5,17 @@ import { HeroFormAbilitiesPanel } from "@/features/heroes/components/hero-form-a
 import { HeroLabShowcaseCard } from "@/features/heroes/components/hero-lab-showcase-card";
 import { DraftPreviewAuthBanner } from "@/features/heroes/components/draft-preview-auth-banner";
 import { HeroGuideInlineShell } from "@/features/heroes/components/hero-guide-inline-shell";
-import { HeroGuideAdminLink } from "@/features/heroes/components/hero-guide-admin-link";
+import { HeroRouteTransitionLayer } from "@/features/heroes/components/hero-route-transition-layer";
+import { getFullTabEditorHref } from "@/features/heroes/loaders/full-tab-editor-href";
+import { HeroCodexResyncTrigger } from "@/features/marvel-site-import/hero-codex-resync-drawer";
+import { HeroCodexResyncShell } from "@/features/marvel-site-import/hero-codex-resync-shell";
 import { buildHeroGuideTabsFromHero, mapHeroToExternalHero } from "@/features/heroes/hero-lab-data";
 import { resolveHeroGuideTabs } from "@/features/heroes/hero-guide-content";
 import { getHeroBySlug, getHeroSlugs, getHeroes } from "@/lib/content-adapter";
-import { buildAbilityLookup } from "@/features/heroes/ability-lookup";
+import { buildComboAbilityLookup } from "@/features/heroes/combo-kit-abilities";
 import { buildHeroPortraitEntries } from "@/features/heroes/hero-portrait-map";
 import { isSupabaseEnabled } from "@/lib/supabase/env";
-import abilitiesBackgroundImage from "../../../../rivals-assets/frames/abilities-section.jpg";
+import { RIVALS_FRAMES } from "@/lib/rivals-assets-paths";
 
 type HeroPageProps = {
   params: Promise<{
@@ -63,7 +66,7 @@ export default async function HeroPage({ params, searchParams }: HeroPageProps) 
   const wantsDraftPreview = resolvedSearchParams?.preview === "draft";
   const guideScope = wantsDraftPreview ? "draft" : "published";
   const loginNextPath = `/heroes/${hero.slug}${wantsDraftPreview ? "?preview=draft" : ""}`;
-  const [guideTabs, allHeroes] = await Promise.all([
+  const [{ tabs: guideTabs, editorialLoaded }, allHeroes] = await Promise.all([
     resolveHeroGuideTabs({
       heroSlug: hero.slug,
       fallbackTabs: fallbackGuideTabs,
@@ -76,51 +79,63 @@ export default async function HeroPage({ params, searchParams }: HeroPageProps) 
     ? hero.forms.flatMap((f) => f.abilities)
     : hero.abilities;
   const abilityEntries = Array.from(
-    buildAbilityLookup(allAbilities).entries(),
+    buildComboAbilityLookup(allAbilities).entries(),
   );
   const heroPortraits = buildHeroPortraitEntries(allHeroes);
+  const fullTabEditorHref = await getFullTabEditorHref(hero.slug);
 
   return (
-    <div className="lab-light-theme min-h-screen">
-      <DraftPreviewAuthBanner
-        wantsDraftPreview={wantsDraftPreview}
-        loginNextPath={loginNextPath}
-      />
-      <section className="w-full">
-        <HeroLabShowcaseCard hero={hero} />
-      </section>
-
-      <section className="relative isolate w-full overflow-hidden">
-        <Image
-          src={abilitiesBackgroundImage}
-          alt=""
-          fill
-          priority={false}
-          sizes="100vw"
-          aria-hidden
-          className="object-cover object-center"
+    <HeroCodexResyncShell heroSlug={hero.slug} heroName={hero.name}>
+      <div className="hero-page-shell lab-light-theme min-h-screen">
+        <HeroRouteTransitionLayer heroSlug={hero.slug} />
+        <DraftPreviewAuthBanner
+          wantsDraftPreview={wantsDraftPreview}
+          loginNextPath={loginNextPath}
         />
-        <div className="relative mx-auto w-full max-w-[min(100%,1680px)] px-5 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-12">
-          <HeroFormAbilitiesPanel
+        <section className="hero-stage-showcase w-full">
+          <HeroLabShowcaseCard
             hero={hero}
-            heroAsExternal={heroAsExternal}
-            stackLogoUrl={hero.stackLogoImage}
-            variant="immersive"
+            toolbarEnd={<HeroCodexResyncTrigger />}
           />
-        </div>
-      </section>
+        </section>
 
-      <HeroGuideInlineShell
-        heroSlug={hero.slug}
-        heroName={hero.name}
-        stackLogoUrl={hero.stackLogoImage}
-        guideTabs={guideTabs}
-        abilityEntries={abilityEntries}
-        heroPortraits={heroPortraits}
-        defaultTabId="overview"
-        supabaseEnabled={isSupabaseEnabled()}
-      />
-      <HeroGuideAdminLink heroSlug={hero.slug} />
-    </div>
+        <HeroGuideInlineShell
+          heroSlug={hero.slug}
+          heroId={hero.id}
+          heroName={hero.name}
+          stackLogoUrl={hero.stackLogoImage}
+          guideTabs={guideTabs}
+          editorialLoaded={editorialLoaded}
+          abilityEntries={abilityEntries}
+          heroPortraits={heroPortraits}
+          defaultTabId="overview"
+          supabaseEnabled={isSupabaseEnabled()}
+          fullTabEditorHref={fullTabEditorHref}
+        />
+
+        <section
+          id="hero-codex-abilities"
+          className="hero-stage-shell hero-stage-abilities relative isolate w-full overflow-hidden"
+        >
+          <Image
+            src={RIVALS_FRAMES.abilitiesSection}
+            alt=""
+            fill
+            priority={false}
+            sizes="100vw"
+            aria-hidden
+            className="object-cover object-center"
+          />
+          <div className="relative mx-auto w-full max-w-[min(100%,1680px)] px-5 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-12">
+            <HeroFormAbilitiesPanel
+              hero={hero}
+              heroAsExternal={heroAsExternal}
+              stackLogoUrl={hero.stackLogoImage}
+              variant="immersive"
+            />
+          </div>
+        </section>
+      </div>
+    </HeroCodexResyncShell>
   );
 }

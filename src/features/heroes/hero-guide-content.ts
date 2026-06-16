@@ -10,37 +10,57 @@ import { fetchHeroGuideTabsFromEditorial } from "@/lib/supabase/hero-guide-edito
 
 export type HeroGuideContentScope = "published" | "draft";
 
+export type ResolvedHeroGuideTabs = {
+  tabs: HeroGuideTabContent[];
+  /** True when editorial JSON loaded from Supabase (not dossier-only fallback). */
+  editorialLoaded: boolean;
+};
+
 export async function resolveHeroGuideTabs(input: {
   heroSlug: string;
   fallbackTabs: HeroGuideTabContent[];
   scope?: HeroGuideContentScope;
-}): Promise<HeroGuideTabContent[]> {
+}): Promise<ResolvedHeroGuideTabs> {
   if (!featureFlags.enableSupabase) {
-    return mergeHeroGuideTabsWithFallback(input.fallbackTabs, input.fallbackTabs);
+    return {
+      tabs: mergeHeroGuideTabsWithFallback(input.fallbackTabs, input.fallbackTabs),
+      editorialLoaded: false,
+    };
   }
 
   if (input.scope === "draft") {
     const supabase = await createSupabaseServerClient();
     if (!supabase) {
-      return mergeHeroGuideTabsWithFallback(input.fallbackTabs, input.fallbackTabs);
+      return {
+        tabs: mergeHeroGuideTabsWithFallback(input.fallbackTabs, input.fallbackTabs),
+        editorialLoaded: false,
+      };
     }
 
     const { data } = await supabase.auth.getUser();
     if (!data.user) {
       const publishedTabs = await getCachedPublishedHeroGuideTabs(input.heroSlug);
-      return mergeHeroGuideTabsWithFallback(
-        publishedTabs ?? input.fallbackTabs,
-        input.fallbackTabs,
-      );
+      return {
+        tabs: mergeHeroGuideTabsWithFallback(
+          publishedTabs ?? input.fallbackTabs,
+          input.fallbackTabs,
+        ),
+        editorialLoaded: publishedTabs !== null,
+      };
     }
 
     unstable_noStore();
 
     const draftTabs = await fetchHeroGuideTabsFromEditorial(supabase, input.heroSlug, "draft");
-    return mergeHeroGuideTabsWithFallback(draftTabs ?? input.fallbackTabs, input.fallbackTabs);
+    return {
+      tabs: mergeHeroGuideTabsWithFallback(draftTabs ?? input.fallbackTabs, input.fallbackTabs),
+      editorialLoaded: draftTabs !== null,
+    };
   }
 
   const publishedTabs = await getCachedPublishedHeroGuideTabs(input.heroSlug);
-  return mergeHeroGuideTabsWithFallback(publishedTabs ?? input.fallbackTabs, input.fallbackTabs);
+  return {
+    tabs: mergeHeroGuideTabsWithFallback(publishedTabs ?? input.fallbackTabs, input.fallbackTabs),
+    editorialLoaded: publishedTabs !== null,
+  };
 }
-

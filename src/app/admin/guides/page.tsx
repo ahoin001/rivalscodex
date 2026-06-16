@@ -11,7 +11,7 @@ export default async function AdminGuidesIndexPage() {
         Hero guides
       </h1>
       <p className="mt-2 text-sm text-rivals-ink-soft">
-        Choose a hero to edit tabbed guide content. Save drafts, then publish when ready.
+        Choose a hero to edit tabbed guide content. Publish to push changes live immediately.
       </p>
       <ul className="mt-8 divide-y divide-rivals-light-300 rounded border border-rivals-light-300 bg-white">
         {sorted.map((hero) => (

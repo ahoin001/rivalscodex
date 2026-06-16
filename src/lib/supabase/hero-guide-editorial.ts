@@ -4,6 +4,10 @@ import {
   heroGuideTabsSchema,
 } from "@/features/heroes/hero-guide-schema";
 import {
+  sanitizeAndParseHeroGuideTabs,
+  sanitizeHeroGuideTabsCandidate,
+} from "@/features/heroes/hero-guide-sanitize";
+import {
   type HeroEditorialScope,
   fetchHeroEditorialContent,
   upsertHeroEditorial,
@@ -39,15 +43,23 @@ export async function fetchHeroGuideTabsFromEditorial(
 
   const candidate = extractGuideTabsCandidate(editorial);
   const parsed = heroGuideTabsSchema.safeParse(candidate);
-  if (!parsed.success) {
-    console.warn(
-      `[supabase] hero guide tabs parse failed for "${heroSlug}" (${scope})`,
-      parsed.error.issues.map((issue) => issue.message).join("; "),
-    );
-    return null;
+  if (parsed.success) {
+    return parsed.data;
   }
 
-  return parsed.data;
+  const recovered = sanitizeAndParseHeroGuideTabs(candidate);
+  if (recovered) {
+    console.warn(
+      `[supabase] hero guide tabs recovered via sanitize for "${heroSlug}" (${scope})`,
+    );
+    return recovered;
+  }
+
+  console.warn(
+    `[supabase] hero guide tabs parse failed for "${heroSlug}" (${scope})`,
+    parsed.error.issues.map((issue) => issue.message).join("; "),
+  );
+  return null;
 }
 
 export async function upsertHeroGuideTabsToEditorial(
@@ -58,7 +70,8 @@ export async function upsertHeroGuideTabsToEditorial(
     tabs: HeroGuideTabContent[];
   },
 ): Promise<{ ok: true } | { ok: false; error: string }> {
-  const parsed = heroGuideTabsSchema.safeParse(input.tabs);
+  const sanitized = sanitizeHeroGuideTabsCandidate(input.tabs);
+  const parsed = heroGuideTabsSchema.safeParse(sanitized);
   if (!parsed.success) {
     return {
       ok: false,

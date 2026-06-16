@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Hero } from "@/data/schema";
 import { FavoriteHeroButton } from "@/features/favorites/favorite-hero-button";
 import { ResolvedHeroForm } from "@/features/heroes/hero-forms";
-import frameImage from "../../../../rivals-assets/frames/hero-frame.jpg";
+import { RIVALS_FRAMES } from "@/lib/rivals-assets-paths";
 
 type HeroDetailShowcaseCardProps = {
   hero: Hero;
@@ -22,7 +22,7 @@ export function HeroDetailShowcaseCard({
     >
       <div className="relative aspect-[16/9] w-full min-h-[360px] sm:min-h-[430px] lg:min-h-[560px]">
         <Image
-          src={hero.frameImage ?? frameImage}
+          src={hero.frameImage ?? RIVALS_FRAMES.hero}
           alt="Marvel Rivals style hero frame"
           fill
           priority

@@ -208,14 +208,70 @@ export const LUNA_BASE_STATS: Array<{ label: string; value: string }> = [
 export const LUNA_HERO_GUIDE_TABS: LunaHeroGuideTabContent[] = [
   {
     id: "overview",
-    label: "Overview",
+    label: "Overview & Playstyle",
     summary: "Luna Snow · Strategist · Difficulty 3 / 5",
     body: [
+      {
+        type: "strengthsWeaknesses",
+        strengths: [
+          {
+            title: "Reliable AoE tempo control with Ice Arts",
+            detail:
+              "Ice Arts creates recurring space denial through chokes and payload lanes. When paired with Smooth Skate repositioning, Luna can pulse damage and healing without hard-committing to duels.",
+          },
+          {
+            title: "Fight-winning burst setup via Absolute Zero",
+            detail:
+              "Absolute Zero converts slow or cornered targets into guaranteed focus windows. Call the follow-up hero before throwing so your team layers burst the instant freeze confirms.",
+          },
+          {
+            title: "Carry amplification with Share the Stage",
+            detail:
+              "Share the Stage lets Luna delegate damage spikes to a duelist or hitscan who already has angle. Rotate the buff target when their cooldowns spike or they lose line-of-sight.",
+          },
+        ],
+        weaknesses: [
+          {
+            title: "Punished by long-range hitscan angles",
+            detail:
+              "Luna wins on controlled sightlines. Open high-ground snipers force awkward skating routes and can delete her before she completes a freeze confirm.",
+          },
+          {
+            title: "Ultimate-dependent peel windows",
+            detail:
+              "When Absolute Zero or Fate of Both Worlds are down, Luna relies on team spacing. Dive tanks that body-block angles can stall her tempo until cooldowns return.",
+          },
+          {
+            title: "Low solo kill pressure without coordination",
+            detail:
+              "Most of Luna's value is setup, not finish. Without a called focus target or follow-up burst, she can lose extended trades against self-sufficient duelists.",
+          },
+        ],
+      },
       {
         type: "callout",
         variant: "gameplan",
         title: "Win condition",
         body: "Control tempo with Ice Arts pulses, amplify one decisive carry with Share the Stage, and convert freezes into coordinated burst so the team snowballs objectives.",
+      },
+      {
+        type: "callout",
+        variant: "macro",
+        title: "Default posture",
+        body: "Stay just behind your frontline with skating exits queued. Prioritize denying flank angles with Ice Arts before committing damage, then reset cover after burst sequences to keep your healing economy intact.",
+      },
+      {
+        type: "twoColumn",
+        leftTitle: "High-value targets",
+        leftItems: [
+          "Isolated duelists overextended without peel.",
+          "Supports channeling ults without reposition options.",
+        ],
+        rightTitle: "Threats to respect",
+        rightItems: [
+          "Long-range snipers that collapse your LOS pockets.",
+          "Dive tanks that can body-block Absolute Zero angles.",
+        ],
       },
       {
         type: "bullets",
@@ -230,22 +286,36 @@ export const LUNA_HERO_GUIDE_TABS: LunaHeroGuideTabContent[] = [
   },
   {
     id: "abilities",
-    label: "Abilities",
+    label: "Kit & Mechanics",
     summary:
       "Anchor your fight on Ice Arts pulses, then use Share the Stage to amplify a damage carry whenever the team needs to snowball.",
-    primaryPoints: [
-      "Lead with Ice Arts to control space and recover health while contesting objectives.",
-      "Use Share the Stage on a high-impact damage carry during major engagements.",
-      "Save Absolute Zero for follow-up freeze on a dive target or to peel off a flanker.",
-    ],
-    secondaryPoints: [
-      "Cycle Light & Dark Ice taps between healing allies and damaging key threats.",
-      "Pre-position with Smooth Skate before fights start to reach contest angles faster.",
+    body: [
+      {
+        type: "abilityTip",
+        abilityRef: "absolute-zero",
+        title: "Freeze confirm discipline",
+        body: "Use Absolute Zero after enemy mobility is committed. Call your focus target before throwing so your team layers burst the instant freeze lands.",
+        tags: ["confirm", "teamplay"],
+      },
+      {
+        type: "abilityTip",
+        abilityRef: "ice-arts",
+        title: "Tempo reset pattern",
+        body: "Pulse Ice Arts through choke lanes, then immediately reposition to cover with Smooth Skate. This keeps pressure high without overexposing your support angle.",
+        tags: ["positioning", "tempo"],
+      },
+      {
+        type: "abilityTip",
+        abilityRef: "share-the-stage",
+        title: "Carry rotation logic",
+        body: "Choose one carry for Share the Stage per fight. Rotate only when that carry spends burst cooldowns or loses line-of-sight.",
+        tags: ["targeting", "macro"],
+      },
     ],
   },
   {
     id: "combos",
-    label: "Combos & Synergies",
+    label: "Combos",
     summary:
       "Convert displacement and freeze windows into reliable burst with allies who excel at decisive follow-up.",
     body: [
@@ -284,36 +354,24 @@ export const LUNA_HERO_GUIDE_TABS: LunaHeroGuideTabContent[] = [
     ],
   },
   {
-    id: "playstyle",
-    label: "Playstyle Guide",
+    id: "matchups",
+    label: "Matchups",
     summary:
-      "Operate as a hybrid skirmish-support: position with line-of-sight on your damage cores while denying enemy dive routes.",
+      "Quickly scan favorable, even, and dangerous opponents before queueing.",
     body: [
-      {
-        type: "callout",
-        variant: "macro",
-        title: "Default posture",
-        body: "Stay just behind your frontline with skating exits queued. Prioritize denying flank angles with Ice Arts before committing damage, then reset cover after burst sequences to keep your healing economy intact.",
-      },
-      {
-        type: "twoColumn",
-        leftTitle: "High-value targets",
-        leftItems: [
-          "Isolated duelists overextended without peel.",
-          "Supports channeling ults without reposition options.",
-        ],
-        rightTitle: "Threats to respect",
-        rightItems: [
-          "Long-range snipers that collapse your LOS pockets.",
-          "Dive tanks that can body-block Absolute Zero angles.",
-        ],
-      },
       {
         type: "matchup",
         disposition: "target",
         opponent: "Flank duelists",
         summary:
           "Track their mobility cooldowns; when empty, Absolute Zero plus a called burst window deletes their tempo.",
+      },
+      {
+        type: "matchup",
+        disposition: "even",
+        opponent: "Brawl tanks",
+        summary:
+          "This is execution-sensitive. Keep line-of-sight discipline and save one peel cooldown for their second engage wave.",
       },
       {
         type: "matchup",
@@ -348,14 +406,5 @@ export const LUNA_HERO_GUIDE_TABS: LunaHeroGuideTabContent[] = [
     label: "Personal Notes",
     summary:
       "Player-managed reminders for this hero: comfort picks, anti-tilt rules, and execution cues per match.",
-    primaryPoints: [
-      "Write a 3-line pre-match checklist for consistency under pressure.",
-      "Capture two mistakes after each session while memory is still fresh.",
-      "Save a custom callout shorthand your stack already understands.",
-    ],
-    secondaryPoints: [
-      "Retire stale notes every patch to avoid outdated habits.",
-      "Keep entries short enough to scan in queue downtime.",
-    ],
   },
 ];

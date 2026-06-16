@@ -31,9 +31,13 @@ function getBlockLabel(block: HeroGuideBlock, index: number): string {
     case "combo":
       return block.name;
     case "matchup":
-      return `${block.disposition === "target" ? "Target" : "Threat"}: ${block.opponent}`;
+      return `${block.disposition === "target" ? "Target" : block.disposition === "even" ? "Even" : "Threat"}: ${block.opponent}`;
+    case "abilityTip":
+      return block.title ?? `Ability tip ${index + 1}`;
     case "video":
       return block.title;
+    case "strengthsWeaknesses":
+      return block.title ?? "Strengths & Weaknesses";
   }
 }
 

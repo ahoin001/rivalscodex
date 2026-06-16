@@ -16,8 +16,10 @@ import { BlockBullets } from "./hero-guide-body/block-bullets";
 import { BlockTwoColumn } from "./hero-guide-body/block-two-column";
 import { BlockCombo } from "./hero-guide-body/block-combo";
 import { ComboRouteCard } from "./hero-guide-body/combo-route-card";
+import { BlockAbilityTip } from "./hero-guide-body/block-ability-tip";
 import { BlockMatchup } from "./hero-guide-body/block-matchup";
 import { BlockVideo } from "./hero-guide-body/block-video";
+import { BlockStrengthsWeaknesses } from "./hero-guide-body/block-strengths-weaknesses";
 import {
   ComboFilterPills,
   DifficultyGroupHeader,
@@ -157,10 +159,7 @@ export function HeroGuideBody({
 
   const renderComboBlock = (block: ComboBlock, index: number): ReactNode => {
     const navItem = navItems[index];
-    const useRouteCard =
-      !!abilityLookup &&
-      !!block.structuredSteps &&
-      block.structuredSteps.length > 0;
+    const useRouteCard = !!abilityLookup;
 
     const comboOnlyPos = comboMeta.comboOnlyIndices.indexOf(index);
     const canMoveUp = comboOnlyPos > 0;
@@ -181,6 +180,8 @@ export function HeroGuideBody({
         onMove={(dir) => onComboBlockMove?.(index, dir)}
         canMoveUp={canMoveUp}
         canMoveDown={canMoveDown}
+        comboIndex={comboOnlyPos >= 0 ? comboOnlyPos : 0}
+        totalCombos={comboMeta.comboCount}
       />
     ) : (
       <BlockCombo block={block} abilityLookup={abilityLookup} clip={block.clip} />
@@ -232,10 +233,26 @@ export function HeroGuideBody({
             />
           </GuideSection>
         );
+      case "abilityTip":
+        return (
+          <GuideSection id={navItem.id}>
+            <BlockAbilityTip block={block} abilityLookup={abilityLookup} />
+          </GuideSection>
+        );
       case "video":
         return (
           <GuideSection id={navItem.id}>
             <BlockVideo title={block.title} watchUrl={block.watchUrl} />
+          </GuideSection>
+        );
+      case "strengthsWeaknesses":
+        return (
+          <GuideSection id={navItem.id}>
+            <BlockStrengthsWeaknesses
+              title={block.title}
+              strengths={block.strengths}
+              weaknesses={block.weaknesses}
+            />
           </GuideSection>
         );
     }
@@ -244,11 +261,9 @@ export function HeroGuideBody({
   const filterCombo = (entry: IndexedComboBlock) =>
     comboPassesFilters(entry.block, difficultyFilter, tagFilter);
 
-  let comboGroupInserted = false;
-
   return (
     <div className="space-y-6 pb-1 sm:space-y-5">
-      {comboMeta.indexed.length >= 2 ? (
+      {comboMeta.indexed.length >= 2 && !comboEditMode ? (
         <div className="space-y-2 rounded-lg border border-rivals-light-300/80 bg-rivals-light-50/60 px-3 py-2">
           <ComboFilterPills
             active={difficultyFilter}
@@ -263,37 +278,32 @@ export function HeroGuideBody({
         </div>
       ) : null}
 
-      {blocks.map((block, index) => {
-        if (comboMeta.hasDifficultyTags && comboMeta.renderedComboIndices.has(index)) {
-          if (comboGroupInserted) return null;
-          comboGroupInserted = true;
-
-          return (
-            <div key="combo-groups" className="space-y-6">
-              {comboMeta.groups?.map(({ tier, combos }) => {
-                const visible = combos.filter(filterCombo);
-                if (visible.length === 0) return null;
-                return (
-                  <div key={tier.key} className="scroll-reveal space-y-4">
-                    <DifficultyGroupHeader label={tier.label} className={tier.lightClass} />
-                    {visible.map(({ block: comboBlock, index: comboIndex }) => (
-                      <div key={`combo-${comboIndex}`}>
-                        {renderComboBlock(comboBlock, comboIndex)}
-                      </div>
-                    ))}
+      {comboMeta.hasDifficultyTags ? (
+        <div key="combo-groups" className="space-y-6">
+          {comboMeta.groups?.map(({ tier, combos }) => {
+            const visible = combos.filter(filterCombo);
+            if (visible.length === 0) return null;
+            return (
+              <div key={tier.key} className="scroll-reveal space-y-4">
+                <DifficultyGroupHeader label={tier.label} className={tier.lightClass} />
+                {visible.map(({ block: comboBlock, index: comboIndex }) => (
+                  <div key={`combo-${comboIndex}`}>
+                    {renderComboBlock(comboBlock, comboIndex)}
                   </div>
-                );
-              })}
+                ))}
+              </div>
+            );
+          })}
 
-              {comboMeta.untagged.filter(filterCombo).map(({ block: comboBlock, index: comboIndex }) => (
-                <div key={`combo-untagged-${comboIndex}`}>
-                  {renderComboBlock(comboBlock, comboIndex)}
-                </div>
-              ))}
+          {comboMeta.untagged.filter(filterCombo).map(({ block: comboBlock, index: comboIndex }) => (
+            <div key={`combo-untagged-${comboIndex}`}>
+              {renderComboBlock(comboBlock, comboIndex)}
             </div>
-          );
-        }
+          ))}
+        </div>
+      ) : null}
 
+      {blocks.map((block, index) => {
         if (block.type === "combo" && comboMeta.hasDifficultyTags) {
           return null;
         }

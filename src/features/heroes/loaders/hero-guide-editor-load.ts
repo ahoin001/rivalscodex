@@ -11,11 +11,9 @@ export type HeroGuideEditorLoadResult = {
   hero: Hero;
   /** Generated from dossier when editorial is missing or invalid. */
   fallbackTabs: HeroGuideTabContent[];
-  /** Saved draft from Supabase (validated); null if none or invalid. */
-  draftTabs: HeroGuideTabContent[] | null;
   /** Published editorial tabs; null if none or invalid. */
   publishedTabs: HeroGuideTabContent[] | null;
-  /** Working copy for the editor: draft wins over fallback. */
+  /** Working copy for the editor: published wins over fallback. */
   initialTabs: HeroGuideTabContent[];
 };
 
@@ -34,23 +32,22 @@ export async function loadHeroGuideEditorState(
     return {
       hero,
       fallbackTabs,
-      draftTabs: null,
       publishedTabs: null,
       initialTabs: fallbackTabs,
     };
   }
 
-  const [draftTabs, publishedTabs] = await Promise.all([
-    fetchHeroGuideTabsFromEditorial(supabase, hero.slug, "draft"),
-    fetchHeroGuideTabsFromEditorial(supabase, hero.slug, "published"),
-  ]);
+  const publishedTabs = await fetchHeroGuideTabsFromEditorial(
+    supabase,
+    hero.slug,
+    "published",
+  );
 
-  const initialTabs = draftTabs ?? fallbackTabs;
+  const initialTabs = publishedTabs ?? fallbackTabs;
 
   return {
     hero,
     fallbackTabs,
-    draftTabs,
     publishedTabs,
     initialTabs,
   };

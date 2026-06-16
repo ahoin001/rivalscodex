@@ -1,12 +1,14 @@
+import type { ReactNode } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { RivalsHeroTitle } from "@/components/ui";
+import { RivalsClipAction } from "@/components/ui/rivals-clip-action";
 import type { Hero } from "@/data/schema";
-import heroFrameImage from "../../../../rivals-assets/frames/hero-frame.jpg";
+import { RIVALS_FRAMES } from "@/lib/rivals-assets-paths";
 
 type HeroLabShowcaseCardProps = {
   hero: Hero;
   className?: string;
+  toolbarEnd?: ReactNode;
 };
 
 const roleColorByName: Record<Hero["role"], string> = {
@@ -15,19 +17,23 @@ const roleColorByName: Record<Hero["role"], string> = {
   Strategist: "text-rivals-strategist",
 };
 
-export function HeroLabShowcaseCard({ hero, className = "" }: HeroLabShowcaseCardProps) {
+export function HeroLabShowcaseCard({
+  hero,
+  className = "",
+  toolbarEnd,
+}: HeroLabShowcaseCardProps) {
   const foregroundSrc = hero.splashImage;
   const frameSrc = hero.frameImage;
   const stackLogoSrc = hero.stackLogoImage;
 
   return (
     <section
-      className={`relative isolate w-full overflow-hidden bg-rivals-light-100 ${className}`.trim()}
+      className={`hero-stage-shell hero-stage-showcase relative isolate w-full overflow-hidden bg-rivals-light-100 ${className}`.trim()}
       aria-label={`${hero.name} hero card`}
     >
       <div className="relative min-h-[520px] w-full aspect-[5/7] sm:min-h-[560px] sm:aspect-[16/10] lg:min-h-[600px] lg:aspect-[21/9] xl:min-h-[680px]">
         <Image
-          src={heroFrameImage}
+          src={RIVALS_FRAMES.hero}
           alt=""
           fill
           priority
@@ -49,7 +55,7 @@ export function HeroLabShowcaseCard({ hero, className = "" }: HeroLabShowcaseCar
         ) : null}
 
         <div
-          className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-[20%] bg-gradient-to-b from-rivals-light-50/90 via-rivals-light-100/40 to-transparent"
+          className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-[14%] bg-gradient-to-b from-rivals-light-50/90 via-rivals-light-100/35 to-transparent"
           aria-hidden
         />
         <div
@@ -58,16 +64,16 @@ export function HeroLabShowcaseCard({ hero, className = "" }: HeroLabShowcaseCar
         />
 
         <div className="absolute left-0 right-0 top-0 z-40 flex items-center justify-between gap-3 px-4 py-3 sm:px-7 sm:py-4 lg:px-10">
-          <Link
-            href="/"
-            className="rivals-clip-tab inline-flex items-center gap-2 bg-rivals-ink/92 px-4 py-2 font-display text-[11px] uppercase italic tracking-[0.18em] text-white transition-colors hover:bg-rivals-ink-soft"
-          >
+          <RivalsClipAction href="/" variant="surface">
             <span aria-hidden>&larr;</span>
             Back To Home
-          </Link>
-          <p className="hidden text-[11px] uppercase tracking-[0.28em] text-rivals-ink/70 sm:block">
-            Hero Detail
-          </p>
+          </RivalsClipAction>
+          <div className="ml-auto flex items-center gap-3">
+            {toolbarEnd}
+            <p className="hidden text-[11px] uppercase tracking-[0.28em] text-rivals-ink/70 sm:block">
+              Hero Detail
+            </p>
+          </div>
         </div>
 
         <div className="relative z-20 flex h-full w-full items-start px-5 pt-6 sm:items-center sm:px-10 sm:pt-0 lg:px-16 xl:px-24">
@@ -106,11 +112,10 @@ export function HeroLabShowcaseCard({ hero, className = "" }: HeroLabShowcaseCar
         <div
           className="
             pointer-events-none absolute z-30
-            -bottom-[18%] right-[-36%] h-[164%] w-[140%]
-            sm:-bottom-[25%] sm:right-[-28%] sm:h-[188%] sm:w-[118%]
-            lg:-bottom-[31%] lg:right-[-18%] lg:h-[214%] lg:w-[92%]
-            xl:-bottom-[35%] xl:right-[-14%] xl:h-[230%] xl:w-[86%]
+            top-14 right-0 bottom-0
+            w-[76%] sm:top-16 sm:w-[62%] lg:w-[54%] xl:w-[50%]
           "
+          id="hero-showcase-transition-target"
         >
           <Image
             src={foregroundSrc}
@@ -118,7 +123,7 @@ export function HeroLabShowcaseCard({ hero, className = "" }: HeroLabShowcaseCar
             fill
             priority
             sizes="(max-width: 640px) 78vw, (max-width: 1024px) 58vw, 50vw"
-            className="object-contain object-bottom drop-shadow-[0_22px_40px_rgba(40,39,54,0.45)]"
+            className="object-contain object-bottom object-right drop-shadow-[0_22px_40px_rgba(40,39,54,0.45)]"
           />
         </div>
 

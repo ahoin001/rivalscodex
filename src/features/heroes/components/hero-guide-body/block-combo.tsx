@@ -4,6 +4,7 @@ import type { HeroGuideBlock } from "@/features/heroes/hero-guide-schema";
 import type { ResolvedAbilityRef } from "@/features/heroes/ability-lookup";
 import { getDifficultyTier } from "@/features/heroes/combo-display";
 import { ComboChain } from "@/features/heroes/components/combo-chain";
+import type { ComboChainVariant } from "@/features/heroes/components/combo-chain-theme";
 import { GuideClip } from "./guide-clip";
 
 type ComboBlock = Extract<HeroGuideBlock, { type: "combo" }>;
@@ -12,10 +13,15 @@ export function BlockCombo({
   block,
   abilityLookup,
   clip,
+  embedded = false,
+  variant = "light",
 }: {
   block: ComboBlock;
   abilityLookup?: Map<string, ResolvedAbilityRef>;
   clip?: { label: string; href: string };
+  /** When true, omits duplicate title/context — parent card owns the header. */
+  embedded?: boolean;
+  variant?: ComboChainVariant;
 }) {
   const hasStructured =
     !!block.structuredSteps &&
@@ -33,22 +39,28 @@ export function BlockCombo({
         condition={block.condition}
         notes={block.notes}
         clip={resolvedClip}
+        embedded={embedded}
       />
     );
   }
 
+  const chainProps = {
+    name: block.name,
+    structuredSteps: block.structuredSteps!,
+    abilityLookup: abilityLookup!,
+    difficulty: block.difficulty,
+    resourceCost: block.resourceCost,
+    condition: block.condition,
+    notes: block.notes,
+    hideHeader: embedded,
+    hideContext: embedded,
+    variant,
+  };
+
   if (resolvedClip) {
     return (
       <div className="grid items-start gap-4 lg:grid-cols-[1fr_1.2fr]">
-        <ComboChain
-          name={block.name}
-          structuredSteps={block.structuredSteps!}
-          abilityLookup={abilityLookup!}
-          difficulty={block.difficulty}
-          resourceCost={block.resourceCost}
-          condition={block.condition}
-          notes={block.notes}
-        />
+        <ComboChain {...chainProps} />
         <div className="overflow-hidden rounded-lg border border-rivals-ink/10 bg-white/60">
           <p className="border-b border-rivals-light-300 px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-rivals-ink-muted">
             Example clip
@@ -62,15 +74,7 @@ export function BlockCombo({
   }
 
   return (
-    <ComboChain
-      name={block.name}
-      structuredSteps={block.structuredSteps!}
-      abilityLookup={abilityLookup!}
-      difficulty={block.difficulty}
-      resourceCost={block.resourceCost}
-      condition={block.condition}
-      notes={block.notes}
-    />
+    <ComboChain {...chainProps} />
   );
 }
 
@@ -93,6 +97,7 @@ function BlockComboLegacy({
   condition,
   notes,
   clip,
+  embedded = false,
 }: {
   name: string;
   steps: string[];
@@ -100,22 +105,27 @@ function BlockComboLegacy({
   condition?: string;
   notes?: string;
   clip?: { label: string; href: string };
+  embedded?: boolean;
 }) {
   return (
     <div className="rounded border border-rivals-ink/12 bg-white/80 px-4 py-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <div className="flex flex-wrap items-center gap-2">
-        <p className="font-display text-sm font-extrabold uppercase italic text-rivals-ink">
-          {name}
-        </p>
-        {difficulty ? <ComboDiffBadge difficulty={difficulty} /> : null}
-      </div>
-      {condition ? (
-        <p className="mt-1 text-xs leading-5 text-rivals-ink-muted">{condition}</p>
+      {!embedded ? (
+        <>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="font-display text-sm font-extrabold uppercase italic text-rivals-ink">
+              {name}
+            </p>
+            {difficulty ? <ComboDiffBadge difficulty={difficulty} /> : null}
+          </div>
+          {condition ? (
+            <p className="mt-1 text-xs leading-5 text-rivals-ink-muted">{condition}</p>
+          ) : null}
+          {notes ? (
+            <p className="mt-1 text-xs leading-5 text-rivals-ink-soft">{notes}</p>
+          ) : null}
+        </>
       ) : null}
-      {notes ? (
-        <p className="mt-1 text-xs leading-5 text-rivals-ink-soft">{notes}</p>
-      ) : null}
-      <ol className="mt-2 list-decimal space-y-1 pl-4 text-sm leading-6 text-rivals-ink-soft sm:text-[15px]">
+      <ol className={`list-decimal space-y-1 pl-4 text-sm leading-6 text-rivals-ink-soft sm:text-[15px] ${embedded ? "" : "mt-2"}`}>
         {steps.map((step) => (
           <li key={step}>{step}</li>
         ))}

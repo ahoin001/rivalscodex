@@ -15,6 +15,8 @@ import { formatKeybindLabel } from "@/features/heroes/keybind-display";
 
 type AbilityTooltipProps = {
   ability: ResolvedAbilityRef;
+  /** Per-step combo tip — shown below ability description when set. */
+  stepTip?: string;
   /** Delay (ms) before the tooltip appears on hover-capable devices. */
   hoverDelayMs?: number;
   children: ReactNode;
@@ -37,9 +39,11 @@ function usePrefersCoarsePointer(): boolean {
 function AbilityTooltipContent({
   ability,
   position,
+  stepTip,
 }: {
   ability: ResolvedAbilityRef;
   position: { x: number; y: number };
+  stepTip?: string;
 }) {
   return (
     <div
@@ -70,6 +74,12 @@ function AbilityTooltipContent({
             </span>
           </div>
           <p className="mt-1.5 text-[11px] leading-4 text-white/65">{ability.description}</p>
+          {stepTip ? (
+            <p className="mt-2 rounded border border-brand-gold/25 bg-brand-gold/10 px-2 py-1.5 text-[10px] leading-4 text-brand-gold/95">
+              <span className="font-bold uppercase tracking-wide">Step tip · </span>
+              {stepTip}
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -96,6 +106,7 @@ function AbilityTooltipContent({
 
 export function AbilityTooltip({
   ability,
+  stepTip,
   hoverDelayMs = 200,
   children,
 }: AbilityTooltipProps) {
@@ -199,7 +210,7 @@ export function AbilityTooltip({
 
       {visible && typeof document !== "undefined"
         ? createPortal(
-            <AbilityTooltipContent ability={ability} position={position} />,
+            <AbilityTooltipContent ability={ability} position={position} stepTip={stepTip} />,
             document.body,
           )
         : null}

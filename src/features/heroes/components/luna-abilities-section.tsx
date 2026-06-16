@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { RivalsBrandButton, RivalsKeyChip, RivalsStatLine } from "@/components/ui";
-import abilitiesBackgroundImage from "../../../../rivals-assets/frames/abilities-section.jpg";
+import { RIVALS_FRAMES } from "@/lib/rivals-assets-paths";
 
 export type LunaAbilityCategory = "Normal Attack" | "Abilities" | "Passive";
 
@@ -63,7 +63,7 @@ export function LunaAbilitiesSection({
       aria-label="Luna Snow abilities"
     >
       <Image
-        src={abilitiesBackgroundImage}
+        src={RIVALS_FRAMES.abilitiesSection}
         alt=""
         fill
         sizes="100vw"

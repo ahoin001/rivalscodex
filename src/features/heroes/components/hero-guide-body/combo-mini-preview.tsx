@@ -22,11 +22,17 @@ export function ComboMiniPreview({
     <div className="flex items-center gap-1.5">
       {preview.map((step, index) => {
         if (step.kind === "action") {
+          const repeatCount = step.repeat && step.repeat > 1 ? step.repeat : 1;
           return (
             <div
               key={`mini-action-${index}`}
-              className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-md border border-dashed border-rivals-ink/20 bg-rivals-light-100 px-0.5"
+              className="relative flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-md border border-dashed border-rivals-ink/20 bg-rivals-light-100 px-0.5 pt-0.5"
             >
+              {repeatCount > 1 ? (
+                <span className="pointer-events-none absolute -right-2 -top-2 z-10 flex h-4 min-w-4 items-center justify-center rounded-full border border-brand-gold/55 bg-white px-0.5 text-[8px] font-bold text-brand-gold shadow-sm">
+                  ×{repeatCount}
+                </span>
+              ) : null}
               <span className="line-clamp-2 text-center text-[8px] font-semibold uppercase leading-tight text-rivals-ink-muted">
                 {step.label}
               </span>
@@ -35,6 +41,7 @@ export function ComboMiniPreview({
         }
 
         const resolved = resolveAbilityRef(step.abilityRef, abilityLookup);
+        const repeatCount = step.repeat && step.repeat > 1 ? step.repeat : 1;
         if (!resolved) {
           return (
             <div
@@ -48,21 +55,28 @@ export function ComboMiniPreview({
 
         return (
           <AbilityTooltip key={`mini-${index}-${step.abilityRef}`} ability={resolved}>
-            <div className="flex w-11 shrink-0 flex-col items-center gap-0.5">
-              <div className="flex h-11 w-11 items-center justify-center rounded-md border border-brand-gold/35 bg-[#1a1f2e]">
-                {resolved.iconUrl ? (
-                  <Image
-                    src={resolved.iconUrl}
-                    alt=""
-                    width={32}
-                    height={32}
-                    className="h-8 w-8 object-contain"
-                  />
-                ) : (
-                  <span className="text-[9px] font-bold uppercase text-white/60">
-                    {resolved.name.slice(0, 2)}
+            <div className="flex w-11 shrink-0 flex-col items-center gap-0.5 pt-0.5">
+              <div className="relative">
+                {repeatCount > 1 ? (
+                  <span className="pointer-events-none absolute -right-2 -top-2 z-10 flex h-4 min-w-4 items-center justify-center rounded-full border border-brand-gold/55 bg-white px-0.5 text-[8px] font-bold text-brand-gold shadow-sm">
+                    ×{repeatCount}
                   </span>
-                )}
+                ) : null}
+                <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-md border border-brand-gold/35 bg-white shadow-sm">
+                  {resolved.iconUrl ? (
+                    <Image
+                      src={resolved.iconUrl}
+                      alt=""
+                      width={32}
+                      height={32}
+                      className="h-8 w-8 object-contain"
+                    />
+                  ) : (
+                    <span className="text-[9px] font-bold uppercase text-rivals-ink-muted">
+                      {resolved.name.slice(0, 2)}
+                    </span>
+                  )}
+                </div>
               </div>
               <span className="line-clamp-2 max-w-[2.75rem] text-center text-[9px] leading-tight text-rivals-ink-soft">
                 {resolved.name}

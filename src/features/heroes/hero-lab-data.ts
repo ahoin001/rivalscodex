@@ -112,7 +112,61 @@ function buildCombosBody(hero: Hero): HeroGuideBlock[] | undefined {
   return comboBlocks;
 }
 
-function buildPlaystyleBody(hero: Hero): HeroGuideBlock[] {
+function buildStrengthsWeaknessesBlock(hero: Hero): HeroGuideBlock {
+  const overview = hero.playstyle.overview.trim();
+  const positioning = hero.playstyle.positioning.trim();
+  const detailFromPlaystyle = (topic: string) => {
+    const source = positioning || overview;
+    if (!source) return `How ${hero.name} leverages ${topic.toLowerCase()} in teamfights.`;
+    return source.length > 900 ? `${source.slice(0, 897)}…` : source;
+  };
+
+  const strengths =
+    hero.playstyle.targetPriority.length > 0
+      ? hero.playstyle.targetPriority.slice(0, 4).map((title) => ({
+          title,
+          detail: detailFromPlaystyle(title),
+        }))
+      : [
+          {
+            title: `${hero.role} teamfight value`,
+            detail: overview || `${hero.name} contributes through ${hero.role.toLowerCase()} positioning and cooldown timing.`,
+          },
+          {
+            title: "Clear win-condition spikes",
+            detail: detailFromPlaystyle("decisive fight windows"),
+          },
+        ];
+
+  const weaknesses =
+    hero.playstyle.avoidPriority.length > 0
+      ? hero.playstyle.avoidPriority.slice(0, 4).map((title) => ({
+          title,
+          detail: `Respect this matchup angle — adjust spacing and save a defensive cooldown when ${title.toLowerCase()} is active.`,
+        }))
+      : [
+          {
+            title: "Cooldown downtime windows",
+            detail:
+              positioning ||
+              "Between major abilities, avoid hard commits and play for reset angles instead of extended duels.",
+          },
+          {
+            title: "Overextension without peel",
+            detail: overview
+              ? `When peel is missing, ${hero.name}'s plan breaks down quickly — track flank audio before pushing.`
+              : "Track flank routes and avoid chasing kills without team confirmation.",
+          },
+        ];
+
+  return {
+    type: "strengthsWeaknesses",
+    strengths,
+    weaknesses,
+  };
+}
+
+function buildOverviewPlaystyleBody(hero: Hero): HeroGuideBlock[] {
   const blocks: HeroGuideBlock[] = [
     {
       type: "callout",
@@ -159,14 +213,15 @@ export function buildHeroGuideTabsFromHero(hero: Hero): HeroGuideTabContent[] {
     .map((resource) => ({ label: resource.title, href: resource.url }));
 
   const combosBody = buildCombosBody(hero);
-  const playstyleBody = buildPlaystyleBody(hero);
+  const overviewPlaystyleBody = buildOverviewPlaystyleBody(hero);
 
   return [
     {
       id: "overview",
-      label: "Overview",
+      label: "Overview & Playstyle",
       summary: `${hero.name} · ${hero.role} · Difficulty ${hero.difficulty}/5`,
       body: [
+        buildStrengthsWeaknessesBlock(hero),
         {
           type: "callout",
           variant: "gameplan",
@@ -178,33 +233,23 @@ export function buildHeroGuideTabsFromHero(hero: Hero): HeroGuideTabContent[] {
           title: "Before you queue",
           items: [
             `${hero.playstyle.overview.length > 320 ? `${hero.playstyle.overview.slice(0, 320)}…` : hero.playstyle.overview}`,
-            "Use Abilities for raw tooltips; use Combos and Playstyle for how to deploy the kit in matches.",
+            "Use Kit & Mechanics for ability tech, then Combos for execution routes.",
             "Editors can attach short YouTube clips to combo rows in the admin guide for motion-heavy sequences.",
           ],
         },
+        ...overviewPlaystyleBody,
       ],
     },
     {
       id: "abilities",
-      label: "Abilities",
-      summary: hero.summary,
-      primaryPoints:
-        hero.abilities.length > 0
-          ? hero.abilities.slice(0, 5).map((ability) => {
-              const key = ability.keybind ? `${ability.keybind} - ` : "";
-              return `${key}${ability.name}: ${ability.description}`;
-            })
-          : [
-              "No detailed ability breakdown is available yet; rely on baseline API descriptors.",
-            ],
-      secondaryPoints: [
-        `Role focus: ${hero.role}`,
-        `Difficulty: ${hero.difficulty}/5`,
-      ],
+      label: "Kit & Mechanics",
+      summary:
+        "Review practical ability interactions, cancels, and usage cues. Full codex details are available above.",
+      body: [],
     },
     {
       id: "combos",
-      label: "Combos & Synergies",
+      label: "Combos",
       summary:
         "Use curated opener chains and team-up timing to secure reliable fight conversions.",
       ...(combosBody
@@ -215,10 +260,11 @@ export function buildHeroGuideTabsFromHero(hero: Hero): HeroGuideTabContent[] {
           }),
     },
     {
-      id: "playstyle",
-      label: "Playstyle Guide",
-      summary: hero.playstyle.overview,
-      body: playstyleBody,
+      id: "matchups",
+      label: "Matchups",
+      summary:
+        "Track favorable, even, and dangerous matchups with short counterplay explanations.",
+      body: [],
     },
     {
       id: "resources",
@@ -236,16 +282,7 @@ export function buildHeroGuideTabsFromHero(hero: Hero): HeroGuideTabContent[] {
       id: "notes",
       label: "Personal Notes",
       summary:
-        "Maintain player-specific reminders for matchup prep, consistency checks, and post-game review.",
-      primaryPoints: [
-        "Write a short pre-match plan before queue pop.",
-        "Track two mistakes and one win condition after each game.",
-        "Keep note entries concise enough to scan quickly.",
-      ],
-      secondaryPoints: [
-        "Retire outdated notes after balance updates.",
-        "Translate notes into simple in-game callouts.",
-      ],
+        "Player-specific reminders, queue prep, and post-match review notes are saved locally.",
     },
   ];
 }

@@ -3,9 +3,9 @@ import type { ComboDifficulty, ComboModifier } from "@/data/schema";
 /**
  * Single source of truth for combo difficulty + modifier presentation.
  *
- * Components rendering combos on **dark surfaces** (the `ComboChain` body)
- * use `darkClass`. Components rendering on **light surfaces** (block
- * headers, filter pills, legacy `BlockComboLegacy`) use `lightClass`.
+ * Components rendering combos use `ComboChain` with `variant="light"` (default)
+ * on guide surfaces, or `variant="dark"` for contrast on dark shells.
+ * Pill styling uses `darkClass` / `lightClass` from difficulty tiers below.
  *
  * This file used to be duplicated three times (combo-chain, hero-guide-body,
  * combo-builder-editor); diverging colors and labels were the result.
@@ -133,6 +133,13 @@ export const MODIFIER_DESCRIPTORS: readonly ModifierDescriptor[] = [
     symbol: "⚡",
     microLabel: "instant",
     arrowClass: "text-amber-400/90",
+  },
+  {
+    key: "or",
+    authorLabel: "Or (branch)",
+    symbol: "OR",
+    microLabel: "alt route",
+    arrowClass: "text-violet-300",
   },
 ];
 

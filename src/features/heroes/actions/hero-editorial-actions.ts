@@ -3,7 +3,10 @@
 import type { HeroEditableSnapshot } from "@/features/heroes/hero-admin-types";
 import { revalidatePath, updateTag } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server-client";
-import { upsertHeroEditorial } from "@/lib/supabase/hero-editorial-repository";
+import {
+  fetchHeroEditorialContent,
+  upsertHeroEditorial,
+} from "@/lib/supabase/hero-editorial-repository";
 import { isSupabaseEnabled } from "@/lib/supabase/env";
 import { heroEditorialPublishedTag } from "@/lib/supabase/hero-editorial-cached";
 
@@ -38,10 +41,23 @@ export async function upsertHeroEditorialSnapshotAction(input: {
     };
   }
 
+  const existing = await fetchHeroEditorialContent(
+    supabase,
+    input.heroSlug,
+    input.scope,
+  );
+  const base =
+    existing && typeof existing === "object" && !Array.isArray(existing)
+      ? (existing as Record<string, unknown>)
+      : {};
+
   const result = await upsertHeroEditorial(supabase, {
     heroSlug: input.heroSlug,
     scope: input.scope,
-    content: snapshotToContent(input.snapshot),
+    content: {
+      ...base,
+      ...snapshotToContent(input.snapshot),
+    },
   });
 
   if (result.ok && input.scope === "published") {

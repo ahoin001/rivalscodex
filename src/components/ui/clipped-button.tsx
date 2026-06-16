@@ -23,7 +23,7 @@ export function ClippedButton({
 
   return (
     <button
-      className={`clipped-edge border border-panel-border px-4 py-2 text-sm font-semibold uppercase tracking-wide transition ${
+      className={`clipped-edge border border-panel-border px-4 py-2 text-sm font-semibold uppercase tracking-wide transition-[transform,background-color,border-color,color,box-shadow] duration-[var(--motion-fast)] ease-[var(--ease-out-soft)] hover:-translate-y-px active:translate-y-0 active:scale-[0.985] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/45 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
         tone === "brand" ? brandClasses : defaultClasses
       } ${className}`.trim()}
       type="button"

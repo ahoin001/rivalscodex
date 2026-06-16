@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import type { HeroGuideBlock } from "@/features/heroes/hero-guide-schema";
 import type { ResolvedAbilityRef } from "@/features/heroes/ability-lookup";
 import { getDifficultyTier } from "@/features/heroes/combo-display";
+import { RivalsBrandButton } from "@/components/ui/rivals-brand-button";
 import { BlockCombo } from "@/features/heroes/components/hero-guide-body/block-combo";
-import { ComboMiniPreview } from "@/features/heroes/components/hero-guide-body/combo-mini-preview";
-import { ComboBuilderEditor } from "@/features/heroes/components/combo-builder-editor";
+import { ComboBlockEditor } from "@/features/heroes/components/combo-editor";
 
 type ComboBlock = Extract<HeroGuideBlock, { type: "combo" }>;
 
@@ -24,11 +23,14 @@ type ComboRouteCardProps = {
   onMove?: (dir: -1 | 1) => void;
   canMoveUp?: boolean;
   canMoveDown?: boolean;
+  /** Zero-based index among combo blocks in this tab. */
+  comboIndex?: number;
+  totalCombos?: number;
 };
 
+/** Edit-mode combo card — always expanded; readers use ComboShowcaseCard instead. */
 export function ComboRouteCard({
   block,
-  blockIndex,
   abilityLookup,
   editMode = false,
   isEditing = false,
@@ -41,18 +43,11 @@ export function ComboRouteCard({
   canMoveUp = false,
   canMoveDown = false,
 }: ComboRouteCardProps) {
-  const [expanded, setExpanded] = useState(false);
   const tier = getDifficultyTier(block.difficulty);
-  const hasStructured =
-    !!block.structuredSteps &&
-    block.structuredSteps.length > 0 &&
-    !!abilityLookup;
-
-  const showExpanded = expanded || isEditing;
   const subtitle = [block.condition, block.notes].filter(Boolean).join(" · ");
 
   return (
-    <article className="overflow-hidden rounded-lg border border-rivals-ink/12 bg-white/90 shadow-sm transition-all duration-200 hover:border-brand-gold/25 hover:shadow-md">
+    <article className="overflow-hidden rounded-lg border border-rivals-ink/12 bg-white/90 shadow-sm transition-[border-color,box-shadow,transform,background-color] duration-[var(--motion-fast)] ease-[var(--ease-out-soft)] hover:-translate-y-px hover:border-brand-gold/25 hover:shadow-md">
       <header className="flex flex-wrap items-start gap-3 border-b border-rivals-light-300/80 px-4 py-3">
         <div className="min-w-0 flex-1 space-y-1.5">
           <div className="flex flex-wrap items-center gap-2">
@@ -76,96 +71,70 @@ export function ComboRouteCard({
             ))}
           </div>
           {subtitle ? (
-            <p
-              className={`text-xs leading-5 text-rivals-ink-muted ${showExpanded ? "" : "line-clamp-2"}`}
-            >
-              {subtitle}
-            </p>
+            <p className="text-xs leading-5 text-rivals-ink-muted">{subtitle}</p>
           ) : null}
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5">
-          {editMode ? (
-            <>
-              <button
-                type="button"
-                className="rounded border border-rivals-light-300 px-2 py-1 text-[10px] font-semibold uppercase text-rivals-ink hover:bg-rivals-light-100"
-                onClick={() => {
-                  if (isEditing) {
-                    onStopEdit?.();
-                  } else {
-                    setExpanded(true);
-                    onStartEdit?.();
-                  }
-                }}
-              >
-                {isEditing ? "Done" : "Edit"}
-              </button>
-              <button
-                type="button"
-                className="rounded border border-rivals-light-300 px-2 py-1 text-[10px] font-semibold uppercase text-rivals-ink-soft hover:bg-rivals-light-100"
-                onClick={onDuplicate}
-              >
-                Copy
-              </button>
-              <button
-                type="button"
-                disabled={!canMoveUp}
-                className="rounded border border-rivals-light-300 px-1.5 py-1 text-[10px] uppercase disabled:opacity-30"
-                onClick={() => onMove?.(-1)}
-              >
-                Up
-              </button>
-              <button
-                type="button"
-                disabled={!canMoveDown}
-                className="rounded border border-rivals-light-300 px-1.5 py-1 text-[10px] uppercase disabled:opacity-30"
-                onClick={() => onMove?.(1)}
-              >
-                Down
-              </button>
-              <button
-                type="button"
-                className="rounded border border-rose-200 px-2 py-1 text-[10px] font-semibold uppercase text-rose-800 hover:bg-rose-50"
-                onClick={onDelete}
-              >
-                Del
-              </button>
-            </>
-          ) : (
+        {editMode ? (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <RivalsBrandButton
+              size="sm"
+              variant={isEditing ? "primary" : "outline"}
+              onClick={() => {
+                if (isEditing) {
+                  onStopEdit?.();
+                } else {
+                  onStartEdit?.();
+                }
+              }}
+            >
+              {isEditing ? "Done & publish" : "Edit"}
+            </RivalsBrandButton>
             <button
               type="button"
-              className="rounded border border-brand-gold/40 bg-brand-gold-muted/50 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-brand-gold hover:bg-brand-gold hover:text-rivals-ink"
-              onClick={() => setExpanded((v) => !v)}
+              className="rounded border border-rivals-light-300 px-2 py-1 text-[10px] font-semibold uppercase text-rivals-ink-soft transition-colors duration-[var(--motion-fast)] hover:bg-rivals-light-100"
+              onClick={onDuplicate}
             >
-              {showExpanded ? "Collapse" : "Expand"}
+              Copy
             </button>
-          )}
-        </div>
+            <button
+              type="button"
+              disabled={!canMoveUp}
+              className="rounded border border-rivals-light-300 px-1.5 py-1 text-[10px] uppercase transition-colors duration-[var(--motion-fast)] hover:bg-rivals-light-100 disabled:opacity-30"
+              onClick={() => onMove?.(-1)}
+            >
+              Up
+            </button>
+            <button
+              type="button"
+              disabled={!canMoveDown}
+              className="rounded border border-rivals-light-300 px-1.5 py-1 text-[10px] uppercase transition-colors duration-[var(--motion-fast)] hover:bg-rivals-light-100 disabled:opacity-30"
+              onClick={() => onMove?.(1)}
+            >
+              Down
+            </button>
+            <button
+              type="button"
+              className="rounded border border-rose-200 px-2 py-1 text-[10px] font-semibold uppercase text-rose-800 transition-colors duration-[var(--motion-fast)] hover:bg-rose-50"
+              onClick={onDelete}
+            >
+              Del
+            </button>
+          </div>
+        ) : null}
       </header>
 
-      {!showExpanded && hasStructured ? (
-        <div className="px-4 py-3">
-          <ComboMiniPreview
-            structuredSteps={block.structuredSteps!}
-            abilityLookup={abilityLookup!}
+      <div className="panel-enter space-y-4 p-4">
+        {isEditing && abilityLookup && onReplace ? (
+          <ComboBlockEditor
+            block={block}
+            abilityLookup={abilityLookup}
+            onReplace={onReplace}
           />
-        </div>
-      ) : null}
-
-      {showExpanded ? (
-        <div className="space-y-4 p-4">
-          {isEditing && abilityLookup && onReplace ? (
-            <ComboBuilderEditor
-              block={block}
-              abilityLookup={abilityLookup}
-              onReplace={onReplace}
-            />
-          ) : (
-            <BlockCombo block={block} abilityLookup={abilityLookup} clip={block.clip} />
-          )}
-        </div>
-      ) : null}
+        ) : (
+          <BlockCombo block={block} abilityLookup={abilityLookup} clip={block.clip} />
+        )}
+      </div>
     </article>
   );
 }

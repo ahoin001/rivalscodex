@@ -1,9 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
 import { RivalsHeroTitle } from "@/components/ui";
-import heroFrameImage from "../../../../rivals-assets/frames/hero-frame.jpg";
-import lunaFrameImage from "../../../../rivals-assets/heros/luna/luna-frame.png";
-import lunaImage from "../../../../rivals-assets/heros/luna/luna.png";
+import { RivalsClipAction } from "@/components/ui/rivals-clip-action";
+import { RIVALS_FRAMES, RIVALS_LUNA } from "@/lib/rivals-assets-paths";
 
 type LunaHeroCardProps = {
   className?: string;
@@ -47,7 +45,7 @@ export function LunaHeroCard({ className = "" }: LunaHeroCardProps) {
       <div className="relative w-full aspect-[5/7] sm:aspect-[16/10] lg:aspect-[21/9] min-h-[520px] sm:min-h-[560px] lg:min-h-[600px] xl:min-h-[680px]">
         {/* Layer 1: Base frame */}
         <Image
-          src={heroFrameImage}
+          src={RIVALS_FRAMES.hero}
           alt=""
           fill
           priority
@@ -62,7 +60,7 @@ export function LunaHeroCard({ className = "" }: LunaHeroCardProps) {
           aria-hidden
         >
           <Image
-            src={lunaFrameImage}
+            src={RIVALS_LUNA.frame}
             alt=""
             fill
             sizes="(max-width: 1024px) 64vw, 58vw"
@@ -76,7 +74,7 @@ export function LunaHeroCard({ className = "" }: LunaHeroCardProps) {
           aria-hidden
         >
           <Image
-            src={lunaFrameImage}
+            src={RIVALS_LUNA.frame}
             alt=""
             fill
             sizes="100vw"
@@ -96,13 +94,10 @@ export function LunaHeroCard({ className = "" }: LunaHeroCardProps) {
 
         {/* Top utility row moved into the hero section */}
         <div className="absolute left-0 right-0 top-0 z-40 flex items-center justify-between gap-3 px-4 py-3 sm:px-7 sm:py-4 lg:px-10">
-          <Link
-            href="/"
-            className="rivals-clip-tab inline-flex items-center gap-2 bg-rivals-ink/92 px-4 py-2 font-display text-[11px] uppercase italic tracking-[0.18em] text-white transition-colors hover:bg-rivals-ink-soft"
-          >
+          <RivalsClipAction href="/" variant="surface">
             <span aria-hidden>&larr;</span>
             Back To Home
-          </Link>
+          </RivalsClipAction>
           <p className="hidden text-[11px] uppercase tracking-[0.28em] text-rivals-ink/70 sm:block">
             Design Sandbox · Luna Snow
           </p>
@@ -143,7 +138,7 @@ export function LunaHeroCard({ className = "" }: LunaHeroCardProps) {
           "
         >
           <Image
-            src={lunaImage}
+            src={RIVALS_LUNA.portrait}
             alt="Luna Snow full body art"
             fill
             priority

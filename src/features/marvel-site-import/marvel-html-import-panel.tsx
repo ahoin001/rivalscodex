@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ClippedButton } from "@/components/ui/clipped-button";
 import { RivalsInput } from "@/components/ui/rivals-input";
 import { HelpTooltip } from "@/components/ui/tooltip";
@@ -34,8 +34,8 @@ type HeroHeaderState = {
   urlStack: string;
 };
 
-const emptyHeader = (): HeroHeaderState => ({
-  slug: "",
+const emptyHeader = (initialSlug = ""): HeroHeaderState => ({
+  slug: initialSlug,
   role: "Duelist",
   name: "",
   realName: "",
@@ -46,6 +46,14 @@ const emptyHeader = (): HeroHeaderState => ({
 });
 
 const BASE_FORM_ID = "base";
+
+export type MarvelHtmlImportPanelProps = {
+  initialSlug?: string;
+  lockSlug?: boolean;
+  variant?: "standalone" | "embedded";
+  heroName?: string;
+  onApplySuccess?: () => void;
+};
 
 function baseFormDraftFor(siteFormIndex: number): MarvelImportFormDraft {
   return {
@@ -77,14 +85,33 @@ function singleBaseDraft(): MarvelImportFormDraft {
   };
 }
 
-export function MarvelHtmlImportPanel() {
+export function MarvelHtmlImportPanel({
+  initialSlug = "",
+  lockSlug = false,
+  variant = "standalone",
+  heroName,
+  onApplySuccess,
+}: MarvelHtmlImportPanelProps = {}) {
+  const isEmbedded = variant === "embedded";
   const [html, setHtml] = useState("");
-  const [header, setHeader] = useState<HeroHeaderState>(emptyHeader);
+  const [header, setHeader] = useState<HeroHeaderState>(() => emptyHeader(initialSlug));
   const [warnings, setWarnings] = useState<string[]>([]);
   const [downloadAssets, setDownloadAssets] = useState(true);
+  const [forceRefreshAssets, setForceRefreshAssets] = useState(false);
   const [status, setStatus] = useState<{ ok: boolean; message: string } | null>(null);
   const [pending, setPending] = useState(false);
   const [drafts, setDrafts] = useState<MarvelImportFormDraft[]>([singleBaseDraft()]);
+  const [parsedOnce, setParsedOnce] = useState(false);
+
+  useEffect(() => {
+    if (!initialSlug) return;
+    queueMicrotask(() => {
+      setHeader((prev) => ({
+        ...prev,
+        slug: prev.slug || initialSlug,
+      }));
+    });
+  }, [initialSlug]);
 
   const multiForm = drafts.length > 1;
   const heroSlug = header.slug || "hero";
@@ -135,8 +162,8 @@ export function MarvelHtmlImportPanel() {
         ? normalizeMarvelSlug(heroResult.codeNameRaw)
         : "");
 
-    setHeader({
-      slug,
+    setHeader((prev) => ({
+      slug: lockSlug ? prev.slug.trim() || initialSlug || slug : slug,
       role: heroResult.role ?? "Duelist",
       name:
         heroResult.name ??
@@ -148,7 +175,7 @@ export function MarvelHtmlImportPanel() {
       urlFrame: heroResult.urls.frame ?? "",
       urlHero: heroResult.urls.heroImage ?? "",
       urlStack: heroResult.urls.stackLogo ?? "",
-    });
+    }));
 
     const parsedAbilities = formResult.abilities.map(toImportAbility);
     const openDetailRollup = applyOpenDetail(parsedAbilities, formResult.openDetail);
@@ -201,7 +228,8 @@ export function MarvelHtmlImportPanel() {
       );
     }
     setWarnings(combinedWarnings);
-  }, [html, applyOpenDetail]);
+    setParsedOnce(true);
+  }, [html, applyOpenDetail, initialSlug, lockSlug]);
 
   const updateDraft = useCallback(
     (draftIndex: number, patch: Partial<MarvelImportFormDraft>) => {
@@ -374,6 +402,7 @@ export function MarvelHtmlImportPanel() {
         realName: header.realName.trim() || undefined,
         summary: header.summary.trim(),
         downloadAssets,
+        forceRefreshAssets: downloadAssets ? forceRefreshAssets : false,
         urls: {
           frame: header.urlFrame.trim() || undefined,
           heroImage: header.urlHero.trim() || undefined,
@@ -440,6 +469,8 @@ export function MarvelHtmlImportPanel() {
         message?: string;
         error?: string;
         writtenFiles?: string[];
+        refreshedFiles?: string[];
+        skippedFilesCount?: number;
         created?: boolean;
         formsCount?: number;
         abilitiesCount?: number;
@@ -460,9 +491,16 @@ export function MarvelHtmlImportPanel() {
         typeof data.formsCount === "number" && data.formsCount > 0
           ? ` Forms: ${data.formsCount}.`
           : "";
+      const writtenCount = data.writtenFiles?.length ?? 0;
+      const refreshedCount = data.refreshedFiles?.length ?? 0;
+      const skippedCount = data.skippedFilesCount ?? 0;
       const fileNote =
-        data.writtenFiles && data.writtenFiles.length > 0
-          ? ` Wrote ${data.writtenFiles.length} file(s).`
+        writtenCount > 0
+          ? ` Wrote ${writtenCount} file(s).`
+          : refreshedCount > 0
+          ? ` Refreshed ${refreshedCount} file(s).`
+          : skippedCount > 0
+          ? ` ${skippedCount} file(s) cached (unchanged).`
           : data.writtenFiles
           ? " No new files (cached)."
           : "";
@@ -488,13 +526,21 @@ export function MarvelHtmlImportPanel() {
       if (data.warnings?.length) {
         setWarnings((prev) => [...prev, ...data.warnings!]);
       }
+
+      onApplySuccess?.();
     } catch (e) {
       const message = e instanceof Error ? e.message : "Apply failed.";
       setStatus({ ok: false, message });
     } finally {
       setPending(false);
     }
-  }, [drafts, downloadAssets, header]);
+  }, [
+    drafts,
+    downloadAssets,
+    forceRefreshAssets,
+    header,
+    onApplySuccess,
+  ]);
 
   const copyParsedJson = useCallback(() => {
     void navigator.clipboard.writeText(
@@ -532,7 +578,20 @@ export function MarvelHtmlImportPanel() {
   }, [drafts, header]);
 
   return (
-    <div className="space-y-8">
+    <div className={`relative ${isEmbedded ? "space-y-5" : "space-y-8"} ${pending ? "codex-resync-pending" : ""}`}>
+      {isEmbedded ? (
+        <div className="tab-enter flex flex-wrap items-center gap-3 border-b border-brand-gold/25 pb-3">
+          <p className="font-display text-[11px] font-bold uppercase italic tracking-[0.2em] text-brand-gold">
+            Codex resync
+          </p>
+          {heroName ? (
+            <span className="text-xs text-muted-foreground">{heroName}</span>
+          ) : null}
+          <span className="ml-auto text-[10px] uppercase tracking-wide text-muted-foreground">
+            Paste → Parse → Apply
+          </span>
+        </div>
+      ) : null}
       <div className="space-y-2">
         <label className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-muted-foreground">
           <span>Paste hero HTML from marvelrivals.com</span>
@@ -593,6 +652,9 @@ export function MarvelHtmlImportPanel() {
               onChange={(e) => setHeader((f) => ({ ...f, slug: e.target.value }))}
               placeholder="gambit"
               autoComplete="off"
+              readOnly={lockSlug}
+              disabled={lockSlug}
+              className={lockSlug ? "opacity-80" : undefined}
             />
           </label>
           <label className="space-y-1">
@@ -702,7 +764,25 @@ export function MarvelHtmlImportPanel() {
             <code className="font-mono text-[11px]">public/rivals-assets/heros/&lt;slug&gt;/</code>{" "}
             and ability icons under{" "}
             <code className="font-mono text-[11px]">.../icons/</code>
-            <HelpTooltip content="Disable only when the files are already on disk and you just want to refresh the codex row. Files that already exist are reused — no redundant downloads." />
+            <HelpTooltip content="Disable only when the files are already on disk and you just want to refresh the codex row. Files that already exist are reused unless Replace existing images is checked." />
+          </span>
+        </label>
+
+        <label
+          className={`flex cursor-pointer items-center gap-2 text-sm text-muted-foreground transition-opacity duration-200 ${
+            downloadAssets ? "opacity-100" : "pointer-events-none opacity-40"
+          }`}
+        >
+          <input
+            type="checkbox"
+            checked={forceRefreshAssets}
+            onChange={(e) => setForceRefreshAssets(e.target.checked)}
+            disabled={!downloadAssets}
+            className="accent-brand-gold"
+          />
+          <span className="flex items-center gap-1.5">
+            Replace existing images
+            <HelpTooltip content="When checked, overwrites PNGs already on disk — use after a game patch updates hero art or ability icons." />
           </span>
         </label>
 
@@ -745,14 +825,14 @@ export function MarvelHtmlImportPanel() {
 
         {status ? (
           <p
-            className={`text-sm ${status.ok ? "text-strategist" : "text-duelist"}`}
+            className={`tab-enter text-sm ${status.ok ? "text-strategist" : "text-duelist"}`}
             role="status"
           >
             {status.message}
           </p>
         ) : null}
 
-        <div className="space-y-4">
+        <div className={`space-y-4 ${parsedOnce ? "codex-resync-stagger" : ""}`}>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-brand-gold">
               Forms
@@ -774,24 +854,30 @@ export function MarvelHtmlImportPanel() {
             </span>
           </div>
           {drafts.map((draft, index) => (
-            <MarvelImportFormCard
+            <div
               key={`${draft.formId}-${draft.siteFormIndex}`}
-              draftIndex={index}
-              draft={draft}
-              heroSlug={heroSlug}
-              multiForm={multiForm}
-              onPasteHtmlChange={handlePasteHtmlChange}
-              onParseForm={handleParseForm}
-              onLabelChange={handleLabelChange}
-              onShortLabelChange={handleShortLabelChange}
-              onIsDefaultChange={handleIsDefaultChange}
-              onAbilityChange={handleAbilityChange}
-              onParseDetail={handleParseDetail}
-              onClearDetail={handleClearDetail}
-            />
+              className="codex-resync-form-card"
+              style={{ animationDelay: `${index * 70}ms` }}
+            >
+              <MarvelImportFormCard
+                draftIndex={index}
+                draft={draft}
+                heroSlug={heroSlug}
+                multiForm={multiForm}
+                onPasteHtmlChange={handlePasteHtmlChange}
+                onParseForm={handleParseForm}
+                onLabelChange={handleLabelChange}
+                onShortLabelChange={handleShortLabelChange}
+                onIsDefaultChange={handleIsDefaultChange}
+                onAbilityChange={handleAbilityChange}
+                onParseDetail={handleParseDetail}
+                onClearDetail={handleClearDetail}
+              />
+            </div>
           ))}
         </div>
 
+        {!isEmbedded ? (
         <p className="text-xs leading-relaxed text-muted-foreground">
           Dev-only: a single <code className="font-mono text-[11px]">POST /api/dev/marvel-site-import</code>{" "}
           upserts the hero into <code className="font-mono text-[11px]">app_rivalscodex_v1.hero_codex</code>{" "}
@@ -801,6 +887,7 @@ export function MarvelHtmlImportPanel() {
           images into <code className="font-mono text-[11px]">public/rivals-assets/</code>. The
           codex is the only runtime source of truth — there is no separate asset-sync step.
         </p>
+        ) : null}
       </div>
     </div>
   );

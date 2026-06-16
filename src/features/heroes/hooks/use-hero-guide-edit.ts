@@ -1,18 +1,24 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import type {
   HeroGuideBlock,
   HeroGuideTabContent,
   HeroGuideTabId,
 } from "@/features/heroes/hero-guide-schema";
 import { heroGuideTabsSchema } from "@/features/heroes/hero-guide-schema";
+import { sanitizeHeroGuideTabsCandidate } from "@/features/heroes/hero-guide-sanitize";
 import { publishHeroGuideTabsAction } from "@/features/heroes/actions/hero-guide-editorial-actions";
 
 const LOCAL_TABS_KEY_PREFIX = "rivalscodex.guide-tabs.v1";
 const AUTOSAVE_MS = 1500;
 
 export type GuideSaveStatus = "idle" | "saving" | "saved" | "error" | "local";
+
+export type GuidePublishResult =
+  | { ok: true; scope: "local" | "remote" }
+  | { ok: false; error: string };
 
 function localTabsKey(heroSlug: string): string {
   return `${LOCAL_TABS_KEY_PREFIX}.${heroSlug.toLowerCase()}`;
@@ -44,67 +50,121 @@ export function useHeroGuideEdit(input: {
   supabaseEnabled: boolean;
 }) {
   const { heroSlug, initialTabs, supabaseEnabled } = input;
+  const router = useRouter();
   const [tabs, setTabs] = useState<HeroGuideTabContent[]>(initialTabs);
   const [saveStatus, setSaveStatus] = useState<GuideSaveStatus>("idle");
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [combosEditMode, setCombosEditMode] = useState(false);
   const [editingComboBlockIndex, setEditingComboBlockIndex] = useState<number | null>(
     null,
   );
 
-  const tabsRef = useRef(tabs);
-  tabsRef.current = tabs;
+  const tabsRef = useRef(initialTabs);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const savedFadeRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const saveInFlightRef = useRef(false);
+  const pendingResaveRef = useRef(false);
+  const executeSaveRef = useRef<
+    () => Promise<GuidePublishResult>
+  >(async () => ({ ok: false, error: "Save not initialized." }));
+
+  useEffect(() => {
+    tabsRef.current = tabs;
+  }, [tabs]);
+
+  const markSaved = useCallback((status: Exclude<GuideSaveStatus, "idle" | "saving">) => {
+    setHasUnsavedChanges(false);
+    setSaveStatus(status);
+    if (savedFadeRef.current) clearTimeout(savedFadeRef.current);
+    if (status === "saved" || status === "local") {
+      savedFadeRef.current = setTimeout(() => {
+        setSaveStatus((s) => (s === status ? "idle" : s));
+      }, 3200);
+    }
+  }, []);
+
+  const executeSave = useCallback(async (): Promise<GuidePublishResult> => {
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
+
+    const current = tabsRef.current;
+    const parsed = heroGuideTabsSchema.safeParse(
+      sanitizeHeroGuideTabsCandidate(current),
+    );
+    if (!parsed.success) {
+      const error = parsed.error.issues.map((i) => i.message).join("; ");
+      setSaveStatus("error");
+      setSaveError(error);
+      return { ok: false, error };
+    }
+
+    writeLocalTabs(heroSlug, parsed.data);
+
+    if (!supabaseEnabled) {
+      setSaveError(null);
+      markSaved("local");
+      return { ok: true, scope: "local" };
+    }
+
+    if (saveInFlightRef.current) {
+      pendingResaveRef.current = true;
+      return { ok: true, scope: "remote" };
+    }
+
+    saveInFlightRef.current = true;
+    setSaveStatus("saving");
+    setSaveError(null);
+
+    const result = await publishHeroGuideTabsAction({
+      heroSlug,
+      tabs: parsed.data,
+    });
+
+    saveInFlightRef.current = false;
+
+    if (!result.ok) {
+      setSaveStatus("error");
+      setSaveError(result.error);
+      return { ok: false, error: result.error };
+    }
+
+    markSaved("saved");
+    router.refresh();
+
+    if (pendingResaveRef.current) {
+      pendingResaveRef.current = false;
+      return executeSaveRef.current();
+    }
+
+    return { ok: true, scope: "remote" };
+  }, [heroSlug, supabaseEnabled, markSaved, router]);
+
+  useEffect(() => {
+    executeSaveRef.current = executeSave;
+  }, [executeSave]);
 
   const scheduleSave = useCallback(() => {
+    setHasUnsavedChanges(true);
     if (saveTimerRef.current) {
       clearTimeout(saveTimerRef.current);
     }
-    saveTimerRef.current = setTimeout(async () => {
-      const current = tabsRef.current;
-      const parsed = heroGuideTabsSchema.safeParse(current);
-      if (!parsed.success) {
-        setSaveStatus("error");
-        setSaveError(parsed.error.issues.map((i) => i.message).join("; "));
-        return;
-      }
-
-      writeLocalTabs(heroSlug, parsed.data);
-
-      if (!supabaseEnabled) {
-        setSaveStatus("local");
-        setSaveError(null);
-        return;
-      }
-
-      setSaveStatus("saving");
-      setSaveError(null);
-
-      const result = await publishHeroGuideTabsAction({
-        heroSlug,
-        tabs: parsed.data,
-      });
-
-      if (!result.ok) {
-        setSaveStatus("error");
-        setSaveError(result.error);
-        return;
-      }
-
-      setSaveStatus("saved");
-      if (savedFadeRef.current) clearTimeout(savedFadeRef.current);
-      savedFadeRef.current = setTimeout(() => {
-        setSaveStatus((s) => (s === "saved" ? "idle" : s));
-      }, 2400);
+    saveTimerRef.current = setTimeout(() => {
+      saveTimerRef.current = null;
+      void executeSave();
     }, AUTOSAVE_MS);
-  }, [heroSlug, supabaseEnabled]);
+  }, [executeSave]);
+
+  const publishNow = useCallback(async (): Promise<GuidePublishResult> => {
+    return executeSave();
+  }, [executeSave]);
 
   const updateTabs = useCallback(
     (updater: (current: HeroGuideTabContent[]) => HeroGuideTabContent[]) => {
       setTabs((current) => {
         const next = updater(current);
-        tabsRef.current = next;
         return next;
       });
       scheduleSave();
@@ -145,6 +205,13 @@ export function useHeroGuideEdit(input: {
     return getCombosTab()?.body ?? [];
   }, [getCombosTab]);
 
+  const exitCombosEditMode = useCallback(async (): Promise<GuidePublishResult> => {
+    const result = await publishNow();
+    setEditingComboBlockIndex(null);
+    setCombosEditMode(false);
+    return result;
+  }, [publishNow]);
+
   useEffect(() => {
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
@@ -154,10 +221,12 @@ export function useHeroGuideEdit(input: {
 
   useEffect(() => {
     if (!supabaseEnabled) {
-      const local = readLocalTabs(heroSlug);
-      if (local) {
-        setTabs(local);
-      }
+      queueMicrotask(() => {
+        const local = readLocalTabs(heroSlug);
+        if (local) {
+          setTabs(local);
+        }
+      });
     }
   }, [heroSlug, supabaseEnabled]);
 
@@ -172,6 +241,10 @@ export function useHeroGuideEdit(input: {
     getCombosBlocks,
     saveStatus,
     saveError,
+    hasUnsavedChanges,
+    isPublishing: saveStatus === "saving",
+    publishNow,
+    exitCombosEditMode,
     combosEditMode,
     setCombosEditMode,
     editingComboBlockIndex,

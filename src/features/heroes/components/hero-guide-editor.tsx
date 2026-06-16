@@ -2,24 +2,26 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { HeroGuideTabContent, HeroGuideTabId } from "@/features/heroes/hero-guide-schema";
 import {
   HERO_GUIDE_TAB_ORDER,
   heroGuideTabsSchema,
 } from "@/features/heroes/hero-guide-schema";
+import { migrateHeroGuideTabs } from "@/features/heroes/hero-guide-migrate";
+import { countComboBlocksInTabs, sanitizeHeroGuideTabsCandidate } from "@/features/heroes/hero-guide-sanitize";
 import { HeroGuideBodyEditor } from "@/features/heroes/components/hero-guide-body-editor";
 import type { ResolvedAbilityRef } from "@/features/heroes/ability-lookup";
 import { useOptionalAbilityLookup } from "@/features/heroes/components/ability-lookup-provider";
-import {
-  publishHeroGuideTabsAction,
-  saveHeroGuideDraftAction,
-} from "@/features/heroes/actions/hero-guide-editorial-actions";
+import { publishHeroGuideTabsAction } from "@/features/heroes/actions/hero-guide-editorial-actions";
+import { GoToHeroLink } from "@/features/heroes/components/go-to-hero-link";
+import { RivalsDisclosure } from "@/components/ui/rivals-disclosure";
 
 const DEFAULT_TAB_LABEL: Record<HeroGuideTabId, string> = {
-  overview: "Overview",
-  abilities: "Abilities",
-  combos: "Combos & Synergies",
-  playstyle: "Playstyle Guide",
+  overview: "Overview & Playstyle",
+  abilities: "Kit & Mechanics",
+  combos: "Combos",
+  matchups: "Matchups",
   resources: "Resources",
   notes: "Personal Notes",
 };
@@ -39,14 +41,20 @@ export function HeroGuideEditor({
   publishedTabs,
   abilityLookup: abilityLookupProp,
 }: HeroGuideEditorProps) {
-  const abilityLookup = abilityLookupProp ?? useOptionalAbilityLookup();
+  const router = useRouter();
+  const optionalAbilityLookup = useOptionalAbilityLookup();
+  const abilityLookup = abilityLookupProp ?? optionalAbilityLookup;
   const [tabs, setTabs] = useState<HeroGuideTabContent[]>(() =>
     normalizeTabs(initialTabs),
+  );
+  const [publishedSnapshot, setPublishedSnapshot] = useState<HeroGuideTabContent[] | null>(
+    publishedTabs ? normalizeTabs(publishedTabs) : null,
   );
   const [activeId, setActiveId] = useState<HeroGuideTabId>("overview");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState<"draft" | "publish" | null>(null);
+  const [pending, setPending] = useState(false);
+  const [liveHeroHref, setLiveHeroHref] = useState<string | null>(null);
 
   const activeTab = useMemo(
     () => tabs.find((tab) => tab.id === activeId) ?? tabs[0],
@@ -59,187 +67,236 @@ export function HeroGuideEditor({
     );
   };
 
-  const runSubmit = async (scope: "draft" | "published") => {
+  const runPublish = async () => {
     setMessage(null);
     setError(null);
 
-    const parsed = heroGuideTabsSchema.safeParse(normalizeTabs(tabs));
+    const parsed = heroGuideTabsSchema.safeParse(
+      sanitizeHeroGuideTabsCandidate(normalizeTabs(tabs)),
+    );
     if (!parsed.success) {
       setError(parsed.error.issues.map((issue) => issue.message).join("; "));
       return;
     }
 
-    setPending(scope === "draft" ? "draft" : "publish");
+    setPending(true);
 
-    const result =
-      scope === "draft"
-        ? await saveHeroGuideDraftAction({ heroSlug, tabs: parsed.data })
-        : await publishHeroGuideTabsAction({ heroSlug, tabs: parsed.data });
+    const result = await publishHeroGuideTabsAction({ heroSlug, tabs: parsed.data });
 
-    setPending(null);
+    setPending(false);
 
     if (!result.ok) {
       setError(result.error);
       return;
     }
 
+    setPublishedSnapshot(parsed.data);
+    setLiveHeroHref(`/heroes/${heroSlug}?t=${Date.now()}`);
+    router.refresh();
+
+    const comboCount = countComboBlocksInTabs(parsed.data);
+
     setMessage(
-      scope === "draft"
-        ? "Draft saved. Preview on the hero page with ?preview=draft while signed in."
-        : "Published. Live site will show this guide for readers.",
+      `Published — changes are live now (${comboCount} combo block${comboCount === 1 ? "" : "s"} in the Combos tab).`,
     );
   };
+  const loadPublishedIntoEditor = () => {
+    if (!publishedSnapshot) return;
+    setTabs(normalizeTabs(publishedSnapshot));
+    setMessage("Reverted to the current live version.");
+    setError(null);
+  };
 
-  const publishedFingerprint = publishedTabs
-    ? JSON.stringify(normalizeTabs(publishedTabs))
+  const publishedFingerprint = publishedSnapshot
+    ? JSON.stringify(publishedSnapshot)
     : "";
   const dirtyVersusPublished =
-    publishedTabs !== null &&
+    publishedSnapshot !== null &&
     JSON.stringify(normalizeTabs(tabs)) !== publishedFingerprint;
+  const hasStructuredBody = (activeTab.body?.length ?? 0) > 0;
+  const isCombosTab = activeId === "combos";
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
-      <nav className="flex flex-wrap gap-2 lg:flex-col lg:gap-1">
+    <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,220px)_minmax(0,1fr)]">
+      <nav className="flex flex-wrap gap-2 lg:sticky lg:top-4 lg:flex-col lg:gap-1 lg:self-start">
         {HERO_GUIDE_TAB_ORDER.map((id) => (
           <button
             key={id}
             type="button"
             onClick={() => setActiveId(id)}
-            className={`rounded px-3 py-2 text-left font-display text-sm font-bold uppercase italic tracking-wide transition-colors ${
+            className={`min-w-0 rounded px-3 py-2 text-left font-display text-sm font-bold uppercase italic tracking-wide transition-colors ${
               activeId === id
                 ? "bg-rivals-yellow-500 text-rivals-ink"
                 : "bg-rivals-light-200 text-rivals-ink-soft hover:bg-rivals-light-300"
             }`}
           >
-            {tabs.find((t) => t.id === id)?.label ?? id}
+            <span className="block truncate">
+              {tabs.find((t) => t.id === id)?.label ?? id}
+            </span>
           </button>
         ))}
       </nav>
 
-      <div className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-rivals-light-300 pb-3">
-          <div>
+      <div className="min-w-0 space-y-4">
+        <div className="flex flex-col gap-3 border-b border-rivals-light-300 pb-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
             <p className="text-xs uppercase tracking-[0.2em] text-rivals-ink-muted">
               Editing · {heroName}
             </p>
-            <h2 className="font-display text-xl font-bold uppercase italic text-rivals-ink">
+            <h2 className="font-display text-xl font-bold uppercase italic text-rivals-ink break-words">
               {activeTab.label}
             </h2>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex w-full shrink-0 flex-wrap gap-2 sm:w-auto sm:justify-end">
+            <GoToHeroLink
+              heroSlug={heroSlug}
+              heroName={heroName}
+              className="flex-1 sm:flex-none"
+            />
             <button
               type="button"
-              disabled={pending !== null}
-              onClick={() => runSubmit("draft")}
-              className="rounded border border-rivals-ink/25 bg-white px-4 py-2 font-display text-xs font-bold uppercase italic tracking-wide text-rivals-ink hover:bg-rivals-light-100 disabled:opacity-50"
+              disabled={pending}
+              onClick={runPublish}
+              className="min-h-10 flex-1 rounded bg-rivals-yellow-500 px-4 py-2 font-display text-xs font-bold uppercase italic tracking-wide text-rivals-ink hover:bg-rivals-yellow-400 disabled:opacity-50 sm:flex-none"
             >
-              {pending === "draft" ? "Saving…" : "Save draft"}
-            </button>
-            <button
-              type="button"
-              disabled={pending !== null}
-              onClick={() => runSubmit("published")}
-              className="rounded bg-rivals-yellow-500 px-4 py-2 font-display text-xs font-bold uppercase italic tracking-wide text-rivals-ink hover:bg-rivals-yellow-400 disabled:opacity-50"
-            >
-              {pending === "publish" ? "Publishing…" : "Publish"}
+              {pending ? "Publishing…" : "Publish"}
             </button>
           </div>
         </div>
 
         {dirtyVersusPublished ? (
-          <p className="rounded border border-amber-400/40 bg-amber-50 px-3 py-2 text-xs text-amber-950">
-            Unpublished changes vs last published version.
+          <p className="rounded border border-amber-400/40 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-950 break-words">
+            Unsaved changes — click Publish to update the live hero page.
+            {publishedSnapshot ? (
+              <button
+                type="button"
+                onClick={loadPublishedIntoEditor}
+                className="ml-2 font-semibold underline underline-offset-2 hover:text-amber-900"
+              >
+                Revert to live
+              </button>
+            ) : null}
           </p>
         ) : null}
-
         {error ? (
-          <p className="rounded border border-rose-300 bg-rose-50 px-3 py-2 text-sm text-rose-900">
+          <p className="rounded border border-rose-300 bg-rose-50 px-3 py-2 text-sm leading-relaxed text-rose-900 break-words">
             {error}
           </p>
         ) : null}
         {message ? (
-          <p className="rounded border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm text-emerald-950">
-            {message}{" "}
-            <Link className="underline" href={`/heroes/${heroSlug}?preview=draft`}>
-              Preview draft
-            </Link>
-            {" · "}
-            <Link className="underline" href={`/heroes/${heroSlug}`}>
-              Live page
-            </Link>
-          </p>
+          <div
+            className="rounded border border-emerald-300 bg-emerald-50 px-3 py-2.5 text-sm text-emerald-950"
+            role="status"
+          >
+            <p className="leading-relaxed break-words">{message}</p>
+            <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs font-semibold">
+              <Link
+                className="underline underline-offset-2"
+                href={liveHeroHref ?? `/heroes/${heroSlug}`}
+              >
+                View live page
+              </Link>
+            </div>
+          </div>
         ) : null}
 
-        <p className="text-xs text-rivals-ink-muted">
-          Concurrent edits: the latest successful save overwrites the previous draft for this hero
-          (last write wins).
-        </p>
-
-        <label className="block space-y-1">
-          <span className="text-xs font-semibold uppercase tracking-wide text-rivals-ink-muted">
-            Tab label
-          </span>
-          <input
-            type="text"
-            value={activeTab.label}
-            onChange={(event) => updateActive({ label: event.currentTarget.value })}
-            className="w-full rounded border border-rivals-light-300 px-3 py-2 text-sm text-rivals-ink"
-          />
-        </label>
-
-        <label className="block space-y-1">
-          <span className="text-xs font-semibold uppercase tracking-wide text-rivals-ink-muted">
-            Summary
-          </span>
-          <textarea
-            value={activeTab.summary}
-            onChange={(event) => updateActive({ summary: event.currentTarget.value })}
-            rows={4}
-            className="w-full rounded border border-rivals-light-300 px-3 py-2 text-sm text-rivals-ink"
-          />
-        </label>
-
-        {(activeTab.body?.length ?? 0) > 0 ? (
-          <p className="rounded border border-cyan-500/30 bg-cyan-50/90 px-3 py-2 text-xs text-cyan-950">
-            Structured body is active: readers see body blocks instead of priority/secondary cue
-            columns for this tab.
+        {activeId === "notes" ? (
+          <p className="rounded-lg border border-rivals-light-300 bg-rivals-light-50 px-3 py-2 text-sm leading-relaxed text-rivals-ink-soft">
+            Personal notes are player-owned and stored locally on the reader side. This tab is
+            intentionally read-only in admin.
           </p>
-        ) : null}
+        ) : (
+          <div className="space-y-4">
+            {isCombosTab && hasStructuredBody ? (
+              <HeroGuideBodyEditor
+                tabId={activeId}
+                blocks={activeTab.body ?? []}
+                onChange={(body) =>
+                  updateActive({ body: body && body.length > 0 ? body : undefined })
+                }
+                abilityLookup={abilityLookup}
+              />
+            ) : null}
 
-        <BulletListEditor
-          title="Priority cues"
-          items={activeTab.primaryPoints ?? []}
-          onChange={(primaryPoints) =>
-            updateActive({
-              primaryPoints: primaryPoints.length > 0 ? primaryPoints : undefined,
-            })
-          }
-          minItems={(activeTab.body?.length ?? 0) > 0 ? 0 : 1}
-        />
+            <RivalsDisclosure
+              title="Tab settings"
+              description="Label, summary, and resource links shown on the live page"
+              defaultOpen={!hasStructuredBody}
+              tone="quiet"
+            >
+              <div className="space-y-3">
+                <label className="block min-w-0 space-y-1">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-rivals-ink-muted">
+                    Tab label
+                  </span>
+                  <input
+                    type="text"
+                    value={activeTab.label}
+                    onChange={(event) => updateActive({ label: event.currentTarget.value })}
+                    className="w-full min-w-0 rounded border border-rivals-light-300 px-3 py-2 text-sm text-rivals-ink"
+                  />
+                </label>
 
-        <BulletListEditor
-          title="Secondary cues (optional)"
-          items={activeTab.secondaryPoints ?? []}
-          onChange={(secondaryPoints) =>
-            updateActive({
-              secondaryPoints: secondaryPoints.length > 0 ? secondaryPoints : undefined,
-            })
-          }
-          minItems={0}
-        />
+                <label className="block min-w-0 space-y-1">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-rivals-ink-muted">
+                    Summary
+                  </span>
+                  <textarea
+                    value={activeTab.summary}
+                    onChange={(event) => updateActive({ summary: event.currentTarget.value })}
+                    rows={3}
+                    className="w-full min-w-0 rounded border border-rivals-light-300 px-3 py-2 text-sm text-rivals-ink"
+                  />
+                </label>
 
-        <HeroGuideBodyEditor
-          blocks={activeTab.body ?? []}
-          onChange={(body) =>
-            updateActive({ body: body && body.length > 0 ? body : undefined })
-          }
-          abilityLookup={abilityLookup}
-        />
+                <LinksEditor
+                  links={activeTab.links ?? []}
+                  onChange={(links) =>
+                    updateActive({ links: links.length > 0 ? links : undefined })
+                  }
+                />
+              </div>
+            </RivalsDisclosure>
 
-        <LinksEditor
-          links={activeTab.links ?? []}
-          onChange={(links) => updateActive({ links: links.length > 0 ? links : undefined })}
-        />
+            {!hasStructuredBody ? (
+              <>
+                <BulletListEditor
+                  title="Priority cues"
+                  items={activeTab.primaryPoints ?? []}
+                  onChange={(primaryPoints) =>
+                    updateActive({
+                      primaryPoints: primaryPoints.length > 0 ? primaryPoints : undefined,
+                    })
+                  }
+                  minItems={1}
+                />
+
+                <BulletListEditor
+                  title="Secondary cues (optional)"
+                  items={activeTab.secondaryPoints ?? []}
+                  onChange={(secondaryPoints) =>
+                    updateActive({
+                      secondaryPoints:
+                        secondaryPoints.length > 0 ? secondaryPoints : undefined,
+                    })
+                  }
+                  minItems={0}
+                />
+              </>
+            ) : null}
+
+            {!isCombosTab || !hasStructuredBody ? (
+              <HeroGuideBodyEditor
+                tabId={activeId}
+                blocks={activeTab.body ?? []}
+                onChange={(body) =>
+                  updateActive({ body: body && body.length > 0 ? body : undefined })
+                }
+                abilityLookup={abilityLookup}
+              />
+            ) : null}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -283,12 +340,12 @@ function BulletListEditor({
       </div>
       <ul className="space-y-2">
         {items.map((line, index) => (
-          <li key={`${title}-${index}`} className="flex gap-2">
+          <li key={`${title}-${index}`} className="flex min-w-0 flex-col gap-2 sm:flex-row">
             <textarea
               value={line}
               onChange={(event) => updateAt(index, event.currentTarget.value)}
               rows={2}
-              className="min-h-[2.5rem] flex-1 rounded border border-rivals-light-300 px-3 py-2 text-sm text-rivals-ink"
+              className="min-h-[2.5rem] min-w-0 flex-1 rounded border border-rivals-light-300 px-3 py-2 text-sm text-rivals-ink"
             />
             <button
               type="button"
@@ -336,20 +393,20 @@ function LinksEditor({
       </div>
       <ul className="space-y-2">
         {links.map((link, index) => (
-          <li key={`link-${index}`} className="grid gap-2 sm:grid-cols-[1fr_2fr_auto]">
+          <li key={`link-${index}`} className="grid min-w-0 gap-2 sm:grid-cols-[1fr_2fr_auto]">
             <input
               type="text"
               value={link.label}
               onChange={(event) => updateAt(index, { label: event.currentTarget.value })}
               placeholder="Label"
-              className="rounded border border-rivals-light-300 px-3 py-2 text-sm text-rivals-ink"
+              className="min-w-0 rounded border border-rivals-light-300 px-3 py-2 text-sm text-rivals-ink"
             />
             <input
               type="url"
               value={link.href}
               onChange={(event) => updateAt(index, { href: event.currentTarget.value })}
               placeholder="https://"
-              className="rounded border border-rivals-light-300 px-3 py-2 text-sm text-rivals-ink"
+              className="min-w-0 rounded border border-rivals-light-300 px-3 py-2 text-sm text-rivals-ink"
             />
             <button
               type="button"
@@ -366,7 +423,7 @@ function LinksEditor({
 }
 
 function normalizeTabs(input: HeroGuideTabContent[]): HeroGuideTabContent[] {
-  const byId = new Map(input.map((tab) => [tab.id, tab]));
+  const byId = new Map(migrateHeroGuideTabs(input).map((tab) => [tab.id, tab]));
   return HERO_GUIDE_TAB_ORDER.map((id) => {
     const existing = byId.get(id);
     if (existing) {
@@ -387,7 +444,7 @@ function normalizeTabs(input: HeroGuideTabContent[]): HeroGuideTabContent[] {
       id,
       label: DEFAULT_TAB_LABEL[id],
       summary: "Add a short summary for this tab.",
-      primaryPoints: ["First priority cue"],
+      ...(id === "notes" ? {} : { primaryPoints: ["First priority cue"] }),
     };
   });
 }

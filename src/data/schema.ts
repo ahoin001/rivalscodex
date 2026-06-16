@@ -53,6 +53,8 @@ export const comboModifierSchema = z.enum([
   "jump-cancel",
   "melee-weave",
   "instant",
+  /** Alternative branch — same setup can go into this step or the next option. */
+  "or",
 ]);
 
 export type ComboModifier = z.infer<typeof comboModifierSchema>;
@@ -62,11 +64,17 @@ export const comboStepSchema = z.discriminatedUnion("kind", [
     kind: z.literal("ability"),
     abilityRef: z.string(),
     modifier: comboModifierSchema.optional(),
+    /** Repeat this input N times in sequence (2–9). Omitted when once. */
+    repeat: z.number().int().min(2).max(9).optional(),
+    /** Optional per-step tip explaining why this input is used here. */
+    tip: z.string().trim().max(200).optional(),
   }),
   z.object({
     kind: z.literal("action"),
     label: z.string().max(60),
     modifier: comboModifierSchema.optional(),
+    repeat: z.number().int().min(2).max(9).optional(),
+    tip: z.string().trim().max(200).optional(),
   }),
 ]);
 

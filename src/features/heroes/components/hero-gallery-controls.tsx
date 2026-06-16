@@ -24,7 +24,7 @@ export function HeroGalleryControls({
   return (
     <ClippedPanel
       tone="sheet"
-      className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between"
+      className="hero-stage-shell flex flex-col gap-4 p-4 transition-[box-shadow,transform] duration-[var(--motion-medium)] ease-[var(--ease-out-soft)] hover:shadow-[0_14px_34px_rgba(0,0,0,0.22)] md:flex-row md:items-center md:justify-between"
     >
       <div className="flex flex-wrap gap-2">
         {heroRoleFilterOptions.map((option) => (

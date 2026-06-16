@@ -48,6 +48,7 @@ import { ClippedPanel, HudSection, RivalsSectionHeader } from "@/components/ui";
 ## Theme Rules
 
 - Use tokenized colors (`brand-gold`, `muted-foreground`, role colors) from `src/app/globals.css`.
+- Use shared motion tokens (`--motion-*`, `--ease-*`) and runtime helpers from `src/components/ui/motion.ts` for any JS-driven timing.
 - Prefer primitives over raw utility duplication.
 - If adding a repeated pattern in 2+ places, extract a `ui` component before expanding feature code.
 - Keep role accents semantically tied to hero role; use gold as global brand framing.

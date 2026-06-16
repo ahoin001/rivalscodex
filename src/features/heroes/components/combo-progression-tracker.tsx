@@ -59,10 +59,14 @@ export function ComboProgressionTracker({
   heroSlug,
   comboNames,
 }: ComboProgressionTrackerProps) {
-  const [progress, setProgress] = useState<Record<string, ComboStatus>>({});
+  const [progress, setProgress] = useState<Record<string, ComboStatus>>(() =>
+    loadProgress(heroSlug),
+  );
 
   useEffect(() => {
-    setProgress(loadProgress(heroSlug));
+    queueMicrotask(() => {
+      setProgress(loadProgress(heroSlug));
+    });
   }, [heroSlug]);
 
   const toggle = useCallback(
@@ -156,10 +160,14 @@ export function ComboProgressBadge({
   heroSlug: string;
   comboNames: string[];
 }) {
-  const [progress, setProgress] = useState<Record<string, ComboStatus>>({});
+  const [progress, setProgress] = useState<Record<string, ComboStatus>>(() =>
+    loadProgress(heroSlug),
+  );
 
   useEffect(() => {
-    setProgress(loadProgress(heroSlug));
+    queueMicrotask(() => {
+      setProgress(loadProgress(heroSlug));
+    });
   }, [heroSlug]);
 
   const mastered = useMemo(

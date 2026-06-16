@@ -79,7 +79,7 @@ export function HeroFormAbilitiesPanel({
   const showTabs = forms.length > 1;
 
   return (
-    <div className="w-full">
+    <div className="hero-stage-shell hero-stage-abilities-panel w-full">
       {showTabs ? (
         <nav
           aria-label={`${hero.name} forms`}
@@ -140,9 +140,6 @@ export function HeroFormAbilitiesPanel({
       <div
         key={activeForm.id}
         className="hero-form-fade"
-        style={{
-          animation: "hero-form-fade 150ms ease-out both",
-        }}
       >
         <HeroAbilitiesSection
           hero={heroAsExternal}
@@ -152,16 +149,6 @@ export function HeroFormAbilitiesPanel({
           variant={variant}
         />
       </div>
-      <style jsx>{`
-        @keyframes hero-form-fade {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-      `}</style>
     </div>
   );
 }

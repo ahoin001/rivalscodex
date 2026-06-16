@@ -5,10 +5,10 @@ import { HeroAbilitiesSection } from "@/features/heroes/components/hero-abilitie
 import { LunaHeroCard } from "@/features/heroes/components/luna-hero-card";
 import { DraftPreviewAuthBanner } from "@/features/heroes/components/draft-preview-auth-banner";
 import { HeroGuideConsole } from "@/features/heroes/components/hero-guide-console";
-import { HeroGuideAdminLink } from "@/features/heroes/components/hero-guide-admin-link";
+import { getFullTabEditorHref } from "@/features/heroes/loaders/full-tab-editor-href";
 import { LUNA_HERO_GUIDE_TABS } from "@/features/heroes/components/luna-data";
 import { resolveHeroGuideTabs } from "@/features/heroes/hero-guide-content";
-import abilitiesBackgroundImage from "../../../../rivals-assets/frames/abilities-section.jpg";
+import { RIVALS_FRAMES } from "@/lib/rivals-assets-paths";
 import { fetchMarvelRivalsHeroes } from "@/lib/api/marvel-rivals";
 
 export const metadata: Metadata = {
@@ -46,11 +46,12 @@ export default async function HeroCardLabPage({ searchParams }: HeroCardLabPageP
   const wantsDraftPreview = resolvedSearchParams?.preview === "draft";
   const guideScope = toGuideScope(resolvedSearchParams?.preview);
   const loginNextPath = `/lab/hero-card${wantsDraftPreview ? "?preview=draft" : ""}`;
-  const lunaGuideTabs = await resolveHeroGuideTabs({
+  const { tabs: lunaGuideTabs } = await resolveHeroGuideTabs({
     heroSlug: LUNA_SLUG,
     fallbackTabs: LUNA_HERO_GUIDE_TABS,
     scope: guideScope,
   });
+  const fullTabEditorHref = await getFullTabEditorHref(LUNA_SLUG);
 
   return (
     <div className="lab-light-theme min-h-screen">
@@ -63,9 +64,9 @@ export default async function HeroCardLabPage({ searchParams }: HeroCardLabPageP
         <LunaHeroCard />
       </section>
 
-      <section className="relative isolate w-full overflow-hidden">
+      <section id="hero-codex-abilities" className="relative isolate w-full overflow-hidden">
         <Image
-          src={abilitiesBackgroundImage}
+          src={RIVALS_FRAMES.abilitiesSection}
           alt=""
           fill
           priority={false}
@@ -79,12 +80,13 @@ export default async function HeroCardLabPage({ searchParams }: HeroCardLabPageP
       </section>
 
       <HeroGuideConsole
+        heroId={lunaHero?.id ?? "luna"}
         heroName="Luna Snow"
         subtitle="Seol Hee"
         tabs={lunaGuideTabs}
         defaultTabId="overview"
+        fullTabEditorHref={fullTabEditorHref}
       />
-      <HeroGuideAdminLink heroSlug={LUNA_SLUG} />
     </div>
   );
 }

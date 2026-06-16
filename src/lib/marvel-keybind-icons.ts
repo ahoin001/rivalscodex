@@ -4,11 +4,13 @@
  * Source URLs look like `https://www.marvelrivals.com/pc/gw/<build>/img/<prefix>_<hash>.png`.
  * The hash segment varies across patches, but the prefix is stable (e.g. `sbzj` = LMB,
  * `sbyj` = RMB). When we encounter one of these, we redirect the download to a stable
- * canonical filename under `rivals-assets/icons/` so we never duplicate the same icon.
+ * canonical filename under `public/rivals-assets/icons/` so we never duplicate the same icon.
  */
 
+import { RIVALS_ASSETS_BASE } from "@/lib/rivals-assets-paths";
+
 export type CanonicalKeybindIcon = {
-  /** Stable filename written into `rivals-assets/icons/`. */
+  /** Stable filename written into `public/rivals-assets/icons/`. */
   filename: string;
   /** Human keybind label used on hero cards / ability rows. */
   keybind: string;
@@ -73,7 +75,7 @@ export function resolveCanonicalKeybindIcon(
 }
 
 /** Public web path that the UI uses to load the canonical icon. */
-export const KEYBIND_ICONS_WEB_BASE = "/rivals-assets/icons";
+export const KEYBIND_ICONS_WEB_BASE = `${RIVALS_ASSETS_BASE}/icons`;
 
 export function canonicalKeybindIconWebPath(icon: CanonicalKeybindIcon): string {
   return `${KEYBIND_ICONS_WEB_BASE}/${icon.filename}`;
