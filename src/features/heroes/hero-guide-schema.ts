@@ -99,6 +99,8 @@ export const heroGuideBlockSchema = z.discriminatedUnion("type", [
     type: z.literal("video"),
     title: z.string().trim().min(1).max(160),
     watchUrl: z.string().trim().url(),
+    /** Short note above the embed — what this video helps with. */
+    note: z.string().trim().max(500).optional(),
   }),
   z.object({
     type: z.literal("strengthsWeaknesses"),

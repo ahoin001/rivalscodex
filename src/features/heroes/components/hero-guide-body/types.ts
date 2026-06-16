@@ -8,7 +8,10 @@ export type HeroGuideBodyNavItem = {
 export type HeroPortraitEntry = {
   slug: string;
   name: string;
+  role?: string;
   portraitUrl: string;
+  stackLogoUrl: string;
+  aliases?: string[];
 };
 
 function slugify(value: string): string {
@@ -57,7 +60,7 @@ export function buildHeroGuideBodyNavItems(
 
 /**
  * Build a portrait lookup Map keyed by lowercased opponent name and slug.
- * O(1) lookups for matchup blocks; otherwise we'd `.find()` per matchup.
+ * @deprecated Prefer buildPortraitLookup from hero-portrait-map for full alias support.
  */
 export function buildPortraitLookup(
   portraits: HeroPortraitEntry[] | undefined,
@@ -67,6 +70,10 @@ export function buildPortraitLookup(
   for (const p of portraits) {
     map.set(p.name.toLowerCase(), p);
     map.set(p.slug, p);
+    map.set(p.slug.replace(/-/g, " "), p);
+    for (const alias of p.aliases ?? []) {
+      map.set(alias.toLowerCase(), p);
+    }
   }
   return map;
 }
@@ -77,5 +84,9 @@ export function findPortraitByOpponent(
 ): HeroPortraitEntry | undefined {
   if (!lookup) return undefined;
   const lower = opponentName.toLowerCase().trim();
-  return lookup.get(lower) ?? lookup.get(lower.replace(/\s+/g, "-"));
+  return (
+    lookup.get(lower) ??
+    lookup.get(lower.replace(/\s+/g, "-")) ??
+    lookup.get(lower.replace(/-/g, " "))
+  );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState, type RefObject } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import type { HeroGuideBlock } from "@/features/heroes/hero-guide-schema";
 import { HeroGuideBody } from "@/features/heroes/components/hero-guide-body";
 import { CombosReaderPanel } from "@/features/heroes/components/combos-reader-panel";
@@ -8,12 +8,12 @@ import { useHeroGuideEditContext } from "@/features/heroes/context/hero-guide-ed
 import { useOptionalAbilityLookup } from "@/features/heroes/components/ability-lookup-provider";
 import { scrollTargetIntoPanel } from "@/features/heroes/components/guide-panel-scroll";
 import type { HeroPortraitEntry } from "@/features/heroes/components/hero-guide-body";
+import { inlineCombosEditEnabled } from "@/lib/guide-edit-policy";
 
 type CombosTabPanelProps = {
   bodyBlocks: HeroGuideBlock[];
   anchorPrefix: string;
   heroPortraits?: HeroPortraitEntry[];
-  scrollContainerRef?: RefObject<HTMLElement | null>;
 };
 
 function defaultComboBlock(): Extract<HeroGuideBlock, { type: "combo" }> {
@@ -92,7 +92,6 @@ export function CombosTabPanel({
   bodyBlocks,
   anchorPrefix,
   heroPortraits,
-  scrollContainerRef,
 }: CombosTabPanelProps) {
   const edit = useHeroGuideEditContext();
   const abilityLookup = useOptionalAbilityLookup();
@@ -151,12 +150,11 @@ export function CombosTabPanel({
       const node = addComboRef.current;
       if (!node) return;
       scrollTargetIntoPanel(node, {
-        container: scrollContainerRef?.current,
-        offset: 56,
+        offset: 80,
         behavior: "smooth",
       });
     });
-  }, [edit, comboBlocks, nonComboBlocks.length, updateBody, scrollContainerRef]);
+  }, [edit, comboBlocks, nonComboBlocks.length, updateBody]);
 
   const handleStopComboEdit = useCallback(async () => {
     if (!edit) return;
@@ -231,11 +229,10 @@ export function CombosTabPanel({
     <CombosReaderPanel
       bodyBlocks={bodyBlocks}
       anchorPrefix={anchorPrefix}
-      scrollContainerRef={scrollContainerRef}
     />
   );
 
-  if (!edit) {
+  if (!edit || !inlineCombosEditEnabled()) {
     return readerPanel;
   }
 

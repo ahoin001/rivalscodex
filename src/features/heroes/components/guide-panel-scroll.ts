@@ -25,8 +25,8 @@ export function findScrollContainer(el: HTMLElement | null): HTMLElement | null 
 }
 
 /**
- * Scroll a target element into view within a tab panel (not the window).
- * Falls back to `scrollIntoView` when no scroll container is found.
+ * Scroll a target into view, preferring the document scroll unless a real
+ * nested scroll container wraps the target (overflow + overflowed content).
  */
 export function scrollTargetIntoPanel(
   target: HTMLElement | null,
@@ -35,10 +35,18 @@ export function scrollTargetIntoPanel(
   if (!target || typeof window === "undefined") return;
 
   const { offset = 48, behavior = "smooth" } = options;
-  const container = options.container ?? findScrollContainer(target);
+  let container = options.container ?? findScrollContainer(target);
+
+  if (container && container.scrollHeight <= container.clientHeight + 1) {
+    container = null;
+  }
 
   if (!container) {
-    target.scrollIntoView({ behavior, block: "start" });
+    const top = target.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({
+      top: Math.max(0, top),
+      behavior,
+    });
     return;
   }
 

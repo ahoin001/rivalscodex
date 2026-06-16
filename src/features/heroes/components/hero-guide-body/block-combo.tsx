@@ -59,8 +59,8 @@ export function BlockCombo({
 
   if (resolvedClip) {
     return (
-      <div className="grid items-start gap-4 lg:grid-cols-[1fr_1.2fr]">
-        <ComboChain {...chainProps} />
+      <div className="grid items-start gap-3 lg:grid-cols-[1fr_1.2fr]">
+        <ComboChain {...chainProps} flush={embedded} />
         <div className="overflow-hidden rounded-lg border border-rivals-ink/10 bg-white/60">
           <p className="border-b border-rivals-light-300 px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-rivals-ink-muted">
             Example clip
@@ -74,7 +74,7 @@ export function BlockCombo({
   }
 
   return (
-    <ComboChain {...chainProps} />
+    <ComboChain {...chainProps} flush={embedded} />
   );
 }
 

@@ -153,3 +153,30 @@ export function getModifierDescriptor(
 ): ModifierDescriptor {
   return MOD_BY_KEY.get(modifier ?? "tap") ?? MOD_BY_KEY.get("tap")!;
 }
+
+const CANCEL_MODIFIERS = new Set<ComboModifier>([
+  "animation-cancel",
+  "dash-cancel",
+  "jump-cancel",
+]);
+
+export function isCancelModifier(modifier: ComboModifier | undefined): boolean {
+  return modifier !== undefined && CANCEL_MODIFIERS.has(modifier);
+}
+
+/** Hover label for cancel connectors — names the move you cancel into. */
+export function getCancelHoverLabel(
+  modifier: ComboModifier,
+  targetName: string,
+): string {
+  switch (modifier) {
+    case "animation-cancel":
+      return `Animation Cancel With ${targetName}`;
+    case "dash-cancel":
+      return `Dash Cancel With ${targetName}`;
+    case "jump-cancel":
+      return `Jump Cancel With ${targetName}`;
+    default:
+      return `Cancel With ${targetName}`;
+  }
+}

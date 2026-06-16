@@ -1,10 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { MouseEvent } from "react";
 import { Hero, HeroRole } from "@/data/schema";
 import { ClippedPanel } from "@/components/ui/clipped-panel";
 import { roleColorClass } from "@/features/heroes/role-utils";
-import { saveHeroRouteTransition } from "@/features/heroes/transition/hero-route-transition";
 
 type HeroCardProps = {
   hero: Hero;
@@ -66,29 +64,11 @@ export function HeroCard({
   onToggleFavorite,
 }: HeroCardProps) {
   const href = `/heroes/${hero.slug}`;
-  const handleRouteTransitionSeed = (
-    event: MouseEvent<HTMLAnchorElement>,
-  ) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    saveHeroRouteTransition({
-      slug: hero.slug,
-      name: hero.name,
-      portraitImage: hero.portraitImage,
-      role: hero.role,
-      rect: {
-        left: rect.left,
-        top: rect.top,
-        width: rect.width,
-        height: rect.height,
-      },
-    });
-  };
 
   return (
     <article className="group relative">
       <Link
         href={href}
-        onClickCapture={handleRouteTransitionSeed}
         className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         aria-label={`View ${hero.name} dossier`}
       >

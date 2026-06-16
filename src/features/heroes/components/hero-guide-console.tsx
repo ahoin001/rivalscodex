@@ -2,7 +2,6 @@
 
 import {
   type CSSProperties,
-  type RefObject,
   useCallback,
   useEffect,
   useMemo,
@@ -22,6 +21,7 @@ import {
 } from "@/features/heroes/components/hero-guide-body";
 import { CombosTabPanel } from "@/features/heroes/components/combos-tab-panel";
 import { MatchupsTabPanel } from "@/features/heroes/components/matchups-tab-panel";
+import { ResourcesTabPanel } from "@/features/heroes/components/resources-tab-panel";
 import { KitTabPanel } from "@/features/heroes/components/kit-tab-panel";
 import { NotesTabPanel } from "@/features/heroes/components/notes-tab-panel";
 import { GuideTabFallback } from "@/features/heroes/components/guide-tab-fallback";
@@ -63,28 +63,19 @@ const GUIDE_SECTION_NAV_CHIP =
 
 function GuideSectionNav({
   items,
-  scrollContainerRef,
   topLabel = "Top",
   onScrollTop,
   variant,
 }: {
   items: { id: string; label: string }[];
-  scrollContainerRef: RefObject<HTMLElement | null>;
   topLabel?: string;
   onScrollTop: () => void;
   variant: "mobile" | "desktop";
 }) {
-  const scrollToSection = useCallback(
-    (id: string) => {
-      const target = document.getElementById(id);
-      scrollTargetIntoPanel(target, {
-        container: scrollContainerRef.current,
-        offset: 48,
-        behavior: "smooth",
-      });
-    },
-    [scrollContainerRef],
-  );
+  const scrollToSection = useCallback((id: string) => {
+    const target = document.getElementById(id);
+    scrollTargetIntoPanel(target, { offset: 80, behavior: "smooth" });
+  }, []);
 
   if (variant === "mobile") {
     return (
@@ -195,11 +186,11 @@ export function HeroGuideConsole({
   // scroll frame, which is wasteful and stutters on lower-end machines.
   const sectionRef = useRef<HTMLElement>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
-  const tabScrollRef = useRef<HTMLDivElement>(null);
 
   const scrollPanelToTop = useCallback(() => {
-    tabScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+    const top = document.getElementById(heroGuideTopId);
+    scrollTargetIntoPanel(top, { offset: 24, behavior: "smooth" });
+  }, [heroGuideTopId]);
 
   const showGenericSectionNav =
     bodyNavItems.length > 0 && activeTabId !== "combos";
@@ -310,9 +301,9 @@ export function HeroGuideConsole({
           className="-mx-1 px-1 sm:mx-0 sm:px-0"
         />
 
-        {/* Fixed-height shell: tab switches swap body inside scroll region so outer layout doesn’t jump */}
+        {/* Tab body grows with content — page scroll handles vertical movement (no nested scroll jail). */}
         <article
-          className="clip-reveal rivals-clip-row flex flex-col rounded-xl border border-white/15 bg-rivals-light-100/96 p-4 shadow-[0_8px_28px_rgba(0,0,0,0.26)] backdrop-blur-sm sm:min-h-[min(58vh,38rem)] sm:rounded-none sm:p-6 sm:shadow-[0_12px_48px_rgba(0,0,0,0.35)] lg:min-h-[min(52vh,40rem)]"
+          className="clip-reveal rivals-clip-row flex flex-col rounded-xl border border-white/15 bg-rivals-light-100/96 p-4 shadow-[0_8px_28px_rgba(0,0,0,0.26)] backdrop-blur-sm sm:rounded-none sm:p-6 sm:shadow-[0_12px_48px_rgba(0,0,0,0.35)]"
           aria-live="polite"
           role="tabpanel"
           id={activePanelId}
@@ -330,23 +321,18 @@ export function HeroGuideConsole({
           </header>
 
           <div
-            ref={tabScrollRef}
             key={activeTabId}
-            className={`flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden pt-4 sm:overflow-y-auto sm:overscroll-contain sm:[-webkit-overflow-scrolling:touch] scroll-smooth ${
-              "tab-enter"
-            }`}
+            className="flex min-w-0 flex-col overflow-x-hidden pt-4 tab-enter"
           >
             {showGenericSectionNav ? (
               <>
                 <GuideSectionNav
                   items={bodyNavItems}
-                  scrollContainerRef={tabScrollRef}
                   onScrollTop={scrollPanelToTop}
                   variant="mobile"
                 />
                 <GuideSectionNav
                   items={bodyNavItems}
-                  scrollContainerRef={tabScrollRef}
                   onScrollTop={scrollPanelToTop}
                   variant="desktop"
                 />
@@ -358,7 +344,6 @@ export function HeroGuideConsole({
                   bodyBlocks={activeTab.body ?? []}
                   anchorPrefix={bodyAnchorPrefix}
                   heroPortraits={heroPortraits}
-                  scrollContainerRef={tabScrollRef}
                 />
               ) : activeTabId === "notes" ? (
                 <NotesTabPanel heroId={heroId} heroName={heroName} />
@@ -371,6 +356,8 @@ export function HeroGuideConsole({
                   primaryPoints={activeTab.primaryPoints}
                   secondaryPoints={activeTab.secondaryPoints}
                 />
+              ) : activeTabId === "resources" ? (
+                <ResourcesTabPanel tab={activeTab} anchorPrefix={bodyAnchorPrefix} />
               ) : activeTab.body && activeTab.body.length > 0 ? (
                 <HeroGuideBody
                   blocks={activeTab.body}
@@ -385,7 +372,7 @@ export function HeroGuideConsole({
               />
             )}
 
-            {activeTab.links && activeTab.links.length > 0 ? (
+            {activeTab.links && activeTab.links.length > 0 && activeTabId !== "resources" ? (
               <footer className="mt-auto flex flex-wrap gap-2.5 border-t border-rivals-light-300 pt-4">
                 {activeTab.links.map((link) => (
                   <a

@@ -66,13 +66,13 @@ export function BlockMatchup({
         className="flex w-full items-center gap-3 px-4 py-3 text-left"
       >
         {portrait ? (
-          <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-rivals-ink/10">
+          <div className="relative h-10 w-14 shrink-0 overflow-hidden rounded-lg border border-rivals-ink/10 bg-[#121726]">
             <Image
-              src={portrait.portraitUrl}
+              src={portrait.stackLogoUrl}
               alt={portrait.name}
               fill
-              sizes="40px"
-              className="object-cover"
+              sizes="56px"
+              className="object-contain p-0.5"
             />
             <div className={`absolute bottom-0 left-0 h-0.5 w-full ${tone.accentBar}`} />
           </div>

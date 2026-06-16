@@ -7,7 +7,7 @@ import { HeroGuideEditProvider } from "@/features/heroes/context/hero-guide-edit
 import { useHeroGuideEdit } from "@/features/heroes/hooks/use-hero-guide-edit";
 import { HeroGuideConsole } from "@/features/heroes/components/hero-guide-console";
 import type { HeroPortraitEntry } from "@/features/heroes/components/hero-guide-body";
-import { inlineGuideEditEnabled } from "@/lib/guide-edit-policy";
+import { inlineCombosEditEnabled, inlineGuideEditEnabled } from "@/lib/guide-edit-policy";
 
 type HeroGuideInlineShellProps = {
   heroSlug: string;
@@ -130,7 +130,7 @@ function InlineGuideInner({
 export function HeroGuideInlineShell(props: HeroGuideInlineShellProps) {
   const { abilityEntries, ...rest } = props;
 
-  if (!inlineGuideEditEnabled()) {
+  if (!inlineGuideEditEnabled() || !inlineCombosEditEnabled()) {
     return (
       <AbilityLookupProvider entries={abilityEntries}>
         <HeroGuideConsole

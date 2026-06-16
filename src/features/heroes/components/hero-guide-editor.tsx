@@ -11,6 +11,7 @@ import {
 import { migrateHeroGuideTabs } from "@/features/heroes/hero-guide-migrate";
 import { countComboBlocksInTabs, sanitizeHeroGuideTabsCandidate } from "@/features/heroes/hero-guide-sanitize";
 import { HeroGuideBodyEditor } from "@/features/heroes/components/hero-guide-body-editor";
+import type { HeroPortraitEntry } from "@/features/heroes/components/hero-guide-body";
 import type { ResolvedAbilityRef } from "@/features/heroes/ability-lookup";
 import { useOptionalAbilityLookup } from "@/features/heroes/components/ability-lookup-provider";
 import { publishHeroGuideTabsAction } from "@/features/heroes/actions/hero-guide-editorial-actions";
@@ -32,6 +33,7 @@ type HeroGuideEditorProps = {
   initialTabs: HeroGuideTabContent[];
   publishedTabs: HeroGuideTabContent[] | null;
   abilityLookup?: Map<string, ResolvedAbilityRef>;
+  heroRoster?: HeroPortraitEntry[];
 };
 
 export function HeroGuideEditor({
@@ -40,6 +42,7 @@ export function HeroGuideEditor({
   initialTabs,
   publishedTabs,
   abilityLookup: abilityLookupProp,
+  heroRoster,
 }: HeroGuideEditorProps) {
   const router = useRouter();
   const optionalAbilityLookup = useOptionalAbilityLookup();
@@ -215,6 +218,7 @@ export function HeroGuideEditor({
                   updateActive({ body: body && body.length > 0 ? body : undefined })
                 }
                 abilityLookup={abilityLookup}
+                heroRoster={heroRoster}
               />
             ) : null}
 
@@ -258,31 +262,38 @@ export function HeroGuideEditor({
               </div>
             </RivalsDisclosure>
 
-            {!hasStructuredBody ? (
-              <>
-                <BulletListEditor
-                  title="Priority cues"
-                  items={activeTab.primaryPoints ?? []}
-                  onChange={(primaryPoints) =>
-                    updateActive({
-                      primaryPoints: primaryPoints.length > 0 ? primaryPoints : undefined,
-                    })
-                  }
-                  minItems={1}
-                />
+            {!isCombosTab ? (
+              <RivalsDisclosure
+                title="Priority & supporting cues"
+                description="Two-column cue cards shown at the top of this tab on the live page"
+                defaultOpen={!hasStructuredBody}
+                tone="quiet"
+              >
+                <div className="space-y-4">
+                  <BulletListEditor
+                    title="Priority cues"
+                    items={activeTab.primaryPoints ?? []}
+                    onChange={(primaryPoints) =>
+                      updateActive({
+                        primaryPoints: primaryPoints.length > 0 ? primaryPoints : undefined,
+                      })
+                    }
+                    minItems={hasStructuredBody ? 0 : 1}
+                  />
 
-                <BulletListEditor
-                  title="Secondary cues (optional)"
-                  items={activeTab.secondaryPoints ?? []}
-                  onChange={(secondaryPoints) =>
-                    updateActive({
-                      secondaryPoints:
-                        secondaryPoints.length > 0 ? secondaryPoints : undefined,
-                    })
-                  }
-                  minItems={0}
-                />
-              </>
+                  <BulletListEditor
+                    title="Supporting cues (optional)"
+                    items={activeTab.secondaryPoints ?? []}
+                    onChange={(secondaryPoints) =>
+                      updateActive({
+                        secondaryPoints:
+                          secondaryPoints.length > 0 ? secondaryPoints : undefined,
+                      })
+                    }
+                    minItems={0}
+                  />
+                </div>
+              </RivalsDisclosure>
             ) : null}
 
             {!isCombosTab || !hasStructuredBody ? (
@@ -293,6 +304,7 @@ export function HeroGuideEditor({
                   updateActive({ body: body && body.length > 0 ? body : undefined })
                 }
                 abilityLookup={abilityLookup}
+                heroRoster={heroRoster}
               />
             ) : null}
           </div>

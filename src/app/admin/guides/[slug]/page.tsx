@@ -44,6 +44,7 @@ export default async function AdminGuideEditPage({ params }: AdminGuideEditPageP
             heroName={state.hero.name}
             initialTabs={state.initialTabs}
             publishedTabs={state.publishedTabs}
+            heroRoster={state.heroRoster}
           />
         </AbilityLookupProvider>
       </div>

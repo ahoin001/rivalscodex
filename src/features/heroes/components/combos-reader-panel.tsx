@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  type RefObject,
   useCallback,
   useMemo,
   useRef,
@@ -30,7 +29,6 @@ type IndexedCombo = {
 type CombosReaderPanelProps = {
   bodyBlocks: HeroGuideBlock[];
   anchorPrefix: string;
-  scrollContainerRef?: RefObject<HTMLElement | null>;
 };
 
 function comboPassesFilters(
@@ -58,7 +56,7 @@ function getComboStepCount(block: ComboBlock): number {
 }
 
 const pickerChipBase =
-  "inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-display font-semibold uppercase tracking-[0.12em] transition-all duration-[var(--motion-fast)] ease-[var(--ease-out-soft)]";
+  "inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-display font-semibold uppercase tracking-[0.12em] transition-all duration-[var(--motion-fast)] ease-[var(--ease-out-soft)]";
 
 function ComboPickerChip({
   combo,
@@ -100,7 +98,6 @@ function ComboPickerChip({
 export function CombosReaderPanel({
   bodyBlocks,
   anchorPrefix,
-  scrollContainerRef,
 }: CombosReaderPanelProps) {
   const abilityLookup = useOptionalAbilityLookup();
   const cardRefs = useRef(new Map<number, HTMLElement>());
@@ -169,12 +166,11 @@ export function CombosReaderPanel({
       const node = cardRefs.current.get(blockIndex);
       if (!node) return;
       scrollTargetIntoPanel(node, {
-        container: scrollContainerRef?.current,
-        offset: 56,
+        offset: 80,
         behavior: "smooth",
       });
     },
-    [scrollContainerRef],
+    [],
   );
 
   const setCardRef = useCallback((blockIndex: number, node: HTMLElement | null) => {
@@ -240,12 +236,12 @@ export function CombosReaderPanel({
         </p>
       ) : (
         <>
-          <div className="sticky top-0 z-10 -mx-1 space-y-2 border-b border-rivals-light-300/70 bg-rivals-light-100/95 px-1 pb-3 pt-1 backdrop-blur sm:mx-0 sm:px-0">
-            <div className="flex items-center justify-between gap-2 md:hidden">
-              <p className="font-display text-[10px] font-bold uppercase italic tracking-[0.18em] text-rivals-ink-muted">
-                Combo routes
-              </p>
-              {filteredCombos.length > 1 ? (
+          {filteredCombos.length > 1 ? (
+            <div className="sticky top-0 z-10 -mx-1 space-y-2 border-b border-rivals-light-300/70 bg-rivals-light-100/95 px-1 pb-3 pt-1 backdrop-blur md:hidden sm:mx-0 sm:px-0">
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-display text-[10px] font-bold uppercase italic tracking-[0.18em] text-rivals-ink-muted">
+                  Combo routes
+                </p>
                 <button
                   type="button"
                   onClick={() => setShowAllMobile((v) => !v)}
@@ -253,37 +249,31 @@ export function CombosReaderPanel({
                 >
                   {showAllMobile ? "Single view" : "Show all"}
                 </button>
-              ) : null}
-            </div>
+              </div>
 
-            <div
-              className="flex gap-1.5 overflow-x-auto pb-0.5 md:flex-wrap md:overflow-visible"
-              style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
-              role="tablist"
-              aria-label="Combo routes"
-            >
-              {filteredCombos.map((combo) => (
-                <ComboPickerChip
-                  key={combo.blockIndex}
-                  combo={combo}
-                  active={activeBlockIndex === combo.blockIndex}
-                  onSelect={() => {
-                    if (typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches) {
-                      scrollToCombo(combo.blockIndex);
-                    } else {
-                      setSelectedBlockIndex(combo.blockIndex);
-                    }
-                  }}
-                />
-              ))}
+              <div
+                className="flex gap-1.5 overflow-x-auto pb-0.5"
+                style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
+                role="tablist"
+                aria-label="Combo routes"
+              >
+                {filteredCombos.map((combo) => (
+                  <ComboPickerChip
+                    key={combo.blockIndex}
+                    combo={combo}
+                    active={activeBlockIndex === combo.blockIndex}
+                    onSelect={() => setSelectedBlockIndex(combo.blockIndex)}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          ) : null}
 
           <div
             className={
               showSideIndex
-                ? "flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8"
-                : "space-y-8 sm:space-y-10"
+                ? "flex flex-col gap-6 sm:gap-8 lg:flex-row lg:items-start lg:gap-8"
+                : "flex flex-col gap-6 sm:gap-8"
             }
           >
             {showSideIndex ? (
@@ -312,11 +302,7 @@ export function CombosReaderPanel({
             ) : null}
 
             <div
-              className={
-                showSideIndex
-                  ? "min-w-0 flex-1 space-y-8 sm:space-y-10"
-                  : "contents"
-              }
+              className={`min-w-0 flex flex-col gap-6 sm:gap-8 ${showSideIndex ? "flex-1" : "w-full"}`}
             >
               {filteredCombos.map((combo) => {
                 const isMobileSingle =

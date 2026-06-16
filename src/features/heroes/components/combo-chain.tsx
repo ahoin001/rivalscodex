@@ -18,7 +18,9 @@ import { resolveAbilityRef } from "@/features/heroes/ability-lookup";
 import { formatKeybindLabel } from "@/features/heroes/keybind-display";
 import {
   getDifficultyTier,
+  getCancelHoverLabel,
   getModifierDescriptor,
+  isCancelModifier,
 } from "@/features/heroes/combo-display";
 import { buildComboChainSegments } from "@/features/heroes/combo-chain-layout";
 import { AbilityTooltip } from "@/features/heroes/components/ability-tooltip";
@@ -45,6 +47,8 @@ type ComboChainProps = {
   className?: string;
   hideHeader?: boolean;
   hideContext?: boolean;
+  /** Strip outer card chrome when a parent frame (e.g. ComboShowcaseCard) owns the border. */
+  flush?: boolean;
   /** Light matches hero guide kit surfaces; dark for legacy/editor contrast. */
   variant?: ComboChainVariant;
 };
@@ -52,18 +56,13 @@ type ComboChainProps = {
 function OrStepConnector({ theme }: { theme: ComboChainTheme }) {
   return (
     <div
-      className="flex shrink-0 flex-col items-center justify-center gap-0.5 px-1.5 sm:px-2.5"
+      className="flex shrink-0 items-center justify-center px-1 sm:px-1.5"
       aria-hidden
     >
-      <span className="h-2 w-px bg-gradient-to-b from-transparent to-violet-400/50" />
       <span
-        className={`rounded-full border px-2.5 py-0.5 font-display text-[10px] font-bold uppercase italic tracking-[0.22em] sm:text-[11px] ${theme.orConnector}`}
+        className={`rounded-full border px-2 py-0.5 font-display text-[9px] font-bold uppercase italic tracking-[0.18em] sm:text-[10px] ${theme.orConnector}`}
       >
         Or
-      </span>
-      <span className="h-2 w-px bg-gradient-to-b from-violet-400/50 to-transparent" />
-      <span className={`text-[9px] uppercase tracking-[0.16em] sm:text-[10px] ${theme.orSub}`}>
-        alt route
       </span>
     </div>
   );
@@ -72,71 +71,25 @@ function OrStepConnector({ theme }: { theme: ComboChainTheme }) {
 function ForkStemConnector({ theme }: { theme: ComboChainTheme }) {
   return (
     <div
-      className="flex shrink-0 flex-col items-center justify-center px-2 sm:px-3"
+      className="flex shrink-0 items-center justify-center px-1 sm:px-1.5"
       aria-hidden
     >
-      <span className={`font-display text-xl font-bold leading-none sm:text-2xl ${theme.forkStem}`}>
+      <span className={`font-display text-lg font-bold leading-none sm:text-xl ${theme.forkStem}`}>
         ⤵
       </span>
-      <span className={`mt-0.5 text-[9px] uppercase tracking-[0.16em] ${theme.forkStemSub}`}>
-        branch
-      </span>
     </div>
   );
 }
 
-function StepConnector({
-  modifier,
-  theme,
+function HoverTip({
+  tip,
+  children,
+  variant = "label",
 }: {
-  modifier?: ComboModifier;
-  theme: ComboChainTheme;
+  tip: string;
+  children: ReactNode;
+  variant?: "label" | "step";
 }) {
-  if (modifier === "or") {
-    return <OrStepConnector theme={theme} />;
-  }
-
-  const descriptor = getModifierDescriptor(modifier);
-  return (
-    <div className="flex shrink-0 flex-col items-center justify-center gap-0.5 px-1 sm:px-2">
-      <span
-        className={`font-display text-lg font-bold leading-none sm:text-xl ${descriptor.arrowClass}`}
-        aria-hidden
-      >
-        {descriptor.symbol}
-      </span>
-      {descriptor.microLabel ? (
-        <span className={`text-[9px] uppercase tracking-[0.14em] sm:text-[10px] ${theme.connectorMicro}`}>
-          {descriptor.microLabel}
-        </span>
-      ) : null}
-    </div>
-  );
-}
-
-function RepeatBadge({ count, theme }: { count: number; theme: ComboChainTheme }) {
-  if (count <= 1) return null;
-  return (
-    <span
-      className={`pointer-events-none absolute -right-2 -top-2 z-20 flex h-5 min-w-5 items-center justify-center rounded-full border px-1 text-[9px] font-bold tabular-nums ${theme.repeatBadge}`}
-    >
-      ×{count}
-    </span>
-  );
-}
-
-function StepTipBadge({ theme }: { theme: ComboChainTheme }) {
-  return (
-    <span
-      className={`pointer-events-none absolute -left-2 -top-2 z-20 flex h-4 w-4 items-center justify-center rounded-full border text-[9px] font-bold ${theme.stepTipBadge}`}
-      aria-hidden
-    >
-      i
-    </span>
-  );
-}
-
-function StepOnlyTip({ tip, children }: { tip: string; children: ReactNode }) {
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const triggerRef = useRef<HTMLSpanElement>(null);
@@ -195,16 +148,119 @@ function StepOnlyTip({ tip, children }: { tip: string; children: ReactNode }) {
         ? createPortal(
             <div
               role="tooltip"
-              className="pointer-events-none fixed z-[9999] w-64 -translate-x-1/2 -translate-y-full rounded-lg border border-cyan-400/30 bg-[#161b28]/98 px-3 py-2 text-[11px] leading-4 text-cyan-100 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
+              className={
+                variant === "step"
+                  ? "pointer-events-none fixed z-[9999] w-64 -translate-x-1/2 -translate-y-full rounded-lg border border-cyan-400/30 bg-[#161b28]/98 px-3 py-2 text-[11px] leading-4 text-cyan-100 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
+                  : "pointer-events-none fixed z-[9999] max-w-xs -translate-x-1/2 -translate-y-full rounded-lg border border-white/15 bg-[#161b28]/98 px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-white shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
+              }
               style={{ left: position.x, top: position.y }}
             >
-              <span className="font-bold uppercase tracking-wide">Step tip · </span>
-              {tip}
+              {variant === "step" ? (
+                <>
+                  <span className="font-bold uppercase tracking-wide">Step tip · </span>
+                  {tip}
+                </>
+              ) : (
+                tip
+              )}
             </div>,
             document.body,
           )
         : null}
     </>
+  );
+}
+
+function StepOnlyTip({ tip, children }: { tip: string; children: ReactNode }) {
+  return (
+    <HoverTip tip={tip} variant="step">
+      {children}
+    </HoverTip>
+  );
+}
+
+type CancelTargetPreview = {
+  name: string;
+  iconUrl?: string;
+};
+
+function StepConnector({
+  modifier,
+  theme,
+  cancelTarget,
+}: {
+  modifier?: ComboModifier;
+  theme: ComboChainTheme;
+  cancelTarget?: CancelTargetPreview;
+}) {
+  if (modifier === "or") {
+    return <OrStepConnector theme={theme} />;
+  }
+
+  const descriptor = getModifierDescriptor(modifier);
+  const showCancelPreview =
+    isCancelModifier(modifier) && cancelTarget !== undefined;
+
+  const connector = (
+    <div className="flex shrink-0 items-center justify-center gap-0.5 px-0.5 sm:px-1">
+      <span
+        className={`font-display text-lg font-bold leading-none sm:text-xl ${descriptor.arrowClass}`}
+        aria-hidden
+      >
+        {descriptor.symbol}
+      </span>
+      {showCancelPreview && cancelTarget.iconUrl ? (
+        <div
+          className={`relative flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md border bg-white/95 sm:h-8 sm:w-8 ${
+            modifier === "animation-cancel"
+              ? "border-rose-400/60"
+              : modifier === "dash-cancel"
+                ? "border-sky-400/60"
+                : "border-emerald-400/60"
+          }`}
+        >
+          <Image
+            src={cancelTarget.iconUrl}
+            alt=""
+            width={28}
+            height={28}
+            className="h-6 w-6 object-contain sm:h-7 sm:w-7"
+          />
+        </div>
+      ) : null}
+    </div>
+  );
+
+  if (showCancelPreview) {
+    return (
+      <HoverTip tip={getCancelHoverLabel(modifier!, cancelTarget.name)}>
+        {connector}
+      </HoverTip>
+    );
+  }
+
+  return connector;
+}
+
+function RepeatBadge({ count, theme }: { count: number; theme: ComboChainTheme }) {
+  if (count <= 1) return null;
+  return (
+    <span
+      className={`pointer-events-none absolute -right-2 -top-2 z-20 flex h-5 min-w-5 items-center justify-center rounded-full border px-1 text-[9px] font-bold tabular-nums ${theme.repeatBadge}`}
+    >
+      ×{count}
+    </span>
+  );
+}
+
+function StepTipBadge({ theme }: { theme: ComboChainTheme }) {
+  return (
+    <span
+      className={`pointer-events-none absolute -left-2 -top-2 z-20 flex h-4 w-4 items-center justify-center rounded-full border text-[9px] font-bold ${theme.stepTipBadge}`}
+      aria-hidden
+    >
+      i
+    </span>
   );
 }
 
@@ -225,49 +281,48 @@ function AbilityNode({
   const keybindLabel = formatKeybindLabel(resolved.keybind);
 
   return (
-    <div className="flex shrink-0 flex-col items-center gap-1.5 px-0.5 pt-1" style={{ minWidth: "4.75rem" }}>
+    <div className="flex shrink-0 flex-col items-center gap-1 px-0.5" style={{ minWidth: "5.25rem" }}>
       <AbilityTooltip ability={resolved} stepTip={stepTip}>
         <div className="relative">
           <RepeatBadge count={repeatCount} theme={theme} />
           {stepTip ? <StepTipBadge theme={theme} /> : null}
           <div
-            className={`relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-lg border transition-all duration-200 hover:-translate-y-0.5 ${theme.abilityIcon}`}
+            className={`relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-lg border transition-all duration-200 hover:-translate-y-0.5 sm:h-[3.75rem] sm:w-[3.75rem] ${theme.abilityIcon}`}
           >
             {resolved.iconUrl ? (
               <Image
                 src={resolved.iconUrl}
                 alt=""
-                width={40}
-                height={40}
-                className="h-9 w-9 object-contain"
+                width={44}
+                height={44}
+                className="h-10 w-10 object-contain sm:h-11 sm:w-11"
               />
             ) : (
               <span className={`text-[10px] font-bold uppercase ${theme.abilityIconFallback}`}>
                 {resolved.name.slice(0, 3)}
               </span>
             )}
+            <span
+              className={`absolute inset-x-0 bottom-0 border-t px-1 py-0.5 text-center text-[9px] font-bold uppercase leading-none tracking-wide sm:text-[10px] ${theme.keybind}`}
+            >
+              {keybindLabel}
+              {repeatCount > 1 ? (
+                <span className={`ml-0.5 ${theme.keybindRepeat}`}>×{repeatCount}</span>
+              ) : null}
+            </span>
           </div>
         </div>
       </AbilityTooltip>
 
       <span
-        className={`line-clamp-2 max-w-[5.25rem] text-center font-display text-[9px] uppercase leading-tight tracking-wide sm:text-[10px] ${theme.abilityName}`}
+        className={`line-clamp-2 max-w-[5.5rem] text-center font-display text-[10px] uppercase leading-tight tracking-wide sm:text-[11px] ${theme.abilityName}`}
       >
         {resolved.name}
       </span>
 
-      <span
-        className={`inline-flex h-5 items-center justify-center rounded border px-1.5 text-[9px] font-bold uppercase tracking-wide sm:text-[10px] ${theme.keybind}`}
-      >
-        {keybindLabel}
-        {repeatCount > 1 ? (
-          <span className={`ml-1 ${theme.keybindRepeat}`}>×{repeatCount}</span>
-        ) : null}
-      </span>
-
       {resourceDelta !== undefined && resourceDelta !== 0 ? (
         <span
-          className={`text-[10px] font-bold tabular-nums ${
+          className={`text-[9px] font-bold tabular-nums leading-none ${
             resourceDelta > 0 ? "text-emerald-600" : "text-rose-600"
           }`}
         >
@@ -295,31 +350,33 @@ function ActionNode({
   const repeatCount = repeat && repeat > 1 ? repeat : 1;
 
   const node = (
-    <div className="flex shrink-0 flex-col items-center gap-1.5 px-0.5 pt-1" style={{ minWidth: "4.75rem" }}>
+    <div className="flex shrink-0 flex-col items-center gap-1 px-0.5" style={{ minWidth: "5.25rem" }}>
       <div className="relative">
         <RepeatBadge count={repeatCount} theme={theme} />
         {stepTip ? <StepTipBadge theme={theme} /> : null}
         <div
-          className={`relative flex h-14 w-14 items-center justify-center rounded-lg border transition-all duration-200 ${theme.actionIcon}`}
+          className={`relative flex h-14 w-14 items-center justify-center rounded-lg border transition-all duration-200 sm:h-[3.75rem] sm:w-[3.75rem] ${theme.actionIcon}`}
         >
-          <span className={`px-1 text-center text-[9px] font-semibold uppercase leading-tight ${theme.actionLabel}`}>
+          <span className={`px-1 text-center text-[9px] font-semibold uppercase leading-tight sm:text-[10px] ${theme.actionLabel}`}>
             {label}
           </span>
+          {repeatCount > 1 ? (
+            <span
+              className={`absolute inset-x-0 bottom-0 border-t px-1 py-0.5 text-center text-[9px] font-bold leading-none sm:text-[10px] ${theme.keybind}`}
+            >
+              ×{repeatCount}
+            </span>
+          ) : null}
         </div>
       </div>
 
-      <span className={`max-w-[5.25rem] truncate text-center text-[10px] leading-tight sm:text-[11px] ${theme.actionLabel}`}>
+      <span className={`line-clamp-2 max-w-[5.5rem] text-center text-[10px] leading-tight sm:text-[11px] ${theme.actionLabel}`}>
         {label}
-        {repeatCount > 1 ? (
-          <span className={theme.keybindRepeat}> ×{repeatCount}</span>
-        ) : null}
       </span>
-
-      <span className="h-5" />
 
       {resourceDelta !== undefined && resourceDelta !== 0 ? (
         <span
-          className={`text-[10px] font-bold tabular-nums ${
+          className={`text-[9px] font-bold tabular-nums leading-none ${
             resourceDelta > 0 ? "text-emerald-600" : "text-rose-600"
           }`}
         >
@@ -333,6 +390,22 @@ function ActionNode({
   if (!stepTip) return node;
 
   return <StepOnlyTip tip={stepTip}>{node}</StepOnlyTip>;
+}
+
+function getCancelTargetPreview(resolved: ResolvedStep): CancelTargetPreview {
+  if (resolved.step.kind === "ability" && resolved.resolved) {
+    return {
+      name: resolved.resolved.name,
+      iconUrl: resolved.resolved.iconUrl,
+    };
+  }
+  if (resolved.step.kind === "action") {
+    return { name: resolved.step.label };
+  }
+  if (resolved.step.kind === "ability") {
+    return { name: resolved.step.abilityRef };
+  }
+  return { name: "move" };
 }
 
 function renderStepNode(
@@ -391,17 +464,17 @@ function ForkBranchGroup({
 }) {
   return (
     <div
-      className={`combo-fork-group relative shrink-0 rounded-xl border px-3 py-3 sm:px-4 sm:py-4 ${theme.forkGroup}`}
+      className={`combo-fork-group relative shrink-0 rounded-lg border px-2 py-2 sm:px-3 ${theme.forkGroup}`}
       style={{ scrollSnapAlign: "center" }}
     >
-      <p className={`mb-2 text-center font-display text-[10px] font-bold uppercase tracking-[0.24em] sm:mb-3 ${theme.forkLabel}`}>
+      <p className={`mb-1.5 text-center font-display text-[9px] font-bold uppercase tracking-[0.2em] ${theme.forkLabel}`}>
         Either route
       </p>
-      <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-start sm:justify-center sm:gap-0">
+      <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-center sm:gap-0">
         {branchIndices.map((stepIndex, branchIndex) => (
           <div
             key={stepIndex}
-            className="flex items-start justify-center sm:justify-start"
+            className="flex items-center justify-center sm:justify-start"
           >
             {branchIndex > 0 ? <OrStepConnector theme={theme} /> : null}
             {renderStepNode(resolvedSteps[stepIndex], stepIndex, theme)}
@@ -423,6 +496,7 @@ export function ComboChain({
   className = "",
   hideHeader = false,
   hideContext = false,
+  flush = false,
   variant = "light",
 }: ComboChainProps) {
   const theme = getComboChainTheme(variant);
@@ -450,7 +524,11 @@ export function ComboChain({
     <div
       ref={revealRef}
       data-combo-chain-variant={variant}
-      className={`scroll-reveal overflow-hidden rounded-lg transition-all duration-300 ${theme.shell} ${className}`}
+      className={`scroll-reveal overflow-hidden transition-all duration-300 ${
+        flush
+          ? "rounded-none border-0 bg-transparent shadow-none"
+          : `rounded-lg ${theme.shell}`
+      } ${className}`.trim()}
     >
       {/* Header band */}
       {!hideHeader ? (
@@ -500,7 +578,9 @@ export function ComboChain({
         <div className={`pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-gradient-to-l sm:hidden ${theme.scrollFadeFrom} to-transparent`} />
 
         <div
-          className="stagger-children flex items-start gap-0 overflow-x-auto px-3 py-5 sm:flex-wrap sm:items-center sm:justify-center sm:gap-y-4 sm:overflow-x-visible sm:px-4 sm:py-6"
+          className={`stagger-children flex items-center gap-0 overflow-x-auto sm:flex-wrap sm:justify-start sm:gap-y-3 sm:overflow-x-visible ${
+            flush ? "px-3 py-3 sm:px-4 sm:py-3" : "px-3 py-4 sm:justify-center sm:px-4 sm:py-5"
+          }`}
           style={{
             scrollSnapType: "x mandatory",
             WebkitOverflowScrolling: "touch",
@@ -511,18 +591,23 @@ export function ComboChain({
               return (
                 <div
                   key={`linear-${segment.indices.join("-")}`}
-                  className="flex shrink-0 items-start"
+                  className="flex shrink-0 items-center"
                 >
                   {segment.indices.map((stepIndex, positionInSegment) => (
                     <div
                       key={stepIndex}
-                      className="flex shrink-0 items-start"
+                      className="flex shrink-0 items-center"
                       style={{ scrollSnapAlign: "center" }}
                     >
                       {positionInSegment > 0 ? (
                         <StepConnector
                           modifier={structuredSteps[stepIndex].modifier}
                           theme={theme}
+                          cancelTarget={
+                            isCancelModifier(structuredSteps[stepIndex].modifier)
+                              ? getCancelTargetPreview(resolvedSteps[stepIndex])
+                              : undefined
+                          }
                         />
                       ) : null}
                       {renderStepNode(resolvedSteps[stepIndex], stepIndex, theme)}
@@ -540,7 +625,7 @@ export function ComboChain({
             return (
               <div
                 key={`fork-${segment.branchIndices.join("-")}`}
-                className="flex shrink-0 items-start"
+                className="flex shrink-0 items-center"
               >
                 {showStem ? <ForkStemConnector theme={theme} /> : null}
                 <ForkBranchGroup

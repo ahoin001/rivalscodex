@@ -5,7 +5,6 @@ import { HeroFormAbilitiesPanel } from "@/features/heroes/components/hero-form-a
 import { HeroLabShowcaseCard } from "@/features/heroes/components/hero-lab-showcase-card";
 import { DraftPreviewAuthBanner } from "@/features/heroes/components/draft-preview-auth-banner";
 import { HeroGuideInlineShell } from "@/features/heroes/components/hero-guide-inline-shell";
-import { HeroRouteTransitionLayer } from "@/features/heroes/components/hero-route-transition-layer";
 import { getFullTabEditorHref } from "@/features/heroes/loaders/full-tab-editor-href";
 import { HeroCodexResyncTrigger } from "@/features/marvel-site-import/hero-codex-resync-drawer";
 import { HeroCodexResyncShell } from "@/features/marvel-site-import/hero-codex-resync-shell";
@@ -87,7 +86,6 @@ export default async function HeroPage({ params, searchParams }: HeroPageProps) 
   return (
     <HeroCodexResyncShell heroSlug={hero.slug} heroName={hero.name}>
       <div className="hero-page-shell lab-light-theme min-h-screen">
-        <HeroRouteTransitionLayer heroSlug={hero.slug} />
         <DraftPreviewAuthBanner
           wantsDraftPreview={wantsDraftPreview}
           loginNextPath={loginNextPath}

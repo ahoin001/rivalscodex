@@ -8,7 +8,17 @@ import { getYoutubeEmbedUrl } from "@/features/heroes/youtube";
  * to an underlined external link otherwise. Used by every block that
  * accepts an optional `clip` (combo, matchup, video).
  */
-export function GuideClip({ label, href }: { label: string; href: string }) {
+export function GuideClip({
+  label,
+  href,
+  variant = "dark",
+  size = "default",
+}: {
+  label: string;
+  href: string;
+  variant?: "light" | "dark";
+  size?: "default" | "compact";
+}) {
   const embedUrl = getYoutubeEmbedUrl(href);
   if (!embedUrl) {
     return (
@@ -23,5 +33,12 @@ export function GuideClip({ label, href }: { label: string; href: string }) {
       </a>
     );
   }
-  return <LazyVideoEmbed title={label} embedUrl={embedUrl} />;
+  return (
+    <LazyVideoEmbed
+      title={label}
+      embedUrl={embedUrl}
+      variant={variant}
+      size={size}
+    />
+  );
 }

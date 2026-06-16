@@ -696,32 +696,6 @@ details.editor-disclosure-native > summary {
   clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
 }
 
-@keyframes heroRouteTransitionOut {
-  0% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    filter: saturate(1.1);
-  }
-  72% {
-    opacity: 0.92;
-    transform: translate3d(6vw, -6vh, 0) scale(1.34);
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(10vw, -10vh, 0) scale(1.72);
-    filter: saturate(1.02);
-  }
-}
-
-.hero-route-transition-card {
-  transform-origin: top left;
-}
-
-.hero-route-transition-card-active {
-  animation: heroRouteTransitionOut calc(var(--motion-slow) + var(--motion-medium))
-    var(--ease-out-soft) forwards;
-}
-
 @keyframes heroStageReveal {
   from {
     opacity: 0;
@@ -767,7 +741,6 @@ details.editor-disclosure-native > summary {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-route-transition-card-active,
   .hero-page-shell .hero-stage-shell,
   .hero-form-fade {
     animation: none;

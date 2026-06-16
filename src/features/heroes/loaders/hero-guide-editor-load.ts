@@ -2,8 +2,10 @@ import "server-only";
 
 import type { Hero } from "@/data/schema";
 import type { HeroGuideTabContent } from "@/features/heroes/hero-guide-schema";
+import type { HeroPortraitEntry } from "@/features/heroes/components/hero-guide-body";
 import { buildHeroGuideTabsFromHero } from "@/features/heroes/hero-lab-data";
-import { getHeroBySlug } from "@/lib/content-adapter";
+import { buildHeroPortraitEntries } from "@/features/heroes/hero-portrait-map";
+import { getHeroBySlug, getHeroes } from "@/lib/content-adapter";
 import { createSupabaseServerClient } from "@/lib/supabase/server-client";
 import { fetchHeroGuideTabsFromEditorial } from "@/lib/supabase/hero-guide-editorial";
 
@@ -15,6 +17,8 @@ export type HeroGuideEditorLoadResult = {
   publishedTabs: HeroGuideTabContent[] | null;
   /** Working copy for the editor: published wins over fallback. */
   initialTabs: HeroGuideTabContent[];
+  /** Full codex roster for matchup opponent picker and icon resolution. */
+  heroRoster: HeroPortraitEntry[];
 };
 
 export async function loadHeroGuideEditorState(
@@ -26,6 +30,12 @@ export async function loadHeroGuideEditorState(
   }
 
   const fallbackTabs = buildHeroGuideTabsFromHero(hero);
+  let heroRoster: HeroPortraitEntry[] = [];
+  try {
+    heroRoster = buildHeroPortraitEntries(await getHeroes());
+  } catch (error) {
+    console.warn("[hero-guide-editor] Failed to load codex roster for matchup picker", error);
+  }
 
   const supabase = await createSupabaseServerClient();
   if (!supabase) {
@@ -34,6 +44,7 @@ export async function loadHeroGuideEditorState(
       fallbackTabs,
       publishedTabs: null,
       initialTabs: fallbackTabs,
+      heroRoster,
     };
   }
 
@@ -50,5 +61,6 @@ export async function loadHeroGuideEditorState(
     fallbackTabs,
     publishedTabs,
     initialTabs,
+    heroRoster,
   };
 }

@@ -136,7 +136,15 @@ function sanitizeBlock(block: unknown): unknown {
     if (!isValidUrl(watchUrl)) {
       return null;
     }
-    return { ...b, watchUrl };
+    const next: Record<string, unknown> = { ...b, watchUrl };
+    const title = typeof next.title === "string" ? next.title.trim() : "";
+    next.title = title.length > 0 ? title.slice(0, 160) : "Video";
+    if (typeof next.note === "string") {
+      const note = next.note.trim();
+      if (note) next.note = note.slice(0, 500);
+      else delete next.note;
+    }
+    return next;
   }
 
   if (type === "strengthsWeaknesses") {

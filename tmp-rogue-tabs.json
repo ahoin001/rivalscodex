@@ -1,0 +1,309 @@
+[
+  {
+    "id": "overview",
+    "body": [
+      {
+        "body": "Anna Marie possesses the Mutant ability to absorb the powers of others with a touch. Her ever-adaptable arsenal of superhuman abilities helps turn the tide of any fight. After touching Raw Chronovium, Rogue's strength soared to new heights, allowing her to overwhelm enemies with unstoppable force!",
+        "type": "callout",
+        "title": "At a glance",
+        "variant": "gameplan"
+      },
+      {
+        "type": "bullets",
+        "items": [
+          "Core plan for this hero.",
+          "Use Kit & Mechanics for ability tech, then Combos for execution routes.",
+          "Editors can attach short YouTube clips to combo rows in the admin guide for motion-heavy sequences."
+        ],
+        "title": "Before you queue"
+      },
+      {
+        "body": "Positioning and rotations guidance.",
+        "type": "callout",
+        "title": "Positioning anchor",
+        "variant": "gameplan"
+      },
+      {
+        "type": "twoColumn",
+        "leftItems": [
+          "Enemy type 1",
+          "Enemy type 2"
+        ],
+        "leftTitle": "High-value targets",
+        "rightItems": [
+          "Threat 1",
+          "Threat 2"
+        ],
+        "rightTitle": "Threats to respect"
+      }
+    ],
+    "label": "Overview & Playstyle",
+    "summary": "Rogue · Vanguard · Difficulty 3/5"
+  },
+  {
+    "id": "abilities",
+    "label": "Kit & Mechanics",
+    "summary": "Review practical ability interactions, cancels, and usage cues. Full codex details are available above.",
+    "primaryPoints": [
+      "Add content for this tab."
+    ]
+  },
+  {
+    "id": "combos",
+    "body": [
+      {
+        "name": "Engagement Combo",
+        "type": "combo",
+        "steps": [
+          "SHIFT ×2",
+          "LMB ×3",
+          "LMB",
+          "E",
+          "V",
+          "LMB",
+          "E",
+          "LMB"
+        ],
+        "difficulty": "bread-and-butter",
+        "structuredSteps": [
+          {
+            "kind": "ability",
+            "repeat": 2,
+            "abilityRef": "fatal-attraction"
+          },
+          {
+            "kind": "ability",
+            "repeat": 3,
+            "abilityRef": "power-surge-punch"
+          },
+          {
+            "kind": "ability",
+            "abilityRef": "southern-brawl"
+          },
+          {
+            "kind": "ability",
+            "modifier": "animation-cancel",
+            "abilityRef": "chrono-kick-combo"
+          },
+          {
+            "kind": "ability",
+            "abilityRef": "melee"
+          },
+          {
+            "kind": "ability",
+            "abilityRef": "power-surge-punch"
+          },
+          {
+            "kind": "ability",
+            "abilityRef": "chrono-kick-combo"
+          },
+          {
+            "kind": "ability",
+            "abilityRef": "power-surge-punch"
+          }
+        ]
+      },
+      {
+        "name": "Double Attraction Combo",
+        "type": "combo",
+        "steps": [
+          "SHIFT ×2",
+          "F",
+          "SHIFT ×2",
+          "LMB",
+          "or LMB"
+        ],
+        "condition": "Use on targets that refresh Rouge's fatal attraction",
+        "difficulty": "intermediate",
+        "structuredSteps": [
+          {
+            "kind": "ability",
+            "repeat": 2,
+            "abilityRef": "fatal-attraction"
+          },
+          {
+            "kind": "ability",
+            "abilityRef": "ability-absorption"
+          },
+          {
+            "kind": "ability",
+            "repeat": 2,
+            "abilityRef": "fatal-attraction"
+          },
+          {
+            "kind": "ability",
+            "abilityRef": "power-surge-punch"
+          },
+          {
+            "kind": "ability",
+            "modifier": "or",
+            "abilityRef": "southern-brawl"
+          }
+        ]
+      },
+      {
+        "name": "Juggle Combo",
+        "type": "combo",
+        "steps": [
+          "SHIFT ×2",
+          "LMB ×3",
+          "E",
+          "LMB",
+          "LMB",
+          "LMB",
+          "E"
+        ],
+        "condition": "For Repositioning enemy out of Invis Ult for example",
+        "difficulty": "intermediate",
+        "structuredSteps": [
+          {
+            "kind": "ability",
+            "repeat": 2,
+            "abilityRef": "fatal-attraction"
+          },
+          {
+            "kind": "ability",
+            "repeat": 3,
+            "abilityRef": "power-surge-punch"
+          },
+          {
+            "kind": "ability",
+            "modifier": "animation-cancel",
+            "abilityRef": "chrono-kick-combo"
+          },
+          {
+            "kind": "ability",
+            "abilityRef": "power-surge-punch"
+          },
+          {
+            "kind": "ability",
+            "abilityRef": "southern-brawl"
+          },
+          {
+            "kind": "ability",
+            "abilityRef": "power-surge-punch"
+          },
+          {
+            "kind": "ability",
+            "abilityRef": "chrono-kick-combo"
+          }
+        ]
+      },
+      {
+        "name": "Damage Burst / Advanced Juggle",
+        "type": "combo",
+        "steps": [
+          "LMB",
+          "E",
+          "V",
+          "LMB",
+          "SHIFT ×2",
+          "LMB",
+          "E"
+        ],
+        "difficulty": "advanced",
+        "structuredSteps": [
+          {
+            "kind": "ability",
+            "abilityRef": "southern-brawl"
+          },
+          {
+            "kind": "ability",
+            "modifier": "animation-cancel",
+            "abilityRef": "chrono-kick-combo"
+          },
+          {
+            "kind": "ability",
+            "abilityRef": "melee"
+          },
+          {
+            "kind": "ability",
+            "abilityRef": "power-surge-punch"
+          },
+          {
+            "kind": "ability",
+            "repeat": 2,
+            "abilityRef": "fatal-attraction"
+          },
+          {
+            "kind": "ability",
+            "abilityRef": "power-surge-punch"
+          },
+          {
+            "kind": "ability",
+            "abilityRef": "chrono-kick-combo"
+          }
+        ]
+      }
+    ],
+    "label": "Combos",
+    "summary": "Use curated opener chains and team-up timing to secure reliable fight conversions.",
+    "primaryPoints": [
+      "Open fights with your safest poke tool before hard committing cooldowns.",
+      "Pair your displacement or control skill with ally burst windows.",
+      "Rotate out after each high-value cast to preserve uptime."
+    ],
+    "secondaryPoints": [
+      "Coordinate with your team on focus targets before each engage.",
+      "Save one cooldown for peel when enemy dive pressure rises.",
+      "Use objective timing to force favorable cooldown trades."
+    ]
+  },
+  {
+    "id": "matchups",
+    "body": [
+      {
+        "type": "matchup",
+        "summary": "One or two sentences on how you exploit or survive this matchup.",
+        "opponent": "Hero name",
+        "disposition": "target"
+      },
+      {
+        "type": "matchup",
+        "summary": "One or two sentences on how you exploit or survive this matchup.",
+        "opponent": "Hero name",
+        "disposition": "target"
+      }
+    ],
+    "label": "Matchups",
+    "summary": "Track favorable, even, and dangerous matchups with short counterplay explanations.",
+    "primaryPoints": [
+      "Add content for this tab."
+    ]
+  },
+  {
+    "id": "resources",
+    "body": [
+      {
+        "type": "video",
+        "title": "Cringe Alarms Combo Guide Beginner to Advanced",
+        "watchUrl": "https://www.youtube.com/watch?v=S75wGWOCqPA"
+      },
+      {
+        "body": "Short callout text.",
+        "type": "callout",
+        "title": "Combos and Explanations of why to use them and copy combos",
+        "variant": "tip"
+      }
+    ],
+    "label": "Resources",
+    "summary": "Reference videos, patch-aware notes, and tactical sources for continuing hero mastery.",
+    "primaryPoints": [
+      "Use API-synced hero data as baseline truth for ability specifics.",
+      "Review one recent VOD and capture two repeatable decisions.",
+      "Refresh your notes every patch to prevent stale habits."
+    ],
+    "secondaryPoints": [
+      "Cross-check major build or strategy shifts each patch.",
+      "Capture your own short post-match notes to reinforce execution."
+    ]
+  },
+  {
+    "id": "notes",
+    "label": "Personal Notes",
+    "summary": "Player-specific reminders, queue prep, and post-match review notes are saved locally.",
+    "primaryPoints": [
+      "Add content for this tab."
+    ]
+  }
+]

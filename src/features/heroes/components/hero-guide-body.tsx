@@ -25,6 +25,7 @@ import {
   DifficultyGroupHeader,
   TagFilterPills,
 } from "./hero-guide-body/combo-groups";
+import { ScrollRevealSection } from "@/features/heroes/components/scroll-reveal-section";
 
 export type { HeroGuideBodyNavItem, HeroPortraitEntry };
 export { buildHeroGuideBodyNavItems };
@@ -44,9 +45,9 @@ function GuideSection({
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-reveal scroll-mt-28">
+    <ScrollRevealSection id={id} className="scroll-mt-28">
       {children}
-    </section>
+    </ScrollRevealSection>
   );
 }
 
@@ -242,7 +243,12 @@ export function HeroGuideBody({
       case "video":
         return (
           <GuideSection id={navItem.id}>
-            <BlockVideo title={block.title} watchUrl={block.watchUrl} />
+            <BlockVideo
+              title={block.title}
+              watchUrl={block.watchUrl}
+              note={block.note}
+              layout="inline"
+            />
           </GuideSection>
         );
       case "strengthsWeaknesses":
@@ -284,14 +290,14 @@ export function HeroGuideBody({
             const visible = combos.filter(filterCombo);
             if (visible.length === 0) return null;
             return (
-              <div key={tier.key} className="scroll-reveal space-y-4">
+              <ScrollRevealSection key={tier.key} className="scroll-reveal space-y-4">
                 <DifficultyGroupHeader label={tier.label} className={tier.lightClass} />
                 {visible.map(({ block: comboBlock, index: comboIndex }) => (
                   <div key={`combo-${comboIndex}`}>
                     {renderComboBlock(comboBlock, comboIndex)}
                   </div>
                 ))}
-              </div>
+              </ScrollRevealSection>
             );
           })}
 

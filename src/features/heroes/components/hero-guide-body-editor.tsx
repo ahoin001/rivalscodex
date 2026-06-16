@@ -3,14 +3,17 @@
 import { useCallback, useState } from "react";
 import type { HeroGuideBlock, HeroGuideTabId } from "@/features/heroes/hero-guide-schema";
 import type { ResolvedAbilityRef } from "@/features/heroes/ability-lookup";
+import type { HeroPortraitEntry } from "@/features/heroes/components/hero-guide-body";
 import { canUseBlockOnTab } from "@/features/heroes/hero-guide-blocks/registry";
 import { ComboBlockEditor } from "@/features/heroes/components/combo-editor";
+import { HeroOpponentPicker } from "@/features/heroes/components/hero-opponent-picker";
 
 type HeroGuideBodyEditorProps = {
   tabId: HeroGuideTabId;
   blocks: HeroGuideBlock[];
   onChange: (next: HeroGuideBlock[] | undefined) => void;
   abilityLookup?: Map<string, ResolvedAbilityRef>;
+  heroRoster?: HeroPortraitEntry[];
 };
 
 function linesToItems(text: string): string[] {
@@ -62,13 +65,21 @@ function blockPreview(block: HeroGuideBlock): string {
     case "abilityTip":
       return block.title ?? block.abilityRef;
     case "video":
-      return block.title;
+      return block.note
+        ? `${block.title} — ${block.note.length > 48 ? `${block.note.slice(0, 48)}…` : block.note}`
+        : block.title;
     case "strengthsWeaknesses":
       return `${block.strengths.length} strengths · ${block.weaknesses.length} weaknesses`;
   }
 }
 
-export function HeroGuideBodyEditor({ tabId, blocks, onChange, abilityLookup }: HeroGuideBodyEditorProps) {
+export function HeroGuideBodyEditor({
+  tabId,
+  blocks,
+  onChange,
+  abilityLookup,
+  heroRoster,
+}: HeroGuideBodyEditorProps) {
   const isCombosTab = tabId === "combos";
   const [expandedIndex, setExpandedIndex] = useState<number | null>(
     isCombosTab && blocks.length > 0 ? 0 : null,
@@ -205,14 +216,15 @@ export function HeroGuideBodyEditor({ tabId, blocks, onChange, abilityLookup }: 
           {canUseBlockOnTab(tabId, "matchup") ? (
             <MiniAdd
               label="+ Matchup"
-              onClick={() =>
+              onClick={() => {
+                const defaultOpponent = heroRoster?.[0]?.name ?? "Hero name";
                 append({
                   type: "matchup",
                   disposition: "target",
-                  opponent: "Hero name",
+                  opponent: defaultOpponent,
                   summary: "One or two sentences on how you exploit or survive this matchup.",
-                })
-              }
+                });
+              }}
             />
           ) : null}
           {canUseBlockOnTab(tabId, "video") ? (
@@ -245,7 +257,9 @@ export function HeroGuideBodyEditor({ tabId, blocks, onChange, abilityLookup }: 
             return (
               <li
                 key={`block-${index}-${block.type}`}
-                className={`min-w-0 overflow-hidden rounded-lg border bg-rivals-light-50/50 ${
+                className={`min-w-0 rounded-lg border bg-rivals-light-50/50 ${
+                  open ? "overflow-visible" : "overflow-hidden"
+                } ${
                   isCombo && open
                     ? "border-brand-gold/35 shadow-sm"
                     : "border-rivals-light-300"
@@ -291,6 +305,7 @@ export function HeroGuideBodyEditor({ tabId, blocks, onChange, abilityLookup }: 
                       block={block}
                       onReplace={(next) => replaceAt(index, next)}
                       abilityLookup={abilityLookup}
+                      heroRoster={heroRoster}
                     />
                   </div>
                 ) : null}
@@ -346,10 +361,12 @@ function BlockFields({
   block,
   onReplace,
   abilityLookup,
+  heroRoster,
 }: {
   block: HeroGuideBlock;
   onReplace: (next: HeroGuideBlock) => void;
   abilityLookup?: Map<string, ResolvedAbilityRef>;
+  heroRoster?: HeroPortraitEntry[];
 }) {
   switch (block.type) {
     case "callout":
@@ -482,11 +499,10 @@ function BlockFields({
             <option value="even">Even (skill matchup)</option>
             <option value="threat">Threat (respect / counterplay)</option>
           </select>
-          <input
-            className="rounded border border-rivals-light-300 px-2 py-1 text-sm"
+          <HeroOpponentPicker
             value={block.opponent}
-            onChange={(e) => onReplace({ ...block, opponent: e.target.value })}
-            placeholder="Opponent hero name"
+            heroes={heroRoster ?? []}
+            onChange={(opponent) => onReplace({ ...block, opponent })}
           />
           <textarea
             rows={3}
@@ -575,18 +591,39 @@ function BlockFields({
     case "video":
       return (
         <div className="grid gap-2">
-          <input
-            className="rounded border border-rivals-light-300 px-2 py-1 text-sm"
-            value={block.title}
-            onChange={(e) => onReplace({ ...block, title: e.target.value })}
-            placeholder="Title shown above player"
-          />
-          <input
-            className="rounded border border-rivals-light-300 px-2 py-1 text-sm"
-            value={block.watchUrl}
-            onChange={(e) => onReplace({ ...block, watchUrl: e.target.value })}
-            placeholder="https://www.youtube.com/watch?v=… or youtu.be/…"
-          />
+          <label className="grid gap-1 text-[11px]">
+            <span className="text-rivals-ink-muted">Title</span>
+            <input
+              className="rounded border border-rivals-light-300 px-2 py-1 text-sm"
+              value={block.title}
+              onChange={(e) => onReplace({ ...block, title: e.target.value })}
+              placeholder="Title shown on the card"
+            />
+          </label>
+          <label className="grid gap-1 text-[11px]">
+            <span className="text-rivals-ink-muted">Why watch (note above thumbnail)</span>
+            <textarea
+              rows={3}
+              className="rounded border border-rivals-light-300 px-2 py-1 text-sm"
+              value={block.note ?? ""}
+              onChange={(e) =>
+                onReplace({
+                  ...block,
+                  note: e.target.value.trim() ? e.target.value : undefined,
+                })
+              }
+              placeholder="e.g. Beginner combo routes with explanations for each step"
+            />
+          </label>
+          <label className="grid gap-1 text-[11px]">
+            <span className="text-rivals-ink-muted">Watch URL</span>
+            <input
+              className="rounded border border-rivals-light-300 px-2 py-1 text-sm"
+              value={block.watchUrl}
+              onChange={(e) => onReplace({ ...block, watchUrl: e.target.value })}
+              placeholder="https://www.youtube.com/watch?v=… or youtu.be/…"
+            />
+          </label>
         </div>
       );
     case "strengthsWeaknesses":
