@@ -5,6 +5,8 @@ import type { HeroGuideBlock, HeroGuideTabId } from "@/features/heroes/hero-guid
 import type { ResolvedAbilityRef } from "@/features/heroes/ability-lookup";
 import type { HeroPortraitEntry } from "@/features/heroes/components/hero-guide-body";
 import { canUseBlockOnTab } from "@/features/heroes/hero-guide-blocks/registry";
+import { SortableDragHandle, useSortableDrag } from "@/components/ui/rivals-sortable";
+import { remapTrackedIndex, reorderByIndex } from "@/lib/reorder-list";
 import { ComboBlockEditor } from "@/features/heroes/components/combo-editor";
 import { HeroOpponentPicker } from "@/features/heroes/components/hero-opponent-picker";
 
@@ -123,16 +125,18 @@ export function HeroGuideBodyEditor({
     [blocks, isCombosTab, onChange],
   );
 
-  const move = useCallback(
-    (index: number, dir: -1 | 1) => {
-      const j = index + dir;
-      if (j < 0 || j >= blocks.length) return;
-      const next = [...blocks];
-      [next[index], next[j]] = [next[j], next[index]];
+  const reorderBlocks = useCallback(
+    (fromIndex: number, toIndex: number) => {
+      const next = reorderByIndex(blocks, fromIndex, toIndex);
       onChange(next);
+      if (isCombosTab) {
+        setExpandedIndex((current) => remapTrackedIndex(current, fromIndex, toIndex));
+      }
     },
-    [blocks, onChange],
+    [blocks, isCombosTab, onChange],
   );
+
+  const sortable = useSortableDrag({ onReorder: reorderBlocks });
 
   return (
     <div className="min-w-0 space-y-3 overflow-hidden rounded-lg border border-rivals-light-300 bg-white p-4 shadow-sm">
@@ -143,8 +147,8 @@ export function HeroGuideBodyEditor({
           </h3>
           <p className="max-w-prose text-[11px] leading-relaxed text-rivals-ink-muted">
             {isCombosTab
-              ? "Each combo is its own card — expand one at a time to edit the chain."
-              : "When present, these blocks replace priority/secondary cue columns on the live page."}
+              ? "Drag combos by the handle to reorder. Expand one card at a time to edit its chain."
+              : "When present, these blocks replace priority/secondary cue columns on the live page. Drag to reorder."}
           </p>
         </div>
         <div className="flex flex-wrap gap-1.5">
@@ -256,16 +260,21 @@ export function HeroGuideBodyEditor({
 
             return (
               <li
-                key={`block-${index}-${block.type}`}
-                className={`min-w-0 rounded-lg border bg-rivals-light-50/50 ${
-                  open ? "overflow-visible" : "overflow-hidden"
-                } ${
-                  isCombo && open
-                    ? "border-brand-gold/35 shadow-sm"
-                    : "border-rivals-light-300"
-                }`}
+                key={`block-${index}`}
+                {...sortable.getItemProps(index)}
+                className={sortable.itemClassName(
+                  index,
+                  `min-w-0 rounded-lg border bg-rivals-light-50/50 transition-[box-shadow,opacity] ${
+                    open ? "overflow-visible" : "overflow-hidden"
+                  } ${
+                    isCombo && open
+                      ? "border-brand-gold/35 shadow-sm"
+                      : "border-rivals-light-300"
+                  }`,
+                )}
               >
                 <div className="flex flex-wrap items-center gap-2 px-3 py-2.5">
+                  <SortableDragHandle {...sortable.getHandleProps(index)} />
                   <button
                     type="button"
                     onClick={() => toggleBlockExpanded(index)}
@@ -289,15 +298,7 @@ export function HeroGuideBodyEditor({
                       ▼
                     </span>
                   </button>
-                  <div className="flex shrink-0 flex-wrap gap-1">
-                    <BlockAction label="Up" onClick={() => move(index, -1)} disabled={index === 0} />
-                    <BlockAction
-                      label="Down"
-                      onClick={() => move(index, 1)}
-                      disabled={index === blocks.length - 1}
-                    />
-                    <BlockAction label="Delete" onClick={() => removeAt(index)} danger />
-                  </div>
+                  <BlockAction label="Delete" onClick={() => removeAt(index)} danger />
                 </div>
                 {open ? (
                   <div className="border-t border-rivals-light-300/80 bg-white px-3 py-3">

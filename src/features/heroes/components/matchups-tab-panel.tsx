@@ -8,6 +8,7 @@ import {
   findPortraitByOpponent,
 } from "@/features/heroes/components/hero-guide-body/types";
 import { BlockMatchup } from "@/features/heroes/components/hero-guide-body/block-matchup";
+import { MatchupTierChart } from "@/features/heroes/components/matchup-tier-chart";
 
 type MatchupBlock = Extract<HeroGuideBlock, { type: "matchup" }>;
 
@@ -17,6 +18,8 @@ const LANE_ORDER: Array<{ key: MatchupBlock["disposition"]; label: string }> = [
   { key: "threat", label: "Unfavorable" },
 ];
 
+type ViewMode = "chart" | "list";
+
 export function MatchupsTabPanel({
   blocks,
   heroPortraits,
@@ -25,6 +28,7 @@ export function MatchupsTabPanel({
   heroPortraits?: HeroPortraitEntry[];
 }) {
   const [filter, setFilter] = useState<"all" | MatchupBlock["disposition"]>("all");
+  const [view, setView] = useState<ViewMode>("chart");
   const matchups = useMemo(
     () => blocks.filter((b): b is MatchupBlock => b.type === "matchup"),
     [blocks],
@@ -61,54 +65,99 @@ export function MatchupsTabPanel({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-1.5 overflow-x-auto pb-2">
-        <FilterPill active={filter === "all"} onClick={() => setFilter("all")}>
-          All
-        </FilterPill>
-        {LANE_ORDER.map((lane) =>
-          grouped[lane.key].length > 0 ? (
-            <FilterPill
-              key={lane.key}
-              active={filter === lane.key}
-              onClick={() => setFilter(lane.key)}
-            >
-              {lane.label}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap gap-1.5 overflow-x-auto pb-1">
+          <ViewPill active={view === "chart"} onClick={() => setView("chart")}>
+            Tier chart
+          </ViewPill>
+          <ViewPill active={view === "list"} onClick={() => setView("list")}>
+            Detail list
+          </ViewPill>
+        </div>
+        {view === "list" ? (
+          <div className="flex flex-wrap gap-1.5 overflow-x-auto pb-1">
+            <FilterPill active={filter === "all"} onClick={() => setFilter("all")}>
+              All
             </FilterPill>
-          ) : null,
-        )}
+            {LANE_ORDER.map((lane) =>
+              grouped[lane.key].length > 0 ? (
+                <FilterPill
+                  key={lane.key}
+                  active={filter === lane.key}
+                  onClick={() => setFilter(lane.key)}
+                >
+                  {lane.label}
+                </FilterPill>
+              ) : null,
+            )}
+          </div>
+        ) : null}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        {LANE_ORDER.map((lane) => {
-          const items = grouped[lane.key];
-          if (items.length === 0) return null;
-          if (filter !== "all" && filter !== lane.key) return null;
+      {view === "chart" ? (
+        <MatchupTierChart
+          threats={grouped.threat}
+          targets={grouped.target}
+          evens={grouped.even}
+          heroPortraits={heroPortraits}
+        />
+      ) : (
+        <div className="grid gap-4 lg:grid-cols-3">
+          {LANE_ORDER.map((lane) => {
+            const items = grouped[lane.key];
+            if (items.length === 0) return null;
+            if (filter !== "all" && filter !== lane.key) return null;
 
-          return (
-            <section
-              key={lane.key}
-              className="rounded-lg border border-rivals-light-300 bg-rivals-light-50/70 p-3"
-            >
-              <h4 className="font-display text-xs font-extrabold uppercase italic tracking-[0.16em] text-rivals-ink-muted">
-                {lane.label}
-              </h4>
-              <div className="mt-3 space-y-3">
-                {items.map((block, index) => (
-                  <BlockMatchup
-                    key={`${lane.key}-${block.opponent}-${index}`}
-                    disposition={block.disposition}
-                    opponent={block.opponent}
-                    summary={block.summary}
-                    clip={block.clip}
-                    portrait={findPortraitByOpponent(portraitLookup, block.opponent)}
-                  />
-                ))}
-              </div>
-            </section>
-          );
-        })}
-      </div>
+            return (
+              <section
+                key={lane.key}
+                className="rounded-lg border border-rivals-light-300 bg-rivals-light-50/70 p-3"
+              >
+                <h4 className="font-display text-xs font-extrabold uppercase italic tracking-[0.16em] text-rivals-ink-muted">
+                  {lane.label}
+                </h4>
+                <div className="mt-3 space-y-3">
+                  {items.map((block, index) => (
+                    <BlockMatchup
+                      key={`${lane.key}-${block.opponent}-${index}`}
+                      disposition={block.disposition}
+                      opponent={block.opponent}
+                      summary={block.summary}
+                      clip={block.clip}
+                      portrait={findPortraitByOpponent(portraitLookup, block.opponent)}
+                    />
+                  ))}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      )}
     </div>
+  );
+}
+
+function ViewPill({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`shrink-0 rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${
+        active
+          ? "border-rivals-ink/25 bg-rivals-ink text-white"
+          : "border-rivals-light-300 text-rivals-ink-muted hover:border-rivals-ink/20"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -135,4 +184,3 @@ function FilterPill({
     </button>
   );
 }
-

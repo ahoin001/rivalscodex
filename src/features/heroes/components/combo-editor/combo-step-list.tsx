@@ -8,6 +8,7 @@ import { formatKeybindLabel } from "@/features/heroes/keybind-display";
 import { COMBO_STEP_REPEAT_MAX } from "@/features/heroes/combo-step-utils";
 import { MODIFIER_DESCRIPTORS } from "@/features/heroes/combo-display";
 import { editorInputClass } from "@/components/ui/rivals-editor-field";
+import { SortableDragHandle, useSortableDrag } from "@/components/ui/rivals-sortable";
 
 const MODIFIER_OPTIONS: { value: ComboModifier | ""; label: string }[] = [
   { value: "", label: "Normal →" },
@@ -23,7 +24,7 @@ export type ComboStepListProps = {
   onUpdateModifier: (index: number, modifier: ComboModifier | undefined) => void;
   onUpdateActionLabel: (index: number, label: string) => void;
   onUpdateRepeat: (index: number, repeat: number) => void;
-  onMove: (index: number, dir: -1 | 1) => void;
+  onReorder: (fromIndex: number, toIndex: number) => void;
   onRemove: (index: number) => void;
 };
 
@@ -33,9 +34,11 @@ export function ComboStepList({
   onUpdateModifier,
   onUpdateActionLabel,
   onUpdateRepeat,
-  onMove,
+  onReorder,
   onRemove,
 }: ComboStepListProps) {
+  const sortable = useSortableDrag({ onReorder });
+
   if (steps.length === 0) return null;
 
   return (
@@ -48,6 +51,9 @@ export function ComboStepList({
           {steps.length} step{steps.length === 1 ? "" : "s"}
         </span>
       </div>
+      <p className="text-[10px] leading-relaxed text-rivals-ink-muted">
+        Drag steps by the handle to reorder the chain.
+      </p>
       <ol className="space-y-1">
         {steps.map((step, index) => {
           const ref =
@@ -59,9 +65,14 @@ export function ComboStepList({
 
           return (
             <li
-              key={index}
-              className="flex flex-wrap items-center gap-2 rounded-md border border-rivals-light-300/90 bg-white px-2 py-1.5"
+              key={`step-${index}`}
+              {...sortable.getItemProps(index)}
+              className={sortable.itemClassName(
+                index,
+                "flex flex-wrap items-center gap-2 rounded-md border border-rivals-light-300/90 bg-white px-2 py-1.5 transition-[box-shadow,opacity]",
+              )}
             >
+              <SortableDragHandle {...sortable.getHandleProps(index)} />
               <span className="w-5 shrink-0 text-center text-[10px] font-bold text-rivals-ink-muted">
                 {index + 1}
               </span>
@@ -140,34 +151,14 @@ export function ComboStepList({
                 <span className="shrink-0 text-[9px] text-rivals-ink-muted">start</span>
               )}
 
-              <div className="flex shrink-0 items-center gap-0.5">
-                <button
-                  type="button"
-                  onClick={() => onMove(index, -1)}
-                  disabled={index === 0}
-                  aria-label="Move step up"
-                  className="rounded px-1.5 py-0.5 text-[10px] text-rivals-ink-soft hover:bg-rivals-light-100 disabled:opacity-30"
-                >
-                  ↑
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onMove(index, 1)}
-                  disabled={index === steps.length - 1}
-                  aria-label="Move step down"
-                  className="rounded px-1.5 py-0.5 text-[10px] text-rivals-ink-soft hover:bg-rivals-light-100 disabled:opacity-30"
-                >
-                  ↓
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onRemove(index)}
-                  aria-label="Remove step"
-                  className="rounded px-1.5 py-0.5 text-[10px] text-rose-700 hover:bg-rose-50"
-                >
-                  Remove
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => onRemove(index)}
+                aria-label="Remove step"
+                className="ml-auto shrink-0 rounded px-1.5 py-0.5 text-[10px] text-rose-700 hover:bg-rose-50"
+              >
+                Remove
+              </button>
             </li>
           );
         })}

@@ -10,6 +10,7 @@ import {
 } from "@/features/heroes/combo-step-utils";
 import { ComboChain } from "@/features/heroes/components/combo-chain";
 import { RivalsDisclosure } from "@/components/ui/rivals-disclosure";
+import { reorderByIndex } from "@/lib/reorder-list";
 import { ComboAbilityPalette } from "./combo-ability-palette";
 import {
   ComboBuilderFallbackSteps,
@@ -96,13 +97,9 @@ export function ComboBuilderEditor({
               ),
             )
           }
-          onMove={(index, dir) => {
-            const j = index + dir;
-            if (j < 0 || j >= steps.length) return;
-            const next = [...steps];
-            [next[index], next[j]] = [next[j], next[index]];
-            updateSteps(next);
-          }}
+          onReorder={(fromIndex, toIndex) =>
+            updateSteps(reorderByIndex(steps, fromIndex, toIndex))
+          }
           onRemove={(index) => updateSteps(steps.filter((_, i) => i !== index))}
         />
       ) : (

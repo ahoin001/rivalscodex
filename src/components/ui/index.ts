@@ -16,6 +16,7 @@ export * from "@/components/ui/rivals-hero-title";
 export * from "@/components/ui/rivals-tab-bar";
 export * from "@/components/ui/rivals-brand-button";
 export * from "@/components/ui/rivals-clip-action";
+export * from "@/components/ui/rivals-sortable";
 export * from "@/components/ui/rivals-disclosure";
 export * from "@/components/ui/rivals-editor-field";
 export * from "@/components/ui/rivals-key-chip";
