@@ -21,6 +21,10 @@ import {
   fetchHeroCodexBySlug,
   upsertHeroCodex,
 } from "@/lib/supabase/hero-codex-repository";
+import {
+  logHeroImport,
+  type HeroImportAction,
+} from "@/lib/supabase/hero-import-log-repository";
 
 const abilityDetailStatInputSchema = z.object({
   label: z.string().min(1),
@@ -510,28 +514,18 @@ async function findExistingHero(slug: string): Promise<{
   return { source: "none" };
 }
 
-async function logHeroImport(args: {
+async function logHeroImportEvent(args: {
   slug: string;
-  action: "apply-skeleton" | "apply-ability-detail";
+  action: HeroImportAction;
   ok: boolean;
   details: Record<string, unknown>;
 }): Promise<void> {
   const service = createSupabaseServiceRoleClient();
   if (!service) return;
 
-  const { error } = await service
-    .schema("app_rivalscodex_v1")
-    .from("hero_import_log")
-    .insert({
-      hero_slug: args.slug,
-      action: args.action,
-      ok: args.ok,
-      details: args.details,
-    });
-
-  if (error) {
-    // Logging is best-effort. The import should still succeed if this fails.
-    console.warn("[hero-import] failed to write hero_import_log", error.message);
+  const result = await logHeroImport(service, args);
+  if (!result.ok) {
+    console.warn("[hero-import] failed to write hero_import_log", result.error);
   }
 }
 
@@ -917,7 +911,7 @@ async function handleApplySkeleton(
   ).length;
   const formsCount = validation.data.forms?.length ?? 0;
 
-  await logHeroImport({
+  await logHeroImportEvent({
     slug: body.slug,
     action: "apply-skeleton",
     ok: persist.supabaseStatus === "ok",
@@ -1052,7 +1046,7 @@ async function handleApplyAbilityDetail(
 
   const persist = await persistHero(validation.data);
 
-  await logHeroImport({
+  await logHeroImportEvent({
     slug: body.slug,
     action: "apply-ability-detail",
     ok: persist.supabaseStatus === "ok",

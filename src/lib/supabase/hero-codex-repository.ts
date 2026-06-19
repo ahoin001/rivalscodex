@@ -395,6 +395,23 @@ function formWriteRowsForHero(hero: Hero): FormWriteRow[] {
   ];
 }
 
+/** All abilities across default + per-form payloads (deduped by id). */
+function collectHeroAbilities(hero: Hero): HeroAbility[] {
+  if (hero.forms && hero.forms.length > 0) {
+    const seen = new Set<string>();
+    const abilities: HeroAbility[] = [];
+    for (const form of hero.forms) {
+      for (const ability of form.abilities) {
+        if (seen.has(ability.id)) continue;
+        seen.add(ability.id);
+        abilities.push(ability);
+      }
+    }
+    return abilities;
+  }
+  return hero.abilities;
+}
+
 function mapAssetRows(hero: Hero) {
   const rows: Array<{
     hero_slug: string;
@@ -420,7 +437,17 @@ function mapAssetRows(hero: Hero) {
     });
   }
 
-  for (const ability of hero.abilities) {
+  for (const form of hero.forms ?? []) {
+    if (!form.portraitImage) continue;
+    rows.push({
+      hero_slug: hero.slug,
+      asset_kind: "form-portrait",
+      asset_key: form.id,
+      web_path: form.portraitImage,
+    });
+  }
+
+  for (const ability of collectHeroAbilities(hero)) {
     if (ability.iconUrl) {
       rows.push({
         hero_slug: hero.slug,
@@ -518,31 +545,59 @@ async function upsertNormalizedAbilities(
   }
 }
 
+function assetRowKey(kind: string, key: string): string {
+  return `${kind}\0${key}`;
+}
+
 async function upsertNormalizedAssets(
   supabase: SupabaseClient,
   hero: Hero,
 ): Promise<void> {
   const rows = mapAssetRows(hero);
+  const nextKeys = new Set(rows.map((row) => assetRowKey(row.asset_kind, row.asset_key)));
 
-  const { error: deleteError } = await supabase
-    .schema(RIVALSCODEX_APP_SCHEMA)
-    .from(ASSET_TABLE)
-    .delete()
-    .eq("hero_slug", hero.slug);
+  // Upsert before deleting stale rows so a failed insert never wipes the registry.
+  if (rows.length > 0) {
+    const { error } = await supabase
+      .schema(RIVALSCODEX_APP_SCHEMA)
+      .from(ASSET_TABLE)
+      .upsert(rows, { onConflict: "hero_slug,asset_kind,asset_key" });
 
-  if (deleteError) {
-    throw new Error(deleteError.message);
+    if (error) {
+      throw new Error(error.message);
+    }
   }
 
-  if (rows.length === 0) return;
-
-  const { error } = await supabase
+  const { data: existingRows, error: readError } = await supabase
     .schema(RIVALSCODEX_APP_SCHEMA)
     .from(ASSET_TABLE)
-    .upsert(rows, { onConflict: "hero_slug,asset_kind,asset_key" });
+    .select("asset_kind,asset_key")
+    .eq("hero_slug", hero.slug);
 
-  if (error) {
-    throw new Error(error.message);
+  if (readError) {
+    throw new Error(readError.message);
+  }
+
+  const staleKeys = (existingRows ?? [])
+    .map((row) => {
+      const kind = (row as { asset_kind: string }).asset_kind;
+      const key = (row as { asset_key: string }).asset_key;
+      return { kind, key, composite: assetRowKey(kind, key) };
+    })
+    .filter((row) => !nextKeys.has(row.composite));
+
+  for (const stale of staleKeys) {
+    const { error: deleteError } = await supabase
+      .schema(RIVALSCODEX_APP_SCHEMA)
+      .from(ASSET_TABLE)
+      .delete()
+      .eq("hero_slug", hero.slug)
+      .eq("asset_kind", stale.kind)
+      .eq("asset_key", stale.key);
+
+    if (deleteError) {
+      throw new Error(deleteError.message);
+    }
   }
 }
 
