@@ -44,6 +44,13 @@ export function useScrollReveal<T extends HTMLElement = HTMLDivElement>({
       return;
     }
 
+    // Already in view on mount — reveal immediately so content is never blank.
+    const rect = node.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      node.classList.add("revealed");
+      if (!repeat) return;
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {

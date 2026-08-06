@@ -1,4 +1,1 @@
-export {
-  ComboBlockEditor,
-  ComboBuilderEditor,
-} from "@/features/heroes/components/combo-editor";
+﻿export * from "./combo/combo-builder-editor";

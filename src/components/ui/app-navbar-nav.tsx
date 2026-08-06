@@ -4,12 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const primaryLinks = [
-  { href: "/", label: "Heroes", match: (path: string) => path === "/" },
-  {
-    href: "/lab/hero-card",
-    label: "Hero Card Lab",
-    match: (path: string) => path.startsWith("/lab/hero-card"),
-  },
+  { href: "/", label: "Heroes", match: (path: string) => path === "/" || path.startsWith("/heroes") },
 ];
 
 export function AppNavbarNav() {
@@ -36,6 +31,7 @@ export function AppNavbarNav() {
       })}
       {process.env.NODE_ENV === "development" ? (
         <>
+          <DevNavLink href="/lab/hero-card" label="Hero Card Lab" pathname={pathname} />
           <DevNavLink href="/dev/endpoints" label="Endpoint Testing" pathname={pathname} />
           <DevNavLink href="/dev/marvel-html-import" label="Site Import" pathname={pathname} />
         </>

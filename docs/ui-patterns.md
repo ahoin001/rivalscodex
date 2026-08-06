@@ -11,8 +11,10 @@ Import from one place:
 Example:
 
 ```tsx
-import { ClippedPanel, HudSection, RivalsSectionHeader } from "@/components/ui";
+import { ClippedPanel, HudSection, RivalsCta, RivalsSectionHeader } from "@/components/ui";
 ```
+
+Canonical design rules also live in [`DESIGN.md`](../DESIGN.md).
 
 ## Layout Patterns
 
@@ -39,9 +41,13 @@ import { ClippedPanel, HudSection, RivalsSectionHeader } from "@/components/ui";
   - Standard label/value row for any stat list.
 - `RivalsPill`
   - Reusable metadata chip for tags, status, and stat badges.
-- `ClippedButton`
-  - Unified clipped button primitive.
-  - `tone="brand"` for yellow/gold action hierarchy.
+- `RivalsCta`
+  - Preferred CTA: `context="chrome"` (dark HUD) or `context="lab"` (light dossier).
+  - Supports `href` for link buttons. Prefer this for new work.
+- `ClippedButton` / `RivalsBrandButton` / `RivalsClipAction`
+  - Legacy wrappers over `RivalsCta` — still fine at call sites; do not extend further.
+- `RivalsTabBar`, `RivalsRoleBadge`, `RivalsHeroTitle`
+  - Tabs, role labeling, and giant slanted titles.
 - `RivalsInput`
   - Standardized input field with brand focus and placeholder behavior.
 

@@ -13,8 +13,9 @@
   --brand-gold-rgb: 201 162 93;
   --body-gradient: radial-gradient(circle at 18% 16%, #2a3344 0%, #1e242d 56%);
   --body-noise-opacity: 0.22;
+  /* Role triad — single source; lab aliases point here */
   --vanguard: #38bdf8;
-  --duelist: #f87171;
+  --duelist: #ef4444;
   --strategist: #2dd4bf;
 
   /* Spotlight band (shared with .lab-light-theme and full-bleed sections) */
@@ -28,7 +29,15 @@
     var(--surface-spotlight-bottom) 100%
   );
   --surface-data: var(--background);
+  --surface-hud: #121726;
+  --surface-input: #161b28;
+  --ink-on-gold: #10131f;
   --category-rail: #b8c5d6;
+
+  /* Clip polygons — retune globally */
+  --clip-panel: polygon(16px 0%, 100% 0%, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0% 100%, 0% 16px);
+  --clip-tab: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%);
+  --clip-row: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
 
   /* Rivals brand palette — aligned with spotlight / ink system for lab + cards */
   --rivals-yellow-300: #dfc9a0;
@@ -44,9 +53,9 @@
   --rivals-light-200: #c9d4e2;
   --rivals-light-300: #b8c5d6;
   --rivals-light-400: #a8b5c8;
-  --rivals-strategist: #2dd4bf;
-  --rivals-duelist: #ef4444;
-  --rivals-vanguard: #38bdf8;
+  --rivals-strategist: var(--strategist);
+  --rivals-duelist: var(--duelist);
+  --rivals-vanguard: var(--vanguard);
 
   /* ----------------------------------------------------------------
    * Motion tokens — shared timing/easing for all guide transitions.
@@ -57,7 +66,7 @@
   --motion-fast: 140ms;
   --motion-medium: 240ms;
   --motion-slow: 380ms;
-  --motion-stagger: 40ms;
+  --motion-stagger: 28ms;
 
   --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out: ease-out;
@@ -99,6 +108,9 @@
   --color-surface-spotlight-mid: var(--surface-spotlight-mid);
   --color-surface-spotlight-bottom: var(--surface-spotlight-bottom);
   --color-surface-data: var(--surface-data);
+  --color-surface-hud: var(--surface-hud);
+  --color-surface-input: var(--surface-input);
+  --color-ink-on-gold: var(--ink-on-gold);
   --color-category-rail: var(--category-rail);
 
   --font-sans: var(--font-inter);
@@ -161,7 +173,7 @@ a {
 }
 
 .clipped-edge {
-  clip-path: polygon(16px 0%, 100% 0%, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0% 100%, 0% 16px);
+  clip-path: var(--clip-panel);
 }
 
 .slanted-title {
@@ -465,7 +477,7 @@ details.editor-disclosure-native > summary {
  * need more, set `style={{ "--stagger-i": index }}` on the child. */
 .stagger-children > * {
   --stagger-i: 0;
-  animation: nodeReveal var(--motion-medium) var(--ease-out-soft) both;
+  animation: nodeReveal var(--motion-fast) var(--ease-out-soft) both;
   animation-delay: calc(var(--stagger-i) * var(--motion-stagger));
 }
 
@@ -502,6 +514,14 @@ details.editor-disclosure-native > summary {
 .scroll-reveal.revealed {
   opacity: 1;
   transform: translateY(0);
+}
+
+@media (scripting: none) {
+  .scroll-reveal,
+  .hero-page-shell .hero-stage-shell {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @keyframes tabSlideOut {
@@ -689,11 +709,11 @@ details.editor-disclosure-native > summary {
 }
 
 .rivals-clip-tab {
-  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%);
+  clip-path: var(--clip-tab);
 }
 
 .rivals-clip-row {
-  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  clip-path: var(--clip-row);
 }
 
 @keyframes heroStageReveal {
@@ -716,12 +736,12 @@ details.editor-disclosure-native > summary {
   animation-delay: var(--motion-instant);
 }
 
-.hero-page-shell .hero-stage-guide {
+.hero-page-shell .hero-stage-abilities,
+.hero-page-shell .hero-stage-abilities-panel {
   animation-delay: calc(var(--motion-instant) + var(--motion-stagger));
 }
 
-.hero-page-shell .hero-stage-abilities,
-.hero-page-shell .hero-stage-abilities-panel {
+.hero-page-shell .hero-stage-guide {
   animation-delay: calc(var(--motion-medium) + var(--motion-stagger));
 }
 

@@ -8,8 +8,8 @@ type HudSectionProps = PropsWithChildren<{
 }>;
 
 const toneClassMap = {
-  primary: "border-brand-gold/30 bg-[#121726]/90",
-  secondary: "border-brand-gold/20 bg-[#121726]/85",
+  primary: "border-brand-gold/30 bg-surface-hud/90",
+  secondary: "border-brand-gold/20 bg-surface-hud/85",
 } as const;
 
 const titleClassMap = {

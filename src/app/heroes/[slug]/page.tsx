@@ -15,13 +15,30 @@ import { buildComboAbilityLookup } from "@/features/heroes/combo-kit-abilities";
 import { buildHeroPortraitEntries } from "@/features/heroes/hero-portrait-map";
 import { isSupabaseEnabled } from "@/lib/supabase/env";
 import { RIVALS_FRAMES } from "@/lib/rivals-assets-paths";
+import type { HeroGuideTabId } from "@/features/heroes/hero-guide-schema";
 
 type HeroPageProps = {
   params: Promise<{
     slug: string;
   }>;
-  searchParams?: Promise<{ preview?: string }> | { preview?: string };
+  searchParams?: Promise<{ preview?: string; tab?: string }> | { preview?: string; tab?: string };
 };
+
+const GUIDE_TAB_IDS: HeroGuideTabId[] = [
+  "overview",
+  "abilities",
+  "combos",
+  "matchups",
+  "resources",
+  "notes",
+];
+
+function resolveDefaultTab(tab: string | undefined): HeroGuideTabId {
+  if (tab && (GUIDE_TAB_IDS as string[]).includes(tab)) {
+    return tab as HeroGuideTabId;
+  }
+  return "overview";
+}
 
 export async function generateStaticParams() {
   const slugs = await getHeroSlugs();
@@ -63,6 +80,7 @@ export default async function HeroPage({ params, searchParams }: HeroPageProps) 
   const fallbackGuideTabs = buildHeroGuideTabsFromHero(hero);
   const resolvedSearchParams = await Promise.resolve(searchParams);
   const wantsDraftPreview = resolvedSearchParams?.preview === "draft";
+  const defaultTabId = resolveDefaultTab(resolvedSearchParams?.tab);
   const guideScope = wantsDraftPreview ? "draft" : "published";
   const loginNextPath = `/heroes/${hero.slug}${wantsDraftPreview ? "?preview=draft" : ""}`;
   const [{ tabs: guideTabs, editorialLoaded }, allHeroes] = await Promise.all([
@@ -83,6 +101,24 @@ export default async function HeroPage({ params, searchParams }: HeroPageProps) 
   const heroPortraits = buildHeroPortraitEntries(allHeroes);
   const fullTabEditorHref = await getFullTabEditorHref(hero.slug);
 
+  const sortedHeroes = [...allHeroes].sort((a, b) => a.name.localeCompare(b.name));
+  const heroIndex = sortedHeroes.findIndex((entry) => entry.slug === hero.slug);
+  const previousHero =
+    heroIndex > 0
+      ? { slug: sortedHeroes[heroIndex - 1].slug, name: sortedHeroes[heroIndex - 1].name }
+      : heroIndex === 0 && sortedHeroes.length > 1
+        ? {
+            slug: sortedHeroes[sortedHeroes.length - 1].slug,
+            name: sortedHeroes[sortedHeroes.length - 1].name,
+          }
+        : null;
+  const nextHero =
+    heroIndex >= 0 && heroIndex < sortedHeroes.length - 1
+      ? { slug: sortedHeroes[heroIndex + 1].slug, name: sortedHeroes[heroIndex + 1].name }
+      : heroIndex === sortedHeroes.length - 1 && sortedHeroes.length > 1
+        ? { slug: sortedHeroes[0].slug, name: sortedHeroes[0].name }
+        : null;
+
   return (
     <HeroCodexResyncShell heroSlug={hero.slug} heroName={hero.name}>
       <div className="hero-page-shell lab-light-theme min-h-screen">
@@ -90,26 +126,15 @@ export default async function HeroPage({ params, searchParams }: HeroPageProps) 
           wantsDraftPreview={wantsDraftPreview}
           loginNextPath={loginNextPath}
         />
+
         <section className="hero-stage-showcase w-full">
           <HeroLabShowcaseCard
             hero={hero}
+            previousHero={previousHero}
+            nextHero={nextHero}
             toolbarEnd={<HeroCodexResyncTrigger />}
           />
         </section>
-
-        <HeroGuideInlineShell
-          heroSlug={hero.slug}
-          heroId={hero.id}
-          heroName={hero.name}
-          stackLogoUrl={hero.stackLogoImage}
-          guideTabs={guideTabs}
-          editorialLoaded={editorialLoaded}
-          abilityEntries={abilityEntries}
-          heroPortraits={heroPortraits}
-          defaultTabId="overview"
-          supabaseEnabled={isSupabaseEnabled()}
-          fullTabEditorHref={fullTabEditorHref}
-        />
 
         <section
           id="hero-codex-abilities"
@@ -133,6 +158,22 @@ export default async function HeroPage({ params, searchParams }: HeroPageProps) 
             />
           </div>
         </section>
+
+        <div id="hero-guide">
+          <HeroGuideInlineShell
+            heroSlug={hero.slug}
+            heroId={hero.id}
+            heroName={hero.name}
+            stackLogoUrl={hero.stackLogoImage}
+            guideTabs={guideTabs}
+            editorialLoaded={editorialLoaded}
+            abilityEntries={abilityEntries}
+            heroPortraits={heroPortraits}
+            defaultTabId={defaultTabId === "abilities" ? "overview" : defaultTabId}
+            supabaseEnabled={isSupabaseEnabled()}
+            fullTabEditorHref={fullTabEditorHref}
+          />
+        </div>
       </div>
     </HeroCodexResyncShell>
   );

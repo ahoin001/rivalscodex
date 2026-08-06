@@ -14,6 +14,7 @@ export * from "@/components/ui/rivals-light-surface";
 export * from "@/components/ui/rivals-role-badge";
 export * from "@/components/ui/rivals-hero-title";
 export * from "@/components/ui/rivals-tab-bar";
+export * from "@/components/ui/rivals-cta";
 export * from "@/components/ui/rivals-brand-button";
 export * from "@/components/ui/rivals-clip-action";
 export * from "@/components/ui/rivals-sortable";

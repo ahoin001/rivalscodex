@@ -1,5 +1,5 @@
 import type { Hero } from "@/data/schema";
-import type { HeroPortraitEntry } from "@/features/heroes/components/hero-guide-body";
+import type { HeroPortraitEntry } from "@/features/heroes/types";
 import { heroAssetPaths } from "@/lib/rivals-assets-paths";
 
 /**

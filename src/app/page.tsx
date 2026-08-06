@@ -4,7 +4,6 @@ import {
   ClippedButton,
   RivalsFeatureSection,
   RivalsPill,
-  RivalsSectionHeader,
 } from "@/components/ui";
 import { HeroGalleryClient } from "@/features/heroes/components/hero-gallery-client";
 import { DevApiPanel } from "@/features/dev-api/components/dev-api-panel";
@@ -23,43 +22,47 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen">
-      <section className="page-spotlight-band w-full py-10 md:py-14 lg:py-16">
-        <div className={HOME_INNER}>
-          <RivalsSectionHeader
-            eyebrow="Marvel Rivals In-Game Dossier"
-            title="RivalsCodex"
-            description="Fast hero reference for loading-screen prep: abilities, combo recipes, matchup targets, and curated learning resources."
-          />
+      <section className="page-spotlight-band relative w-full overflow-hidden py-8 md:py-10 lg:py-12">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-40"
+          aria-hidden
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 60% at 70% 20%, rgb(var(--brand-gold-rgb)/18%), transparent 55%)",
+          }}
+        />
+        <div className={`${HOME_INNER} relative space-y-6`}>
+          <header className="max-w-3xl space-y-3">
+            <p className="font-display text-[11px] font-bold uppercase italic tracking-[0.28em] text-brand-gold">
+              Marvel Rivals · In-Game Dossier
+            </p>
+            <h1 className="slanted-title font-display text-5xl font-black uppercase italic leading-[0.9] text-rivals-ink sm:text-6xl lg:text-7xl">
+              <span>RivalsCodex</span>
+            </h1>
+            <p className="max-w-xl text-sm leading-relaxed text-rivals-ink-muted sm:text-base">
+              Fast hero reference for loading-screen prep — abilities, combo recipes, and
+              matchup priorities.
+            </p>
+          </header>
+
+          <HeroGalleryClient heroes={heroes} />
         </div>
       </section>
 
-      <section className="page-data-band w-full py-8 lg:py-12">
-        <div className={`${HOME_INNER} space-y-8`}>
-          <RivalsFeatureSection
-            variant="flat"
-            eyebrow="Core Section"
-            title="Hero Codex"
-            description="Browse the heroes we have fully parsed and indexed in our codex. New heroes appear here as soon as they're imported via the dev tools."
-          >
-            <HeroGalleryClient heroes={heroes} />
-          </RivalsFeatureSection>
-
-          {process.env.NODE_ENV === "development" ? (
+      {process.env.NODE_ENV === "development" ? (
+        <section className="page-data-band w-full py-8 lg:py-12">
+          <div className={HOME_INNER}>
             <RivalsFeatureSection
               variant="flat"
-              eyebrow="Core Section"
-              title="Dev Endpoint Panel"
-              description="Organize and test Marvel Rivals heroes endpoints in a secure local-only workflow."
+              eyebrow="Dev Only"
+              title="Endpoint Panel"
+              description="Local Marvel Rivals endpoint testing — never ships to production UI."
               media={
                 <div className="space-y-2">
                   <RivalsPill tone="brand">Dev Tools</RivalsPill>
                   <p className="text-sm leading-6 text-muted-foreground">
-                    Requests run through server routes so the API key never reaches the client while
-                    you iterate on endpoint behavior.
+                    Requests run through server routes so the API key never reaches the client.
                   </p>
-                  <div className="border-t border-brand-gold/40 pt-2 text-xs uppercase tracking-wide text-brand-gold/90">
-                    Local Only · Secure Key Handling · Endpoint Validation
-                  </div>
                   <div className="pt-2">
                     <Link href="/dev/endpoints">
                       <ClippedButton tone="brand" className="w-full md:w-auto">
@@ -72,9 +75,9 @@ export default async function Home() {
             >
               <DevApiPanel />
             </RivalsFeatureSection>
-          ) : null}
-        </div>
-      </section>
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

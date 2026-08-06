@@ -126,7 +126,7 @@ export function RivalsTabBar({
     >
       {!isVertical ? (
         <div
-          className="pointer-events-none absolute bottom-0 z-10 h-[3px] rounded-full bg-brand-gold shadow-[0_0_10px_rgba(201,162,93,0.5)] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+          className="pointer-events-none absolute bottom-0 z-10 h-[3px] rounded-full bg-brand-gold shadow-[0_0_10px_rgb(var(--brand-gold-rgb)/0.5)] transition-[left,width] duration-[var(--motion-medium)] ease-[var(--ease-out-soft)]"
           style={{ left: indicator.left, width: indicator.width }}
           aria-hidden
         />
