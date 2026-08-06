@@ -13,6 +13,9 @@
 # testing
 /coverage
 
+# local codebase knowledge graph
+/graphify-out/
+
 # next.js
 /.next/
 /out/
