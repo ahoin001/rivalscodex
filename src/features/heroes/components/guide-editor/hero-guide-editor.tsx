@@ -19,8 +19,9 @@ import { GoToHeroLink } from "@/features/heroes/components/go-to-hero-link";
 import { RivalsDisclosure } from "@/components/ui/rivals-disclosure";
 
 const DEFAULT_TAB_LABEL: Record<HeroGuideTabId, string> = {
-  overview: "Overview & Playstyle",
+  overview: "Gameplan",
   abilities: "Kit & Mechanics",
+  loadouts: "Loadouts",
   combos: "Combos",
   matchups: "Matchups",
   resources: "Resources",
@@ -456,7 +457,9 @@ function normalizeTabs(input: HeroGuideTabContent[]): HeroGuideTabContent[] {
       id,
       label: DEFAULT_TAB_LABEL[id],
       summary: "Add a short summary for this tab.",
-      ...(id === "notes" ? {} : { primaryPoints: ["First priority cue"] }),
+      ...(id === "notes" || id === "loadouts" || id === "matchups" || id === "abilities"
+        ? {}
+        : { primaryPoints: ["First priority cue"] }),
     };
   });
 }

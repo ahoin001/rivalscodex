@@ -27,13 +27,16 @@ type HeroPageProps = {
 const GUIDE_TAB_IDS: HeroGuideTabId[] = [
   "overview",
   "abilities",
+  "loadouts",
   "combos",
   "matchups",
-  "resources",
   "notes",
 ];
 
 function resolveDefaultTab(tab: string | undefined): HeroGuideTabId {
+  if (tab === "resources") {
+    return "overview";
+  }
   if (tab && (GUIDE_TAB_IDS as string[]).includes(tab)) {
     return tab as HeroGuideTabId;
   }

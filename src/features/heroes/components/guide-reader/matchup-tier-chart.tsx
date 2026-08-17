@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useMemo } from "react";
 import type { HeroGuideBlock } from "@/features/heroes/hero-guide-schema";
 import { Tooltip } from "@/components/ui/tooltip";
+import { HeroPartnerLink } from "@/features/heroes/components/hero-partner-link";
 import {
   buildPortraitLookup,
   findPortraitByOpponent,
@@ -124,7 +124,7 @@ export function MatchupTierChart({
   const hasTargets = targets.length > 0;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-rivals-ink/15 bg-[#12151f] shadow-[inset_0_1px_0_rgb(255_255_255/6%)]">
+    <div className="overflow-hidden rivals-clip-row border border-white/12 bg-surface-hud shadow-[inset_0_1px_0_rgb(255_255_255/6%)]">
       <div className="border-b border-white/8 px-4 py-3 sm:px-5">
         <p className="text-[11px] uppercase tracking-[0.28em] text-white/55">
           Matchup board
@@ -276,7 +276,7 @@ function MatchupIcon({
 
   const iconVisual = (
     <span
-      className={`relative block h-9 w-9 shrink-0 overflow-hidden rounded-md bg-[#1a2030] ring-1 transition-[transform,box-shadow] duration-150 group-hover/matchup-icon:-translate-y-0.5 group-hover/matchup-icon:shadow-lg group-focus-within/matchup-icon:-translate-y-0.5 sm:h-10 sm:w-10 ${ringClass}`}
+      className={`relative block h-9 w-9 shrink-0 overflow-hidden rivals-clip-row bg-surface-input ring-1 transition-[transform,box-shadow] duration-[var(--motion-fast)] ease-[var(--ease-out-soft)] group-hover/matchup-icon:-translate-y-0.5 group-hover/matchup-icon:shadow-lg group-focus-within/matchup-icon:-translate-y-0.5 sm:h-10 sm:w-10 ${ringClass}`}
     >
       {imageSrc ? (
         <Image
@@ -297,13 +297,14 @@ function MatchupIcon({
   return (
     <Tooltip content={tooltip} placement="top" maxWidth="18rem" className="group/matchup-icon">
       {portrait ? (
-        <Link
-          href={`/heroes/${portrait.slug}`}
-          className="inline-flex rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/60"
-          aria-label={`${dispositionLabel}: ${block.opponent}`}
-        >
-          {iconVisual}
-        </Link>
+        <HeroPartnerLink
+          variant="chip"
+          slug={portrait.slug}
+          name={block.opponent}
+          portraitUrl={imageSrc ?? portrait.portraitUrl}
+          ariaLabel={`${dispositionLabel}: ${block.opponent}`}
+          frameClassName={`ring-1 transition-[transform,box-shadow] duration-[var(--motion-fast)] ease-[var(--ease-out-soft)] group-hover/matchup-icon:-translate-y-0.5 group-hover/matchup-icon:shadow-lg group-focus-within/matchup-icon:-translate-y-0.5 ${ringClass}`}
+        />
       ) : (
         <button
           type="button"

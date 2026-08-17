@@ -84,7 +84,7 @@ export function MiniAbilityCard({
 
       {/* Expandable full description */}
       <div
-        className={`grid transition-[grid-template-rows] duration-[220ms] ease-out ${
+        className={`grid transition-[grid-template-rows] duration-[var(--motion-medium)] ease-[var(--ease-out)] ${
           expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
         }`}
       >

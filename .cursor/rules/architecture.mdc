@@ -1,0 +1,24 @@
+---
+description: Layered UI architecture, file caps, and primitive reuse
+alwaysApply: true
+---
+
+# Architecture
+
+Layers (do not mix):
+
+- Tokens / motion: CSS vars `--motion-*` / `--ease-*`. JS timing via `resolveMotionDurationMs`. No raw `duration-[Nms]`, no GSAP/Framer, no `transition-all`.
+- `src/components/ui`: generic primitives used in 2+ unrelated surfaces. No hero-kit PNG chrome, no catalog parse, no route I/O.
+- `src/features/<domain>/components`: compositions. Feature-local helpers stay next to the feature.
+- Adapters (`src/data`, `src/features/<domain>/*.ts`): JSON/schema/lookup/merge. UI never parses catalogs.
+
+Reuse order: existing primitive → new primitive → feature-local split.
+
+Prefer `RivalsCta`, `RivalsTabBar` (chapter nav), `RivalsClipSegment` (compact toggles), `HudReadout`, `HudEmptyState`.
+
+## Anti-god files
+
+- Soft cap ~220 lines, hard cap ~320 for UI files.
+- One primary export per file. Subviews and view-models get their own files.
+- If a file mixes list + detail + view-model + motion + demo data, split before adding more.
+- Extract a primitive at 2+ unrelated uses. Keep kit-only chrome in `features/heroes`.

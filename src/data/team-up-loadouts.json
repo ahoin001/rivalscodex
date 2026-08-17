@@ -1,0 +1,1518 @@
+{
+  "season": "9",
+  "updatedAt": "2026-08-16",
+  "loadouts": [
+    {
+      "ownerSlug": "captain-america",
+      "ownerName": "Captain America",
+      "ownerRole": "Vanguard",
+      "name": "Voltaic Union",
+      "partnerSlug": "thor",
+      "partnerName": "Thor",
+      "baseEffect": "Modify Sentinel Strike into a Lightning Shield projectile. After landing two hits, Captain America launches the piercing Lightning Shield four times.",
+      "enhancedEffect": "When Thor is on your team, each hit from Lightning Shield triggers an extra burst of damage in the surrounding area.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "captain-america",
+      "ownerName": "Captain America",
+      "ownerRole": "Vanguard",
+      "name": "Stars Aligned",
+      "partnerSlug": "winter-soldier",
+      "partnerName": "Winter Soldier",
+      "baseEffect": "Captain America can leap directly to a teammate, providing Bonus Health to both himself and the ally, while redirecting a portion of incoming damage to himself.",
+      "enhancedEffect": "When Winter Soldier is on your team, you can trigger a charge with that player to leap to one another, slamming together to grant Bonus Health and Movement Speed to all nearby friends. The original effect remains, now granting an additional Speed Boost to the targeted teammate.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "doctor-strange",
+      "ownerName": "Doctor Strange",
+      "ownerRole": "Vanguard",
+      "name": "Gamma Maelstrom",
+      "partnerSlug": "hulk",
+      "partnerName": "Hulk",
+      "baseEffect": "Upgrade Maelstrom of Madness to Gamma Maelstrom. This drastically boosts energy charge rates and removes the Anti-Heal curse.",
+      "enhancedEffect": "When Hulk is on your team, releasing Gamma Maelstrom retains some energy, and stored Gamma energy doesn't decay over time.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "doctor-strange",
+      "ownerName": "Doctor Strange",
+      "ownerRole": "Vanguard",
+      "name": "Psionic Vortex",
+      "partnerSlug": "invisible-woman",
+      "partnerName": "Invisible Woman",
+      "baseEffect": "Upgrade Maelstrom of Madness to Psionic Vortex. Enemies caught in are launched toward you. Shield of the Seraphim also gains increased shield value.",
+      "enhancedEffect": "When Invisible Woman is on your team, any damage dealt by Psionic Vortex provides proportional Bonus Health to Doctor Strange.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "hulk",
+      "ownerName": "Hulk",
+      "ownerRole": "Vanguard",
+      "name": "Savage Slam",
+      "partnerSlug": "captain-america",
+      "partnerName": "Captain America",
+      "baseEffect": "Leap high and smash into the ground, dealing damage to enemies and reducing the cooldowns of other abilities based on remaining health.",
+      "enhancedEffect": "When Captain America is on your team, the ground slam additionally applies Vulnerability to enemies hit.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "hulk",
+      "ownerName": "Hulk",
+      "ownerRole": "Vanguard",
+      "name": "Gamma Fastball",
+      "partnerSlug": "wolverine",
+      "partnerName": "Wolverine",
+      "baseEffect": "Enter a Furious state upon activation, gaining Speed Boost and Attack Speed for a duration. Also unlocks Scars of Rage, granting Unstoppable for a period when Health drops below a certain threshold.",
+      "enhancedEffect": "When Wolverine is on your team, unlocks the Fastball Special throw. Upon mutual confirmation, Hulk hurls Wolverine forward and enters the Furious state.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "groot",
+      "ownerName": "Groot",
+      "ownerRole": "Vanguard",
+      "name": "Wild Wall",
+      "partnerSlug": "mantis",
+      "partnerName": "Mantis",
+      "baseEffect": "Summon a Wild Wall that provides Continuous Healing and Bonus Health to allies within range.",
+      "enhancedEffect": "When Mantis is on your team, the Wild Wall evolves after providing a certain amount of healing, increasing its healing output.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "groot",
+      "ownerName": "Groot",
+      "ownerRole": "Vanguard",
+      "name": "Bubble Buddies",
+      "partnerSlug": "jeff-the-land-shark",
+      "partnerName": "Jeff the Land Shark",
+      "baseEffect": "Retreat inside a Bubble Shield to enter an Invincible state, granting self-targeted Continuous Healing.",
+      "enhancedEffect": "When Jeff the Land Shark is on your team, the healing effect inside the bubble is enhanced, and any excess healing converts into Bonus Health.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "venom",
+      "ownerName": "Venom",
+      "ownerRole": "Vanguard",
+      "name": "Blood Leech",
+      "partnerSlug": "blade",
+      "partnerName": "Blade",
+      "baseEffect": "When Cellular Corrosion tethers to enemies, continuously siphon health from every linked target, restoring Venom's health.",
+      "enhancedEffect": "When Blade is on your team, Venom gains a burst of one-time healing when using specific abilities.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "venom",
+      "ownerName": "Venom",
+      "ownerRole": "Vanguard",
+      "name": "Abyssal Flames",
+      "partnerSlug": "phoenix",
+      "partnerName": "Phoenix",
+      "baseEffect": "Ignite the symbiote with Phoenix Flames for a duration, replacing Dark Predation (primary attack) with a sweeping Avian Claw frontal slash.",
+      "enhancedEffect": "When Phoenix is on your team, Venom's Phoenix Force is enhanced, causing every Avian Claw attack to apply a Spark. Upon reaching three stacks, the Sparks detonate.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "magneto",
+      "ownerName": "Magneto",
+      "ownerRole": "Vanguard",
+      "name": "Metallic Chaos",
+      "partnerSlug": "scarlet-witch",
+      "partnerName": "Scarlet Witch",
+      "baseEffect": "Swing a colossal Chaos Greatsword forward to inflict damage over a mid-range.",
+      "enhancedEffect": "When Scarlet Witch is on your team, Mag-Cannon transforms into a charged ability that consumes his passive energy bar. For every tick of energy burned, a Chaos Greatsword is fired, damaging enemies in large bursts.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "magneto",
+      "ownerName": "Magneto",
+      "ownerRole": "Vanguard",
+      "name": "Magnetic Resonance",
+      "partnerSlug": "emma-frost",
+      "partnerName": "Emma Frost",
+      "baseEffect": "Cast a magnetic projection that mimics Magneto's movement and ability casts perfectly from the enemy's perspective.",
+      "enhancedEffect": "When Emma Frost is on your team, the magnetic projection receives a massive health bump and will persist indefinitely unless destroyed manually or recalled.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "the-thing",
+      "ownerName": "The Thing",
+      "ownerRole": "Vanguard",
+      "name": "Two in One",
+      "partnerSlug": "human-torch",
+      "partnerName": "Human Torch",
+      "baseEffect": "Enter an enhanced state upon activation. For the duration, The Thing's fists are violently engulfed in flames. Every Rocky Jab deals splash damage, and every Stone Haymaker creates an explosion, dealing damage in a frontal cone.",
+      "enhancedEffect": "When Human Torch is on your team, Human Torch can lift The Thing into the air and slam him down, dealing damage and Stun to enemies. The Thing automatically enters his flaming state upon landing.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "the-thing",
+      "ownerName": "The Thing",
+      "ownerRole": "Vanguard",
+      "name": "Unbreakable Forces",
+      "partnerSlug": "invisible-woman",
+      "partnerName": "Invisible Woman",
+      "baseEffect": "Generate a layer of Psionic Armor upon activation, granting Bonus Health scaling off currently missing Health.",
+      "enhancedEffect": "When Invisible Woman is on your team, every time The Thing takes a set amount of damage, any activated Psionic Armor pulses out a wave of area healing for allies. Furthermore, the conversion ratio for missing Health into Bonus Health is increased.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "peni-parker",
+      "ownerName": "Peni Parker",
+      "ownerRole": "Vanguard",
+      "name": "Vibranium Mech",
+      "partnerSlug": "black-panther",
+      "partnerName": "Black Panther",
+      "baseEffect": "Upon activation, briefly grants Cyber-Web Cluster an Attack Speed and Damage Boost.",
+      "enhancedEffect": "When Black Panther is on your team, activating the ability deploys a frontal Vibranium Shield, while reducing the Vibranium Energy cost of Cyber-Web Cluster.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "peni-parker",
+      "ownerName": "Peni Parker",
+      "ownerRole": "Vanguard",
+      "name": "Rocket Network",
+      "partnerSlug": "rocket-raccoon",
+      "partnerName": "Rocket Raccoon",
+      "baseEffect": "Deploy an Armored Spider-Nest that periodically drops Spider-Drones and Armor Packs that grant Bonus Health.",
+      "enhancedEffect": "When Rocket Raccoon is on your team, the Armored Spider-Nest passively regenerates its own Health. At the same time, Rocket's B.R.B. will generate Cyber-Webs, and spawn both Spider-Drones and Arachno-Mines.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "thor",
+      "ownerName": "Thor",
+      "ownerRole": "Vanguard",
+      "name": "Ragnarok Rebirth",
+      "partnerSlug": "hela",
+      "partnerName": "Hela",
+      "baseEffect": "Receiving fatal damage prevents immediate defeat, as Thor gains a decaying pool of Bonus Health. If he participates in a K.O. during this time, he resurrects and recovers a small amount of Health.",
+      "enhancedEffect": "When Hela is on your team, if either of them participates in a K.O., Thor instantly revives, restoring Health equal to his remaining Bonus Health and gaining a Continuous Healing effect.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "thor",
+      "ownerName": "Thor",
+      "ownerRole": "Vanguard",
+      "name": "Divine Armory",
+      "partnerSlug": "angela",
+      "partnerName": "Angela",
+      "baseEffect": "Hurl a Thunder Spear that restores Thorforce for each enemy struck. Afterward, Thor can leap to the spear's explosion point, dealing a second wave of damage to all enemies within range.",
+      "enhancedEffect": "When Angela is on your team, leaping to the Thunder Spear grants Bonus Health.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "rogue",
+      "ownerName": "Rogue",
+      "ownerRole": "Vanguard",
+      "name": "Mr. & Mrs. X",
+      "partnerSlug": "gambit",
+      "partnerName": "Gambit",
+      "baseEffect": "After activation, every attack triggers a kinetic explosion, dealing area damage to surrounding enemies while simultaneously healing nearby allies.",
+      "enhancedEffect": "When Gambit is on your team, Rogue remains permanently locked in the Hearts as One state.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "rogue",
+      "ownerName": "Rogue",
+      "ownerRole": "Vanguard",
+      "name": "Explosive Entanglement",
+      "partnerSlug": "magneto",
+      "partnerName": "Magneto",
+      "baseEffect": "Defensive Stance is fortified, as activating the ability expands a magnetic field to drastically boost the Damage Reduction ratio of the move. Furthermore, all damage absorbed by the field is converted directly into damage for Southern Brawl.",
+      "enhancedEffect": "When Magneto is on your team, Southern Brawl knocks back enemies. Extra damage is dealt if they are propelled into a wall.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "angela",
+      "ownerName": "Angela",
+      "ownerRole": "Vanguard",
+      "name": "Odin's Unacknowledged",
+      "partnerSlug": "loki",
+      "partnerName": "Loki",
+      "baseEffect": "Project an illusion forward. The illusion utilizes Assassin's Charge to thrust at enemies. Enemies struck head-on will be carried through the air for a short while.",
+      "enhancedEffect": "When Loki is on your team, this ability gains two charges.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "angela",
+      "ownerName": "Angela",
+      "ownerRole": "Vanguard",
+      "name": "Asgardians of the Galaxy",
+      "partnerSlug": "star-lord",
+      "partnerName": "Star-Lord",
+      "baseEffect": "Activation grants Reveal within a targeted area. Activating this ability again performs a slam attack, applying Grounded to all enemies hit by the slam.",
+      "enhancedEffect": "When Star-Lord is on your team, Angela gains Bonus Health scaling with the number of enemies struck by the slam.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "emma-frost",
+      "ownerName": "Emma Frost",
+      "ownerRole": "Vanguard",
+      "name": "Iced Out Diamond",
+      "partnerSlug": "luna-snow",
+      "partnerName": "Luna Snow",
+      "baseEffect": "Project ice energy forward, dealing damage and slowing enemies. In diamond form, condense frost into an Absolute Zero Diamond barrier that blocks enemy attacks and movement.",
+      "enhancedEffect": "When Luna Snow is on your team, entering Diamond Form imbues all damaging abilities with a Slow effect. Telepathic Pulse will also inflict a Slow effect.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "emma-frost",
+      "ownerName": "Emma Frost",
+      "ownerRole": "Vanguard",
+      "name": "Spirit Breaker",
+      "partnerSlug": "mantis",
+      "partnerName": "Mantis",
+      "baseEffect": "Damaging an enemy's sentience directly converts that damage into Bonus Health.",
+      "enhancedEffect": "When Mantis is on your team, shattering a sentience grants one-time Bonus Health while simultaneously reducing the cooldown of Psychic Spear.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "devil-dinosaur",
+      "ownerName": "Devil Dinosaur",
+      "ownerRole": "Vanguard",
+      "name": "Primal Punishment",
+      "partnerSlug": "the-punisher",
+      "partnerName": "The Punisher",
+      "baseEffect": "Upon activation, replaces Primal Bite with two magnetic cannons that can be fired forward, with the cannonballs detonating when hitting enemies or the environment. These projectiles also apply Bleed.",
+      "enhancedEffect": "When The Punisher is on your team, the duo can mutually interact for The Punisher to ride on top of Devil Dinosaur. While mounted, Devil Dinosaur absorbs a portion of all damage inflicted on The Punisher.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "devil-dinosaur",
+      "ownerName": "Devil Dinosaur",
+      "ownerRole": "Vanguard",
+      "name": "Surf & Turf",
+      "partnerSlug": "jeff-the-land-shark",
+      "partnerName": "Jeff the Land Shark",
+      "baseEffect": "Impact Beam is replaced by a frontal water spray. The stream damages enemies while providing healing to teammates.",
+      "enhancedEffect": "When Jeff the Land Shark is on your team, Jeff can ride atop Devil Dinosaur. While riding, both gain some Damage Reduction and are swirled in waters that grant Continuous Healing. Jeff can only cast Joyful Splash, Aqua Burst, and Healing Bubble during this time.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "deadpool",
+      "ownerName": "Deadpool",
+      "ownerRole": "Vanguard",
+      "name": "Gumbo Chimichangas",
+      "partnerSlug": "gambit",
+      "partnerName": "Gambit",
+      "baseEffect": "Activate for kinetic energy, propelling Deadpool in a forward leap. Upon landing, Vanguard/Duelist Deadpool scatters a ring of kinetically charged Chimichangas that deal damage to enemies. Strategist Deadpool's Chimichangas continuously heal allies.",
+      "enhancedEffect": "When Gambit is on your team, the kinetic energy causes Deadpool's landing to inflict a Stun effect on enemies in the blast radius.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "deadpool",
+      "ownerName": "Deadpool",
+      "ownerRole": "Vanguard",
+      "name": "Hel-Yeah, Honey",
+      "partnerSlug": "hela",
+      "partnerName": "Hela",
+      "baseEffect": "Desert Eagles and Katanas can be upgraded one more time. Duelist/Vanguard Desert Eagles gain pierce and thought bubbles become homing death-rattle bubbles; Katanas inject undead energy that detonates after three hits for percentage damage based on max Health. Strategist versions heal allies when those effects explode.",
+      "enhancedEffect": "When Hela is on your team, both the Desert Eagles and Katanas can be upgraded one extra time.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "deadpool",
+      "ownerName": "Deadpool",
+      "ownerRole": "Duelist",
+      "name": "Gumbo Chimichangas",
+      "partnerSlug": "gambit",
+      "partnerName": "Gambit",
+      "baseEffect": "Activate for kinetic energy, propelling Deadpool in a forward leap. Upon landing, Vanguard/Duelist Deadpool scatters a ring of kinetically charged Chimichangas that deal damage to enemies. Strategist Deadpool's Chimichangas continuously heal allies.",
+      "enhancedEffect": "When Gambit is on your team, the kinetic energy causes Deadpool's landing to inflict a Stun effect on enemies in the blast radius.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "deadpool",
+      "ownerName": "Deadpool",
+      "ownerRole": "Duelist",
+      "name": "Hel-Yeah, Honey",
+      "partnerSlug": "hela",
+      "partnerName": "Hela",
+      "baseEffect": "Desert Eagles and Katanas can be upgraded one more time. Duelist/Vanguard Desert Eagles gain pierce and thought bubbles become homing death-rattle bubbles; Katanas inject undead energy that detonates after three hits for percentage damage based on max Health. Strategist versions heal allies when those effects explode.",
+      "enhancedEffect": "When Hela is on your team, both the Desert Eagles and Katanas can be upgraded one extra time.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "deadpool",
+      "ownerName": "Deadpool",
+      "ownerRole": "Strategist",
+      "name": "Gumbo Chimichangas",
+      "partnerSlug": "gambit",
+      "partnerName": "Gambit",
+      "baseEffect": "Activate for kinetic energy, propelling Deadpool in a forward leap. Upon landing, Vanguard/Duelist Deadpool scatters a ring of kinetically charged Chimichangas that deal damage to enemies. Strategist Deadpool's Chimichangas continuously heal allies.",
+      "enhancedEffect": "When Gambit is on your team, the kinetic energy causes Deadpool's landing to inflict a Stun effect on enemies in the blast radius.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "deadpool",
+      "ownerName": "Deadpool",
+      "ownerRole": "Strategist",
+      "name": "Hel-Yeah, Honey",
+      "partnerSlug": "hela",
+      "partnerName": "Hela",
+      "baseEffect": "Desert Eagles and Katanas can be upgraded one more time. Duelist/Vanguard Desert Eagles gain pierce and thought bubbles become homing death-rattle bubbles; Katanas inject undead energy that detonates after three hits for percentage damage based on max Health. Strategist versions heal allies when those effects explode.",
+      "enhancedEffect": "When Hela is on your team, both the Desert Eagles and Katanas can be upgraded one extra time.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "the-punisher",
+      "ownerName": "The Punisher",
+      "ownerRole": "Duelist",
+      "name": "Ammo Overload",
+      "partnerSlug": "rocket-raccoon",
+      "partnerName": "Rocket Raccoon",
+      "baseEffect": "Throw an Ammo Overload device in the target direction. Upon entering the device's range, receive Faster Firing.",
+      "enhancedEffect": "When Rocket Raccoon is on your team, the device grants Faster Firing and Infinite Ammo.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "the-punisher",
+      "ownerName": "The Punisher",
+      "ownerRole": "Duelist",
+      "name": "Bestial Hunt",
+      "partnerSlug": "daredevil",
+      "partnerName": "Daredevil",
+      "baseEffect": "Shoot a piercing bullet that carries a Damage Boost effect.",
+      "enhancedEffect": "When Daredevil is on your team, the bullet gains increased speed when piercing enemy summoned walls and shields.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "storm",
+      "ownerName": "Storm",
+      "ownerRole": "Duelist",
+      "name": "God of Thunder",
+      "partnerSlug": "thor",
+      "partnerName": "Thor",
+      "baseEffect": "Upgrade Wind Blade into a hitscan lightning beam that detonates upon striking a target.",
+      "enhancedEffect": "When Thor is on your team, Bolt Rush becomes Chain Lightning, allowing it to bounce from foe to foe.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "storm",
+      "ownerName": "Storm",
+      "ownerRole": "Duelist",
+      "name": "Jaws of Fate",
+      "partnerSlug": "jeff-the-land-shark",
+      "partnerName": "Jeff the Land Shark",
+      "baseEffect": "Unleash a torrential downpour that continuously heals both herself and her teammates.",
+      "enhancedEffect": "When Jeff the Land Shark is on your team, casting Omega Hurricane allows Jeff to swim inside the cyclone, generating a localized Jeff-nado.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "hawkeye",
+      "ownerName": "Hawkeye",
+      "ownerRole": "Duelist",
+      "name": "Moonlit Slash",
+      "partnerSlug": "cloak-and-dagger",
+      "partnerName": "Cloak & Dagger",
+      "baseEffect": "Upgrade Crescent Slash to Moonlit Slash, projecting a radiant slash outward. It heals and boosts healing for allies, while damaging enemies and applying Vulnerability.",
+      "enhancedEffect": "When Cloak & Dagger is on your team, Moonlit Slash can be chained into a three-hit combo, firing off three consecutive sweeping light blades.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "hawkeye",
+      "ownerName": "Hawkeye",
+      "ownerRole": "Duelist",
+      "name": "Senbonzakura Strike",
+      "partnerSlug": "psylocke",
+      "partnerName": "Psylocke",
+      "baseEffect": "Upgrade Blast Arrow to Psionic Arrow. While drawn, Hawkeye can continuously bank extra Psionic Arrows. Releasing the bowstring fires all accumulated arrows forward simultaneously.",
+      "enhancedEffect": "When Psylocke is on your team, the nocking speed for each Psionic Arrow is significantly quickened, and they explode upon hitting enemies or the environment.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "magik",
+      "ownerName": "Magik",
+      "ownerRole": "Duelist",
+      "name": "Chain of Cyttorak",
+      "partnerSlug": "doctor-strange",
+      "partnerName": "Doctor Strange",
+      "baseEffect": "Chain of Cyttorak can tether two enemies simultaneously, dragging both targets to the same location.",
+      "enhancedEffect": "When Doctor Strange is on your team, Chain of Cyttorak can tether multiple enemies at once, pulling the entire group to a singular point.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "magik",
+      "ownerName": "Magik",
+      "ownerRole": "Duelist",
+      "name": "Void Pentagram",
+      "partnerSlug": "the-hood",
+      "partnerName": "The Hood",
+      "baseEffect": "Casting Stepping Discs within a Void Magic Circle refunds energy, and each use of Stepping Discs summons a Limbo Demon.",
+      "enhancedEffect": "When The Hood is on your team, the summoned Limbo Demons have heavily increased Health and a wider attack range.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "black-panther",
+      "ownerName": "Black Panther",
+      "ownerRole": "Duelist",
+      "name": "Damisa-Yao",
+      "partnerSlug": "storm",
+      "partnerName": "Storm",
+      "baseEffect": "Trigger the elemental power stored within his armor, dealing damage and applying Slow to surrounding enemies while attaching Vibranium Marks.",
+      "enhancedEffect": "When Storm is on your team, enemies within range are launched toward Black Panther.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "black-panther",
+      "ownerName": "Black Panther",
+      "ownerRole": "Duelist",
+      "name": "Dimensional Shortcut",
+      "partnerSlug": "magik",
+      "partnerName": "Magik",
+      "baseEffect": "Activate a Limbo stepping disc to instantly return to your position from a few seconds ago, gaining Bonus Health in the process. When the teleport ends, the disc collapses in an explosion, damaging nearby enemies and applying Vibranium Marks.",
+      "enhancedEffect": "When Magik is on your team, the teleportation sequence can be manually canceled mid-transit.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "hela",
+      "ownerName": "Hela",
+      "ownerRole": "Duelist",
+      "name": "Hel Tendrils",
+      "partnerSlug": "venom",
+      "partnerName": "Venom",
+      "baseEffect": "Replace Soul Drainer with Hel Tendrils. Upon hit, tendrils pull nearby enemies toward the impact point and link them, Slowing enemies that try to escape.",
+      "enhancedEffect": "When Venom is on your team, Piercing Night fires a dense volley of symbiote-infused Nightsword Thorns. Each direct Nightsword Thorn hit restores a portion of Hela's Health.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "hela",
+      "ownerName": "Hela",
+      "ownerRole": "Duelist",
+      "name": "Deep Wrath",
+      "partnerSlug": "namor",
+      "partnerName": "Namor",
+      "baseEffect": "Whenever Hela participates in a K.O., an Undead Monstro spawns at the fallen enemy's position. While an Undead Monstro is present, casting Piercing Night will command the Monstro to spit a Nightsword Thorn at the nearest enemy.",
+      "enhancedEffect": "When Namor is on your team, each attack during Goddess of Death spawns an Undead Monstro at the point of impact.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "black-widow",
+      "ownerName": "Black Widow",
+      "ownerRole": "Duelist",
+      "name": "Allied Agents",
+      "partnerSlug": "hawkeye",
+      "partnerName": "Hawkeye",
+      "baseEffect": "Landing hits with Red Room Rifle builds Focus. At three stacks, enter a Focused state where the next bullet gains the Hunter's Sight effect, granting Damage Boost and pierce effects.",
+      "enhancedEffect": "When Hawkeye is on your team, landing a critical hit prevents the Focused state from expiring, allowing continuous enhanced fire until missing a crit.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "black-widow",
+      "ownerName": "Black Widow",
+      "ownerRole": "Duelist",
+      "name": "Burning Bullets",
+      "partnerSlug": "phoenix",
+      "partnerName": "Phoenix",
+      "baseEffect": "Activation grants the Red Room Rifle a Fire Rate Boost. Additionally, the Plasma Cannon projectile becomes a hitscan laser that no longer requires charging.",
+      "enhancedEffect": "When Phoenix is on your team, her Plasma Cannon gains a second ability charge.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "squirrel-girl",
+      "ownerName": "Squirrel Girl",
+      "ownerRole": "Duelist",
+      "name": "Squirrel Missile",
+      "partnerSlug": "iron-man",
+      "partnerName": "Iron Man",
+      "baseEffect": "Gain the Squirrel Missile ability. Squirrel Girl directs a squirrel to ride Iron Man's nanotech glove as a homing missile. Upon hit, the squirrel flees just before a fiery explosion.",
+      "enhancedEffect": "When Iron Man is on your team, using Squirrel Blockade simultaneously fires a Squirrel Missile.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "squirrel-girl",
+      "ownerName": "Squirrel Girl",
+      "ownerRole": "Duelist",
+      "name": "ESU Alumnus",
+      "partnerSlug": "spider-man",
+      "partnerName": "Spider-Man",
+      "baseEffect": "Spider-Man gives Squirrel Girl a web bomb. She can launch it to unleash an explosion upon contact with the environment or an enemy, briefly Slowing and damaging enemies caught in the blast.",
+      "enhancedEffect": "When Spider-Man is on your team, Squirrel Girl receives more Web Fluid. After throwing Webbed Acorn, viscous web fluid coats the ground alongside the explosion, leaving behind a sticky Web Area. Enemies within suffer a continuous Slow that scales into a Stun if they linger too long.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "moon-knight",
+      "ownerName": "Moon Knight",
+      "ownerRole": "Duelist",
+      "name": "Luminous Moon",
+      "partnerSlug": "cloak-and-dagger",
+      "partnerName": "Cloak & Dagger",
+      "baseEffect": "Enter Phased state and dash forward. Upon concluding, emit a Light Energy Healing Wave that heals Moon Knight and nearby allies.",
+      "enhancedEffect": "When Cloak & Dagger is on your team, the Phased state duration is extended, the dash distance increases, and the Light Energy Healing Wave boasts a larger radius and stronger healing output.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "moon-knight",
+      "ownerName": "Moon Knight",
+      "ownerRole": "Duelist",
+      "name": "Blood Moon",
+      "partnerSlug": "elsa-bloodstone",
+      "partnerName": "Elsa Bloodstone",
+      "baseEffect": "Deploy an Ankh Trap. Upon triggering, an Ankh materializes at the location, while summoning a single Talon of Khonshu to Launch enemies toward the trap's center.",
+      "enhancedEffect": "When Elsa Bloodstone is on your team, triggering the trap summons multiple Talons of Khonshu to bombard the area.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "scarlet-witch",
+      "ownerName": "Scarlet Witch",
+      "ownerRole": "Duelist",
+      "name": "Sorcerers Supreme",
+      "partnerSlug": "doctor-strange",
+      "partnerName": "Doctor Strange",
+      "baseEffect": "Chthonian Burst is replaced with Mystic Burst upon activation. Hold down the attack button to unleash a rapid, relentless salvo of magical missiles in the target direction.",
+      "enhancedEffect": "When Doctor Strange is on your team, Scarlet Witch's total Chaos Energy pool increases, and Chaos Control generates energy much faster when attacking.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "scarlet-witch",
+      "ownerName": "Scarlet Witch",
+      "ownerRole": "Duelist",
+      "name": "Hex Fireworks",
+      "partnerSlug": "jubilee",
+      "partnerName": "Jubilee",
+      "baseEffect": "Infuse firework energy into the Dark Seal forcefield, turning it into a Plasmoid Seal, allowing for a secondary blast. After expanding the Plasmoid Seal, pressing the input again while it persists will detonate the fireworks, dealing damage and inflicting Vulnerability.",
+      "enhancedEffect": "When Jubilee is on your team, Scarlet Witch receives constant healing from the firework energy while using Mystic Projection.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "spider-man",
+      "ownerName": "Spider-Man",
+      "ownerRole": "Duelist",
+      "name": "Symbiote Bond",
+      "partnerSlug": "venom",
+      "partnerName": "Venom",
+      "baseEffect": "Venom shares a part of his symbiote with Spider-Man, who can convert the symbiotes into explosive spikes that inflict harm on nearby enemies and relentlessly drive them back.",
+      "enhancedEffect": "When Venom is on your team, this triggers additional Touch of Klyntar tendrils that continuously tether and damage enemies on top of the base effect.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "spider-man",
+      "ownerName": "Spider-Man",
+      "ownerRole": "Duelist",
+      "name": "Parker Power-Up",
+      "partnerSlug": "peni-parker",
+      "partnerName": "Peni Parker",
+      "baseEffect": "Peni Parker gives Spider-Man a Sticky Spider-Bomb, which can be primed before tossing it before the timer is up. Timing this right triggers a blast that damages nearby enemies and attaches a Spider-Tracer to them. If not thrown in time, it explodes on Spider-Man, recharging all Web-Cluster shots.",
+      "enhancedEffect": "When Peni Parker is on your team, Spider-Tracers applied by Web-Cluster are upgraded. Detonating these upgraded marks generates Bonus Health for Spider-Man.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "iron-man",
+      "ownerName": "Iron Man",
+      "ownerRole": "Duelist",
+      "name": "Gamma Charge",
+      "partnerSlug": "hulk",
+      "partnerName": "Hulk",
+      "baseEffect": "Upgrade Armor Overdrive to Gamma Overdrive. In this state, Iron Man gains a Gamma Shield and can fire stronger Repulsor Blasts and Unibeams.",
+      "enhancedEffect": "When Hulk is on your team, releasing Invincible Pulse Cannon generates a Gamma Shield and heavily infuses the blast, creating a Gamma Pulse Cannon. Its radiation creates a damage increase while the projectile flies.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "iron-man",
+      "ownerName": "Iron Man",
+      "ownerRole": "Duelist",
+      "name": "Thunder Overdrive",
+      "partnerSlug": "thor",
+      "partnerName": "Thor",
+      "baseEffect": "Enhance Unibeam both in and out of Armor Overdrive. When fired, a ring of volatile lightning energy forms, dealing bonus damage to enemies caught near the beam's edge.",
+      "enhancedEffect": "When Thor is on your team, Armor Overdrive cooldown is massively reduced.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "namor",
+      "ownerName": "Namor",
+      "ownerRole": "Duelist",
+      "name": "Chilling Charisma",
+      "partnerSlug": "luna-snow",
+      "partnerName": "Luna Snow",
+      "baseEffect": "Gain a new ability to summon a Frost Tide forward. The wave damages, pushes back, and inflicts Slow on all enemies hit.",
+      "enhancedEffect": "When Luna Snow is on your team, the Frost Tide gains one charge and crashes down upon reaching its maximum range, dealing area damage and Slowing enemies caught near the endpoint.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "namor",
+      "ownerName": "Namor",
+      "ownerRole": "Duelist",
+      "name": "Gamma Monstro",
+      "partnerSlug": "hulk",
+      "partnerName": "Hulk",
+      "baseEffect": "Summon an extra Gamma Monstro that continuously damages the nearest enemy. Upon landing critical hits, the Gamma Monstro gains increased Attack Speed. Hitting an enemy with Wrath of the Seven Seas prompts it to fire a powerful beam.",
+      "enhancedEffect": "When Hulk is on your team, casting Blessing of the Deep creates a water barrier infused with Gamma energy. Standing inside accelerates the Gamma Monstro cooldown and grants it Bonus Damage.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "star-lord",
+      "ownerName": "Star-Lord",
+      "ownerRole": "Duelist",
+      "name": "Flora Munitions",
+      "partnerSlug": "groot",
+      "partnerName": "Groot",
+      "baseEffect": "Gain a new ability to toss Twisted Thorn Seeds forward. Upon landing, they rapidly Sprout and take root, generating Thorn Snares around the area. Enemies stepping on a snare take damage and suffer a Root effect.",
+      "enhancedEffect": "When Groot is on your team, the number of Thorn Snares deployed increases, and the damage dealt when an enemy steps on them is boosted.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "star-lord",
+      "ownerName": "Star-Lord",
+      "ownerRole": "Duelist",
+      "name": "Star-Soul",
+      "partnerSlug": "adam-warlock",
+      "partnerName": "Adam Warlock",
+      "baseEffect": "Gain a new ability to place a Telekinetic Beacon. You can teleport back to the location where the beacon is deployed from anywhere on the map. Upon defeat, Star-Lord will cocoon and respawn at the beacon's location.",
+      "enhancedEffect": "When Adam Warlock is on your team, every time Star-Lord participates in a K.O., Telekinetic Beacon cooldown is reduced.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "winter-soldier",
+      "ownerName": "Winter Soldier",
+      "ownerRole": "Duelist",
+      "name": "Timeless Veterans",
+      "partnerSlug": "the-punisher",
+      "partnerName": "The Punisher",
+      "baseEffect": "Unlocks the Burst Spike ability. Using the bionic arm, Winter Soldier emits forward electricity, dealing damage and knocking back enemies.",
+      "enhancedEffect": "When The Punisher is on your team, the electric burst provides a Grounded effect and knocks back enemies further.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "winter-soldier",
+      "ownerName": "Winter Soldier",
+      "ownerRole": "Duelist",
+      "name": "Expert Instinct",
+      "partnerSlug": "elsa-bloodstone",
+      "partnerName": "Elsa Bloodstone",
+      "baseEffect": "Securing or participating in a K.O. grants a stack of Culling Instinct. Each stack reduces the cooldowns of Winter Soldier's other abilities. Stacks are lost upon defeat.",
+      "enhancedEffect": "When Elsa Bloodstone is on your team, the Bonus Health generated by Ceaseless Charge is increased.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "iron-fist",
+      "ownerName": "Iron Fist",
+      "ownerRole": "Duelist",
+      "name": "Kumiho Palm",
+      "partnerSlug": "white-fox",
+      "partnerName": "White Fox",
+      "baseEffect": "Hitting an enemy with Yat Jee Chung Kuen provides a burst of healing to nearby allies.",
+      "enhancedEffect": "When White Fox is on your team, the lock-on distance for Yat Jee Chung Kuen is significantly increased.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "iron-fist",
+      "ownerName": "Iron Fist",
+      "ownerRole": "Duelist",
+      "name": "Iron & Stone",
+      "partnerSlug": "the-thing",
+      "partnerName": "The Thing",
+      "baseEffect": "Unleash a powerful uppercut to launch enemies up.",
+      "enhancedEffect": "When The Thing is on your team, unleashing the uppercut can be chained directly into a sweeping leg sweep for a follow-up attack.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "wolverine",
+      "ownerName": "Wolverine",
+      "ownerRole": "Duelist",
+      "name": "Blast Slash",
+      "partnerSlug": "cyclops",
+      "partnerName": "Cyclops",
+      "baseEffect": "Activation extends the attack range of Savage Claw and Berserk Claw Strike. Vicious Rampage is replaced with Kinetic Claws, granting a brief forward lunge that unleashes a flurry of slashes around.",
+      "enhancedEffect": "When Cyclops is on your team, Blast Slash is permanently active.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "wolverine",
+      "ownerName": "Wolverine",
+      "ownerRole": "Duelist",
+      "name": "Pair of Threes",
+      "partnerSlug": "gambit",
+      "partnerName": "Gambit",
+      "baseEffect": "Upon activation, Wolverine receives Kinetic Enhancement, gaining increased Movement Speed and a Jump Boost. Attacking enemies applies Kinetic Particles that detonate after a short delay for bonus damage. The effect only lasts for a short duration.",
+      "enhancedEffect": "When Gambit is on your team, Wolverine receives Continuous Healing for the entire duration of the ability.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "psylocke",
+      "ownerName": "Psylocke",
+      "ownerRole": "Duelist",
+      "name": "Light & Dark Darts",
+      "partnerSlug": "cloak-and-dagger",
+      "partnerName": "Cloak & Dagger",
+      "baseEffect": "Unleash a ring of Light Darts in all directions that damages enemies and restore Psylocke's health upon impact. This also leaves behind a Shadow Domain, where staying inside for a short time will re-enter Psylocke's Stealth.",
+      "enhancedEffect": "When Cloak & Dagger is on your team, the radius of the Shadow Domain expands, and each time re-entering Stealth, the Light Darts are fired in all directions again.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "psylocke",
+      "ownerName": "Psylocke",
+      "ownerRole": "Duelist",
+      "name": "Mental Projection",
+      "partnerSlug": "emma-frost",
+      "partnerName": "Emma Frost",
+      "baseEffect": "Create an illusory projection that automatically dashes forward to use Psi-Blade Dash, while Psylocke enters Stealth. If Psylocke attacks, the illusion mimics her strikes.",
+      "enhancedEffect": "When Emma Frost is on your team, Psylocke's mental powers are elevated, allowing her to reactivate the ability to instantly swap places with her illusion.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "phoenix",
+      "ownerName": "Phoenix",
+      "ownerRole": "Duelist",
+      "name": "Circle of Life",
+      "partnerSlug": "hela",
+      "partnerName": "Hela",
+      "baseEffect": "Psionic Detonation is replaced by Phoenix Netherfire, applying a Telekinetic Mark to the targeted location. Upon hitting, it triggers an initial small explosion that briefly Stuns enemies, followed by two larger explosions that apply a Healing Reduction effect. Every single blast inflicts Sparks onto the enemies.",
+      "enhancedEffect": "When Hela is on your team, every blast in this sequence applies multiple stacks of Sparks to enemies caught within.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "phoenix",
+      "ownerName": "Phoenix",
+      "ownerRole": "Duelist",
+      "name": "Telekinetic Beatdown",
+      "partnerSlug": "rogue",
+      "partnerName": "Rogue",
+      "baseEffect": "Fire a telekinetic shockwave forward. If it lands, the Phoenix Force rushes the enemy and delivers a powerful punch. If there are other targets nearby, the Phoenix Force rapidly blinks between them to strike them as well, inflicting a Spark on each victim while healing Phoenix.",
+      "enhancedEffect": "When Rogue is on your team, add an additional Spark stack, gain more healing, and increase the maximum number of strikes from this Team-Up.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "human-torch",
+      "ownerName": "Human Torch",
+      "ownerRole": "Duelist",
+      "name": "Fiery Sparks",
+      "partnerSlug": "jubilee",
+      "partnerName": "Jubilee",
+      "baseEffect": "Passively detect enemies in the immediate vicinity and launch tracking Firework Sparks to chip away at their health.",
+      "enhancedEffect": "When Jubilee is on your team, successfully landing a Firework Spark on an enemy grants Human Torch Bonus Health.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "human-torch",
+      "ownerName": "Human Torch",
+      "ownerRole": "Duelist",
+      "name": "Storming Ignition",
+      "partnerSlug": "storm",
+      "partnerName": "Storm",
+      "baseEffect": "Unleash a storm-driven blaze of fire forward, generating a persistent Fire Vortex upon impact that continuously damages enemies and pulls them inward.",
+      "enhancedEffect": "When Storm is on your team, her Omega Hurricane ignites into a Burning Hurricane if it crosses a Flame Tornado. Also, any Omega Hurricane, Jeff-Nado, or Burning Hurricane that sweeps across a Flame Field will instantly generate a new Flame Tornado.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "mister-fantastic",
+      "ownerName": "Mister Fantastic",
+      "ownerRole": "Duelist",
+      "name": "Fantastic Amplifier",
+      "partnerSlug": "rocket-raccoon",
+      "partnerName": "Rocket Raccoon",
+      "baseEffect": "Equips the Fantastic Amplifier, a tool that allows Mister Fantastic's Elasticity maximum to be increased for a duration. Mister Fantastic can also actively enter the Inflation State manually with this Team-Up.",
+      "enhancedEffect": "When Rocket Raccoon is on your team, Brainiac Bounce launches up hit enemies.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "mister-fantastic",
+      "ownerName": "Mister Fantastic",
+      "ownerRole": "Duelist",
+      "name": "Clobberin' Research Dept.",
+      "partnerSlug": "the-thing",
+      "partnerName": "The Thing",
+      "baseEffect": "In brawler stance, Stretch Punch becomes a charged ability, firing forward a Brawling Punch. Hitting an enemy grants Bonus Health scaling with damage, and a full charge hit launches enemies.",
+      "enhancedEffect": "When The Thing is on your team, while in the brawling stance, Distended Grip also becomes a charged ability, slamming down a Distended Hammer. Hitting enemies grants Bonus Health based on damage, and a full charge hit launches enemies.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "daredevil",
+      "ownerName": "Daredevil",
+      "ownerRole": "Duelist",
+      "name": "Comprehensive Defense",
+      "partnerSlug": "iron-fist",
+      "partnerName": "Iron Fist",
+      "baseEffect": "Objection! is enhanced. Whirling billy clubs now damage all enemies in range while deflecting projectiles from all directions. Successfully deflecting attacks recovers Fury.",
+      "enhancedEffect": "When Iron Fist is on your team, Daredevil passively recovers Health for the entire duration of the ability.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "daredevil",
+      "ownerName": "Daredevil",
+      "ownerRole": "Duelist",
+      "name": "Devilish Affair",
+      "partnerSlug": "black-widow",
+      "partnerName": "Black Widow",
+      "baseEffect": "Swings Devil's Chain in a criss-cross pattern, dealing damage to enemies in front and inflicting Slow.",
+      "enhancedEffect": "When Black Widow is on your team, the damage radius of the Team-Up is expanded, and landing hits recovers Fury.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "blade",
+      "ownerName": "Blade",
+      "ownerRole": "Duelist",
+      "name": "Blade of Khonshu",
+      "partnerSlug": "moon-knight",
+      "partnerName": "Moon Knight",
+      "baseEffect": "Perform a heavy forward cleave with the Ancestral Sword while performing a short dash. At the end of the dash, swiftly slash four times, each strike sending a Darkmoon Blade forward. When a Darkmoon Blade hits an enemy, it bounces to nearby targets.",
+      "enhancedEffect": "When Moon Knight is on your team, each Whirlwind Slash triggered generates one additional Darkmoon Blade.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "blade",
+      "ownerName": "Blade",
+      "ownerRole": "Duelist",
+      "name": "Bleed for Battle",
+      "partnerSlug": "captain-america",
+      "partnerName": "Captain America",
+      "baseEffect": "For every set amount of damage taken, Blade builds a stock of Bloodline Awakening.",
+      "enhancedEffect": "When Captain America is on your team, taking critical damage instantly triggers the Bloodline Awakening state, gaining bonus stacks while raising the overall stock cap.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "elsa-bloodstone",
+      "ownerName": "Elsa Bloodstone",
+      "ownerRole": "Duelist",
+      "name": "Prehistoric Trap",
+      "partnerSlug": "devil-dinosaur",
+      "partnerName": "Devil Dinosaur",
+      "baseEffect": "After deploying the Smoky Snare trap, Diablo will monitor the area. If enemies approach, Diablo immobilizes and damages them. He also releases a lethal gas, causing continuous area damage.",
+      "enhancedEffect": "When Devil Dinosaur is on your team, Elsa can store and deploy two Smoky Snares.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "elsa-bloodstone",
+      "ownerName": "Elsa Bloodstone",
+      "ownerRole": "Duelist",
+      "name": "Loudmouth Mercs",
+      "partnerSlug": "deadpool",
+      "partnerName": "Deadpool",
+      "baseEffect": "Living Bullet changes to special rounds that Taunt targets with Deadpool's chatter, while Slowing and damaging nearby enemies over time. After a timer, the bullet auto-recalls, healing Elsa based on the damage dealt while adding one extra gauge block to her Inherited Instinct passive cap.",
+      "enhancedEffect": "When Deadpool is on your team, Deadpool breaks the fourth wall, significantly boosting Instinct acquisition rate.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "black-cat",
+      "ownerName": "Black Cat",
+      "ownerRole": "Duelist",
+      "name": "Feline Alliance",
+      "partnerSlug": "black-panther",
+      "partnerName": "Black Panther",
+      "baseEffect": "Taking damage accumulates Vibranium Energy. Upon reaching a specific threshold, Black Cat unleashes a violent explosion, damaging and knocking back surrounding enemies while gaining a brief Speed Boost and Bonus Health.",
+      "enhancedEffect": "When Black Panther is on your team, this explosion is no longer restricted by the energy threshold, and can be triggered at any time.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "black-cat",
+      "ownerName": "Black Cat",
+      "ownerRole": "Duelist",
+      "name": "Binding Ties",
+      "partnerSlug": "spider-man",
+      "partnerName": "Spider-Man",
+      "baseEffect": "Turn of Fortune is replaced by Spider-Web Grapple, which has two charges. Landing the grapple on an enemy steals Fortune and applies a Spider-Tracer. If Black Cat hits an enemy carrying a Spider-Tracer with any other ability, she triggers the mark to deal bonus damage.",
+      "enhancedEffect": "When Spider-Man is on your team, using Spider-Web Grapple to hit an enemy already marked with a Spider-Tracer temporarily Immobilizes them in place.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "cyclops",
+      "ownerName": "Cyclops",
+      "ownerRole": "Duelist",
+      "name": "Slim and Red",
+      "partnerSlug": "phoenix",
+      "partnerName": "Phoenix",
+      "baseEffect": "Hitting an enemy with Ricochet Force summons the Phoenix Force to ignite them, causing continuous burn damage over a set duration. Hitting an ignited target with Optic Blast or Concussive Beam instantly triggers a percentage of the remaining burn damage as a single burst.",
+      "enhancedEffect": "When Phoenix is on your team, Spark detonations reduce the cooldown of Ricochet Force.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "cyclops",
+      "ownerName": "Cyclops",
+      "ownerRole": "Duelist",
+      "name": "Kinetic Bros",
+      "partnerSlug": "gambit",
+      "partnerName": "Gambit",
+      "baseEffect": "Release stored kinetic energy to enter an enhanced state for a duration. While active, Cyclops gains significantly increased movement speed and jump height.",
+      "enhancedEffect": "When Gambit is on your team, during the enhanced state of the Team-Up, the attack speeds for both Optic Blast and Concussive Beam are increased.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "rocket-raccoon",
+      "ownerName": "Rocket Raccoon",
+      "ownerRole": "Strategist",
+      "name": "Planet X Pals",
+      "partnerSlug": "groot",
+      "partnerName": "Groot",
+      "baseEffect": "Convert Bombard Mode to launch Thorny Spores. Upon impact, they deal continuous damage to enemies within the radius while healing and granting Bonus Health to allies.",
+      "enhancedEffect": "When Groot is on your team, Rocket can ride on Groot's shoulders, and the active duration of the Thorny Spores field is extended.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "rocket-raccoon",
+      "ownerName": "Rocket Raccoon",
+      "ownerRole": "Strategist",
+      "name": "Mammalian Bond",
+      "partnerSlug": "squirrel-girl",
+      "partnerName": "Squirrel Girl",
+      "baseEffect": "Toss out a scattered batch of augmented Vitality Acorns. Acorns that hit the floor can be collected. Whether struck directly or picked up, teammates receive a burst of healing and global cooldown reduction.",
+      "enhancedEffect": "When Squirrel Girl is on your team, the maximum charge count for this ability is increased.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "mantis",
+      "ownerName": "Mantis",
+      "ownerRole": "Strategist",
+      "name": "Star Blossom",
+      "partnerSlug": "star-lord",
+      "partnerName": "Star-Lord",
+      "baseEffect": "Recasting Healing Flower on a teammate with the effect enhances and spreads the healing aura.",
+      "enhancedEffect": "When Star-Lord is on your team, using Healing Flower on any teammate instantly triggers the enhanced spell field and healing effect.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "mantis",
+      "ownerName": "Mantis",
+      "ownerRole": "Strategist",
+      "name": "Vitality Pact",
+      "partnerSlug": "adam-warlock",
+      "partnerName": "Adam Warlock",
+      "baseEffect": "Upon defeat, Mantis can freely move as a soul, healing nearby allies, and reforge her body at a chosen spot. After using Natural Anger, the effect of Nature's Favor is enhanced, increasing the amount of healing provided.",
+      "enhancedEffect": "When Adam Warlock is on your team, her soul state can forge Soul Bond with nearby teammates, granting Healing Over Time and distributing damage taken across the bond.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "loki",
+      "ownerName": "Loki",
+      "ownerRole": "Strategist",
+      "name": "Vibrant Vitality",
+      "partnerSlug": "mantis",
+      "partnerName": "Mantis",
+      "baseEffect": "Regeneration Domain provides a Damage Boost effect to allies within range; the Runestone triggers a psychic catalysis, expanding the domain's radius.",
+      "enhancedEffect": "When Mantis is on your team, deploying Regeneration Domain emits a shockwave of nature energy that damages enemies within the radius and slightly Launch them up.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "loki",
+      "ownerName": "Loki",
+      "ownerRole": "Strategist",
+      "name": "Villain's Illusion",
+      "partnerSlug": "hela",
+      "partnerName": "Hela",
+      "baseEffect": "Gain a new ability to target fallen heroes (friend or foe), letting Loki assume their form for a set time (cannot cast their Ultimate Ability).",
+      "enhancedEffect": "When Hela is on your team, Loki's transformation lasts slightly longer. Furthermore, taking lethal damage while transformed or in his Ultimate Ability state will merely revert him back to Loki with some Health, preventing a KO.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "adam-warlock",
+      "ownerName": "Adam Warlock",
+      "ownerRole": "Strategist",
+      "name": "Cosmic Cyclone",
+      "partnerSlug": "storm",
+      "partnerName": "Storm",
+      "baseEffect": "Teammates linked by Soul Bond receive a Speed Boost.",
+      "enhancedEffect": "When Storm is on your team, linked teammates additionally gain a Damage Boost.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "adam-warlock",
+      "ownerName": "Adam Warlock",
+      "ownerRole": "Strategist",
+      "name": "Flawless Design",
+      "partnerSlug": "ultron",
+      "partnerName": "Ultron",
+      "baseEffect": "Cosmic Cluster now provides healing to allies.",
+      "enhancedEffect": "When Ultron is on your team, Cosmic Cluster creates an explosion upon impact.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "luna-snow",
+      "ownerName": "Luna Snow",
+      "ownerRole": "Strategist",
+      "name": "Atlas Bond",
+      "partnerSlug": "white-fox",
+      "partnerName": "White Fox",
+      "baseEffect": "Unleash a spirit fox forward that Charms enemies while healing any allies in its path. Activating the ability instantly cleanses all negative status effects on Luna Snow.",
+      "enhancedEffect": "When White Fox is on your team, the spirit fox automatically returns after reaching its maximum distance, and the self-cleanse is retained.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "luna-snow",
+      "ownerName": "Luna Snow",
+      "ownerRole": "Strategist",
+      "name": "Duality Dance",
+      "partnerSlug": "adam-warlock",
+      "partnerName": "Adam Warlock",
+      "baseEffect": "Cast Soul Bond to tether all characters within range. Attacking tethered enemies or healing linked allies restores your Health.",
+      "enhancedEffect": "When Adam Warlock is on your team, scoring critical hits with Light & Dark Ice reduces the cooldowns of Absolute Zero and Ice Arts.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "cloak-and-dagger",
+      "ownerName": "Cloak & Dagger",
+      "ownerRole": "Strategist",
+      "name": "Oblivion Shroud",
+      "partnerSlug": "the-hood",
+      "partnerName": "The Hood",
+      "baseEffect": "Veil of Lightforce and Terror Cape are warped by void magic, changing into Twilight Veil and Void Veil while retaining their original effects. After traveling a set distance, the veils halt in place. Enemy damage passing through the Twilight Veil is weakened, while enemy healing passing through the Void Veil suffers Healing Reduction.",
+      "enhancedEffect": "When The Hood is on your team, the width of both the Twilight Veil and Void Veil expands. Additionally, allies passing through the veils are empowered by hellfire energy, gaining Damage Boost for a duration.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "cloak-and-dagger",
+      "ownerName": "Cloak & Dagger",
+      "ownerRole": "Strategist",
+      "name": "Frozen Haven",
+      "partnerSlug": "luna-snow",
+      "partnerName": "Luna Snow",
+      "baseEffect": "Channel frost energy outward to encase yourself in an absolute block of ice. This offers great protection, but Freezes you in place. While frozen, you can be healed and emit a weak healing aura to nearby allies.",
+      "enhancedEffect": "When Luna Snow is on your team, the healing aura provided to allies while Frozen becomes significantly stronger.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "ultron",
+      "ownerName": "Ultron",
+      "ownerRole": "Strategist",
+      "name": "Stark Protocol",
+      "partnerSlug": "iron-man",
+      "partnerName": "Iron Man",
+      "baseEffect": "Upgrade Encephalo-Ray to Nano-Ray, firing multiple damaging nano-projectiles forward.",
+      "enhancedEffect": "When Iron Man is on your team, Imperative: Firewall fires powerful homing missiles at enemies within range, causing area damage.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "ultron",
+      "ownerName": "Ultron",
+      "ownerRole": "Strategist",
+      "name": "SP//DR Sync",
+      "partnerSlug": "peni-parker",
+      "partnerName": "Peni Parker",
+      "baseEffect": "Apply Imperative: Patch to all allies.",
+      "enhancedEffect": "When Peni Parker is on your team, Imperative: Firewall applies to all drones, allowing the ability effects to be triggered multiple times simultaneously.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "invisible-woman",
+      "ownerName": "Invisible Woman",
+      "ownerRole": "Strategist",
+      "name": "United Siblings",
+      "partnerSlug": "human-torch",
+      "partnerName": "Human Torch",
+      "baseEffect": "Generate a Flame Shield for a targeted ally that blocks incoming damage while providing a Continuous Healing aura to everyone nearby. Projectiles from teammates shot through the Flame Shield receive a Damage Boost. Enemies that pass through the shield are Slowed.",
+      "enhancedEffect": "When Human Torch is on your team, the Flame Shield boasts a larger radius and heavily increased shield value.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "invisible-woman",
+      "ownerName": "Invisible Woman",
+      "ownerRole": "Strategist",
+      "name": "First Family",
+      "partnerSlug": "mister-fantastic",
+      "partnerName": "Mister Fantastic",
+      "baseEffect": "Invisible Woman and surrounding allies enter Invisible state, gaining healing and a Speed Boost. The effect ends if they take damage or the duration expires. Disengaging from combat for a duration will re-enter the Invisible state.",
+      "enhancedEffect": "When Mister Fantastic is on your team, the healing and Speed Boost effects are enhanced, and the Invisible state duration is increased.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "jeff-the-land-shark",
+      "ownerName": "Jeff the Land Shark",
+      "ownerRole": "Strategist",
+      "name": "Guardian of the Deep",
+      "partnerSlug": "venom",
+      "partnerName": "Venom",
+      "baseEffect": "Shoot out healing tendrils; linked allies receive Continuous Healing, and excess healing is converted into Bonus Health.",
+      "enhancedEffect": "When Venom is on your team, symbiote tendrils can also lash out at nearby enemies within range, inflicting continuous damage.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "jeff-the-land-shark",
+      "ownerName": "Jeff the Land Shark",
+      "ownerRole": "Strategist",
+      "name": "Mr. Pool's Interdimensional Toy Box",
+      "partnerSlug": "deadpool",
+      "partnerName": "Deadpool",
+      "baseEffect": "Gain a new ability to spit out a Deadpool Plushie. The plushie continuously Taunts nearby enemies while spraying a healing mist onto surrounding allies.",
+      "enhancedEffect": "When Deadpool is on your team, the Deadpool Plushie asserts a stronger Taunt while continuously damaging enemies caught in its radius.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "white-fox",
+      "ownerName": "White Fox",
+      "ownerRole": "Strategist",
+      "name": "Lucky Loan",
+      "partnerSlug": "black-cat",
+      "partnerName": "Black Cat",
+      "baseEffect": "White Fox receives an Orb of Life from Black Cat. Upon use, it recovers Spirit Tail energy and converts life energy into Nine-Tailed Aura that shoots out in all directions. This automatically tracks nearby allies and enemies, granting Speed and Healing to allies while damaging and Slowing enemies.",
+      "enhancedEffect": "When Black Cat is on your team, using the Orb triggers a state where Spirit Tail Energy is no longer consumed for a duration, allowing free use of Spectral Surge and Fox Form Awakening.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "white-fox",
+      "ownerName": "White Fox",
+      "ownerRole": "Strategist",
+      "name": "Psionic Fox",
+      "partnerSlug": "psylocke",
+      "partnerName": "Psylocke",
+      "baseEffect": "Activating Fox Form Awakening no longer consumes Spirit Tail Energy, and grants the maximum possible duration immediately upon use.",
+      "enhancedEffect": "When Psylocke is on your team, the cooldown for Fox Form Awakening is drastically reduced.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "gambit",
+      "ownerName": "Gambit",
+      "ownerRole": "Strategist",
+      "name": "Favorable Odds",
+      "partnerSlug": "magneto",
+      "partnerName": "Magneto",
+      "baseEffect": "Throw two magnetic playing cards forward. Upon hitting the environment or a character, the two cards magnetically repel and unfurl, spinning in place for a duration. They heal allies when hit, while damaging and launching up enemies.",
+      "enhancedEffect": "When Magneto is on your team, after the duration of the Team-Up ends, the magnetic poles of the two cards reverse. They violently slam back together and explode, providing an extra burst of healing to allies and damage to enemies.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "gambit",
+      "ownerName": "Gambit",
+      "ownerRole": "Strategist",
+      "name": "Sparkling Staff",
+      "partnerSlug": "jubilee",
+      "partnerName": "Jubilee",
+      "baseEffect": "Twirl your firework-energy enhanced bo staff. The radiating firework sparks provide healing to nearby allies. Concurrently, the staff deals damage to close-range enemies, and the rapid spinning blocks incoming damage from most projectiles.",
+      "enhancedEffect": "When Jubilee is on your team, both Bayou Bash and Big Easy Impact gain an additional Continuous Healing aura.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "jubilee",
+      "ownerName": "Jubilee",
+      "ownerRole": "Strategist",
+      "name": "Hellfire Sparks",
+      "partnerSlug": "the-hood",
+      "partnerName": "The Hood",
+      "baseEffect": "When Attack Speed is enhanced, Energy Plasmoids transform into a hitscan attack that grants self-healing on hit and is capable of dealing critical hits.",
+      "enhancedEffect": "When The Hood is on your team, the Void Magic Mark is never cleared, allowing her to indefinitely sustain the hitscan attack form.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    },
+    {
+      "ownerSlug": "jubilee",
+      "ownerName": "Jubilee",
+      "ownerRole": "Strategist",
+      "name": "Vampiric Kin",
+      "partnerSlug": "blade",
+      "partnerName": "Blade",
+      "baseEffect": "Deploy a Vampiric Field. Allies standing within the field gain Life Steal when attacking enemies.",
+      "enhancedEffect": "When Blade is on your team, allies inside the field receive an additional Continuous Healing effect.",
+      "sources": [
+        "https://screenrant.com/marvel-rivals-season-9-every-how-to-use-every-team-up/",
+        "https://dotesports.com/marvel/news/marvel-rivals-team-up-abilities-explained-listed"
+      ]
+    }
+  ]
+}

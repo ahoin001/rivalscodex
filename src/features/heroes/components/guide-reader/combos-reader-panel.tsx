@@ -56,7 +56,7 @@ function getComboStepCount(block: ComboBlock): number {
 }
 
 const pickerChipBase =
-  "inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-display font-semibold uppercase tracking-[0.12em] transition-all duration-[var(--motion-fast)] ease-[var(--ease-out-soft)]";
+  "rivals-clip-tab inline-flex min-h-8 shrink-0 items-center gap-1.5 px-2.5 py-1 text-[10px] font-display font-semibold uppercase tracking-[0.12em] transition-[background-color,color,border-color,transform] duration-[var(--motion-fast)] ease-[var(--ease-out-soft)] active:scale-[0.97]";
 
 function ComboPickerChip({
   combo,

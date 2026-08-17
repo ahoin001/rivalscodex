@@ -1,0 +1,160 @@
+<div class="hero-abilties">
+    <h3 class="title">ABILITIES</h3>
+    <div class="abilties-wrap">
+      <div class="abilties-l">
+        <div class="role-picture">
+          
+          <div class="jobnav">
+            
+            <a href="javascript:;" class="jobbtn" data-type="0"></a>
+            
+            <a href="javascript:;" class="jobbtn" data-type="1"></a>
+            
+            <a href="javascript:;" class="jobbtn" data-type="2"></a>
+          </div>
+          <img class="role-pic" src="https://r.res.easebar.com/pic/20260416/52d63b17-8793-44c9-8134-387d5e249bb6.png" alt="">
+          <p class="role-name more">Black Cat</p>
+          <a href="javascript:;" class="basic-btn">
+            <span>BASE STATS</span>
+          </a>
+          <div class="xt-wrap"><a href="javascript:;" data-type="0" class="on">
+              <img src="https://r.res.easebar.com/pic/20260416/13a9a895-86b0-43fd-b182-2c230d38a61f.png" alt="Black Cat">
+            </a><a href="javascript:;" data-type="1" class="">
+              <img src="https://r.res.easebar.com/pic/20260416/8fc39281-1c61-4d51-8d09-a3bbd62be2ac.png" alt="Black Cat">
+            </a><a href="javascript:;" data-type="2" class="">
+              <img src="https://r.res.easebar.com/pic/20260416/b88fc77d-3b5e-4802-87de-6c38485e32c1.png" alt="Black Cat">
+            </a></div>
+        </div>
+        <div class="skill-scroll">
+          <div class="inner-wrap">
+            <div class="scroll-box">
+              <div class="skill-info">
+                <h5>NORMAL ATTACK</h5>
+                <ul><li data-type="3" "="">
+                  <p class="tag1"><img src="https://www.marvelrivals.com/pc/gw/20241128194803/img/sbzj_5901af42.png" alt=""></p>
+                  <div class="img">
+                    <img src="https://r.res.easebar.com/pic/20260416/b418cfa2-f3dd-4eae-b205-967e67831cf7.png" alt="FELINE FURY">
+                  </div>
+                  <p class="tag2">FELINE FURY</p>
+                </li></ul>
+              </div>
+              <div class="skill-info">
+                <h5>ABILITIES</h5>
+                <ul><li data-type="4" "="">
+                  <p class="tag1">Q</p>
+                  <div class="img">
+                    <img src="https://r.res.easebar.com/pic/20260416/c1b8429e-cbce-4c01-ad81-b1255d6ddbb8.png" alt="CALLING CARD">
+                  </div>
+                  <p class="tag2">CALLING CARD</p>
+                </li><li data-type="5" "="">
+                  <p class="tag1">SHIFT</p>
+                  <div class="img">
+                    <img src="https://r.res.easebar.com/pic/20260416/0724214f-fa9d-4530-803b-02b40f0b9af7.png" alt="CAT'S CRADLE">
+                  </div>
+                  <p class="tag2">CAT'S CRADLE</p>
+                </li><li data-type="6" "="">
+                  <p class="tag1">E</p>
+                  <div class="img">
+                    <img src="https://r.res.easebar.com/pic/20260416/46a0da80-3314-466d-aab1-41bc525fc793.png" alt="TURN OF FORTUNE">
+                  </div>
+                  <p class="tag2">TURN OF FORTUNE</p>
+                </li><li data-type="7" "="">
+                  <p class="tag1">SPACE</p>
+                  <div class="img">
+                    <img src="https://r.res.easebar.com/pic/20260416/331db52b-ea1e-4d74-a4c7-c27fa17ec1a5.png" alt="THIEVING GRACE">
+                  </div>
+                  <p class="tag2">THIEVING GRACE</p>
+                </li><li data-type="8" "="">
+                  <p class="tag1"><img src="https://www.marvelrivals.com/pc/gw/20241128194803/img/sbyj_ec1b2d5e.png" alt=""></p>
+                  <div class="img">
+                    <img src="https://r.res.easebar.com/pic/20260416/f20a3d87-0110-46b5-ae9c-e942746833cd.png" alt="FORTUNE'S FAVOR">
+                  </div>
+                  <p class="tag2">FORTUNE'S FAVOR</p>
+                </li><li data-type="9" "="">
+                  <p class="tag1">SPACE</p>
+                  <div class="img">
+                    <img src="https://r.res.easebar.com/pic/20260416/76e1a388-8bcd-40cb-b9b9-cbfea50d5264.png" alt="STEALTHY CATWALK">
+                  </div>
+                  <p class="tag2">STEALTHY CATWALK</p>
+                </li><li data-type="10" "="">
+                  <p class="tag1">PASSIVE</p>
+                  <div class="img">
+                    <img src="https://r.res.easebar.com/pic/20260416/048b7e20-1062-44e0-9ae2-588cbb9d4fc8.png" alt="MALKIN MISFORTUNE">
+                  </div>
+                  <p class="tag2">MALKIN MISFORTUNE</p>
+                </li></ul>
+              </div>
+              <div class="skill-info lx-info">
+                <div class="lxhead">
+                  <h5>TEAM-UP ABILITIES</h5>
+                  <div class="lxbox">
+    <a href="javascript:;" class="lx-hero" data-lx="0">
+      <img src="https://r.res.easebar.com/pic/20260707/b5d2a70b-62d2-4db9-8fec-cf3d4c00dbdf.png" alt="">
+    </a>
+    <a href="javascript:;" class="lx-hero on" data-lx="1">
+      <img src="https://r.res.easebar.com/pic/20260707/1644013e-ce0f-4cb8-9e2c-6a68c6ef77a5.png" alt="">
+    </a></div>
+                </div>
+                <h5 class="lx-base"><span>BASE EFFECT</span></h5>
+                <ul><li data-type="31" "="" class="on">
+                  <p class="tag1">E</p>
+                  <div class="img">
+                    <img src="https://r.res.easebar.com/pic/20260707/262ef028-4fc2-42d5-8340-713856dbe63d.png" alt="BINDING TIES">
+                  </div>
+                  <p class="tag2">BINDING TIES</p>
+                </li></ul>
+              </div>
+              <div class="skill-info lx-info">
+                <h5 class="lx-base"><span>ENHANCED EFFECT</span></h5>
+                <ul><li data-type="32" "="" class="">
+                  <p class="tag1">E</p>
+                  <div class="img">
+                    <img src="https://r.res.easebar.com/pic/20260707/262ef028-4fc2-42d5-8340-713856dbe63d.png" alt="BINDING TIES">
+                  </div>
+                  <p class="tag2">BINDING TIES</p>
+                </li></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="abilties-r jcsx">
+        <h3 class="basic">BASE STATS</h3>
+        <div class="sx-all sx1-all">
+          <div class="inner-wrap">
+            <div class="scroll-box"><div class="sxz">
+      <div>HEALTH</div>
+      <span class="num">150+125 Regenerative Shield</span>
+    </div><div class="sxz">
+      <div>MOVEMENT SPEED</div>
+      <span class="num">600</span>
+    </div></div>
+          </div>
+        </div>
+      </div>
+      <div class="abilties-r jnsx on">
+        <div class="jnsx-top">
+          <h3>BINDING TIES</h3>
+          <div class="top-info">
+            <p>E</p>
+            <span>Base Effect: Turn of Fortune is replaced by Spider-Web Grapple, which has 2 charges. Landing the grapple on an enemy steals Fortune and applies a Spider-Tracer. If Black Cat hits an enemy carrying a Spider-Tracer with any other ability, she triggers the mark to deal bonus damage.<br>
+        Enhanced Effect: When teaming up with Spider-Man, using Spider-Web Grapple to hit an enemy already marked with a Spider-Tracer temporarily Immobilizes them in place.</span>
+          </div>
+        </div>
+        <div class="sx-all sx2-all">
+          <div class="inner-wrap">
+            <div class="scroll-box"><div class="sxz">
+                <div>KEY</div>
+                <span class="num img-num">E</span>
+              </div><div class="sxz">
+                <div>COOLDOWN</div>
+                <span class="num ">2 charges, 5s each</span>
+              </div><div class="sxz">
+                <div>BONUS DAMAGE ON MARK TRIGGE</div>
+                <span class="num ">45</span>
+              </div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

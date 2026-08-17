@@ -44,7 +44,7 @@ type LinkProps = SharedProps &
 export type RivalsCtaProps = ButtonProps | LinkProps;
 
 const motionClass =
-  "transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--motion-fast)] ease-[var(--ease-out-soft)] active:scale-[0.985] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/45 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
+  "transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--motion-fast)] ease-[var(--ease-out-soft)] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/45 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
 
 const labSize: Record<RivalsCtaSize, string> = {
   sm: "min-h-10 px-3 py-1.5 text-[11px] tracking-[0.18em]",

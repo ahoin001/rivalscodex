@@ -15,13 +15,18 @@ export const HERO_GUIDE_CONTENT_STRATEGY = "supabase-editorial-v1" as const;
 export const HERO_GUIDE_TAB_ORDER = [
   "overview",
   "abilities",
+  "loadouts",
   "combos",
   "matchups",
-  "resources",
   "notes",
 ] as const;
 
-export const heroGuideTabIdSchema = z.enum(HERO_GUIDE_TAB_ORDER);
+export const HERO_GUIDE_LEGACY_TAB_IDS = ["resources"] as const;
+
+export const heroGuideTabIdSchema = z.enum([
+  ...HERO_GUIDE_TAB_ORDER,
+  ...HERO_GUIDE_LEGACY_TAB_IDS,
+]);
 
 export type HeroGuideTabId = z.infer<typeof heroGuideTabIdSchema>;
 
@@ -108,6 +113,16 @@ export const heroGuideBlockSchema = z.discriminatedUnion("type", [
     strengths: z.array(heroGuideProConItemSchema).min(1).max(8),
     weaknesses: z.array(heroGuideProConItemSchema).min(1).max(8),
   }),
+  z.object({
+    type: z.literal("loadout"),
+    name: z.string().trim().min(1).max(120),
+    baseEffect: z.string().trim().min(1).max(1200),
+    enhancedEffect: z.string().trim().max(1200).optional(),
+    partnerSlug: z.string().trim().max(80).optional(),
+    partnerName: z.string().trim().max(80).optional(),
+    whenToPick: z.string().trim().max(500).optional(),
+    soloQueueDefault: z.boolean().optional(),
+  }),
 ]);
 
 export type HeroGuideBlock = z.infer<typeof heroGuideBlockSchema>;
@@ -123,7 +138,12 @@ export const heroGuideTabContentSchema = z
     body: z.array(heroGuideBlockSchema).max(32).optional(),
   })
   .superRefine((tab, ctx) => {
-    if (tab.id === "notes" || tab.id === "abilities" || tab.id === "matchups") {
+    if (
+      tab.id === "notes" ||
+      tab.id === "abilities" ||
+      tab.id === "matchups" ||
+      tab.id === "loadouts"
+    ) {
       return;
     }
     const primaryLen = tab.primaryPoints?.length ?? 0;

@@ -20,7 +20,7 @@ export function StatRow({
       <span className={accent ? "text-brand-gold" : "text-muted-foreground"}>
         {label}
       </span>
-      <span className="font-semibold text-white">{value}</span>
+      <span className="font-semibold tabular-nums text-white">{value}</span>
     </div>
   );
 }

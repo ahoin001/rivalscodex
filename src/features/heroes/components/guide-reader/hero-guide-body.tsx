@@ -20,6 +20,7 @@ import { BlockAbilityTip } from "./hero-guide-body/block-ability-tip";
 import { BlockMatchup } from "./hero-guide-body/block-matchup";
 import { BlockVideo } from "./hero-guide-body/block-video";
 import { BlockStrengthsWeaknesses } from "./hero-guide-body/block-strengths-weaknesses";
+import { LoadoutsTabPanel } from "@/features/heroes/components/loadouts-tab-panel";
 import {
   ComboFilterPills,
   DifficultyGroupHeader,
@@ -261,6 +262,12 @@ export function HeroGuideBody({
               strengths={block.strengths}
               weaknesses={block.weaknesses}
             />
+          </GuideSection>
+        );
+      case "loadout":
+        return (
+          <GuideSection id={navItem.id}>
+            <LoadoutsTabPanel blocks={[block]} heroPortraits={heroPortraits} />
           </GuideSection>
         );
     }

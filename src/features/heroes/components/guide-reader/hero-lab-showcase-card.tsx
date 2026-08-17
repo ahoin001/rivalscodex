@@ -5,6 +5,7 @@ import { RivalsHeroTitle } from "@/components/ui";
 import { RivalsClipAction } from "@/components/ui/rivals-clip-action";
 import type { Hero } from "@/data/schema";
 import { RIVALS_FRAMES } from "@/lib/rivals-assets-paths";
+import { HeroPortraitTransition } from "@/features/heroes/transition";
 
 export type AdjacentHeroLink = {
   slug: string;
@@ -28,6 +29,7 @@ const roleColorByName: Record<Hero["role"], string> = {
 const CHAPTER_RAIL = [
   { href: "#hero-codex-abilities", label: "Abilities" },
   { href: "#hero-guide", label: "Guide" },
+  { href: "#hero-guide", label: "Loadouts", hashHint: "loadouts" as const },
   { href: "#hero-guide", label: "Combos", hashHint: "combos" as const },
 ] as const;
 
@@ -171,14 +173,16 @@ export function HeroLabShowcaseCard({
           "
           id="hero-showcase-transition-target"
         >
-          <Image
-            src={foregroundSrc}
-            alt={`${hero.name} full body art`}
-            fill
-            priority
-            sizes="(max-width: 640px) 78vw, (max-width: 1024px) 58vw, 50vw"
-            className="object-contain object-bottom object-right drop-shadow-[0_22px_40px_rgba(40,39,54,0.45)]"
-          />
+          <HeroPortraitTransition slug={hero.slug}>
+            <Image
+              src={foregroundSrc}
+              alt={`${hero.name} full body art`}
+              fill
+              priority
+              sizes="(max-width: 640px) 78vw, (max-width: 1024px) 58vw, 50vw"
+              className="object-contain object-bottom object-right drop-shadow-[0_22px_40px_rgba(40,39,54,0.45)]"
+            />
+          </HeroPortraitTransition>
         </div>
 
         <div

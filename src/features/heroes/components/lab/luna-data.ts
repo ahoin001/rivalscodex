@@ -208,7 +208,7 @@ export const LUNA_BASE_STATS: Array<{ label: string; value: string }> = [
 export const LUNA_HERO_GUIDE_TABS: LunaHeroGuideTabContent[] = [
   {
     id: "overview",
-    label: "Overview & Playstyle",
+    label: "Gameplan",
     summary: "Luna Snow · Strategist · Difficulty 3 / 5",
     body: [
       {
@@ -282,6 +282,10 @@ export const LUNA_HERO_GUIDE_TABS: LunaHeroGuideTabContent[] = [
           "Bank Absolute Zero for peel or confirmed follow-up, not for solo poke damage.",
         ],
       },
+    ],
+    links: [
+      { label: "Marvel Rivals API", href: "https://marvelrivalsapi.com/" },
+      { label: "Official Hero Page", href: "https://www.marvelrivals.com/heros/" },
     ],
   },
   {
@@ -383,22 +387,22 @@ export const LUNA_HERO_GUIDE_TABS: LunaHeroGuideTabContent[] = [
     ],
   },
   {
-    id: "resources",
-    label: "Resources",
+    id: "loadouts",
+    label: "Loadouts",
     summary:
-      "Curated guide stack: short-form mechanics drills, structured matchup notes, and macro VOD references.",
-    primaryPoints: [
-      "Bookmark concise mechanics clips for warm-up consistency.",
-      "Track 3 problematic matchups per patch with execution counter notes.",
-      "Refresh resources after every balance update to avoid outdated tactics.",
-    ],
-    secondaryPoints: [
-      "Prefer guides with explicit decision criteria, not just montage cuts.",
-      "Review at least one high-rank Luna POV per session for macro reads.",
-    ],
-    links: [
-      { label: "Marvel Rivals API", href: "https://marvelrivalsapi.com/" },
-      { label: "Official Hero Page", href: "https://www.marvelrivals.com/heros/" },
+      "Pick a Team-Up loadout for the Base effect in solo queue, then swap in spawn if your partner is present.",
+    body: [
+      {
+        type: "loadout",
+        name: "Idol Stage",
+        baseEffect:
+          "Share the Stage still buffs a chosen ally. Use it as a self-sufficient tempo tool when your partner is not in the lobby.",
+        enhancedEffect:
+          "When the named partner is present, Share the Stage also refunds a slice of cooldown and extends the buff window.",
+        partnerName: "Namor",
+        whenToPick: "Default in solo queue. Swap only if your partner locks in.",
+        soloQueueDefault: true,
+      },
     ],
   },
   {

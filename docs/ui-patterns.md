@@ -16,6 +16,19 @@ import { ClippedPanel, HudSection, RivalsCta, RivalsSectionHeader } from "@/comp
 
 Canonical design rules also live in [`DESIGN.md`](../DESIGN.md).
 
+## Architecture layers
+
+| Layer | Lives in | Owns |
+|---|---|---|
+| Tokens / motion | `src/app/globals.css`, `src/components/ui/motion.ts` | Duration/easing CSS vars; JS reads them via `resolveMotionDurationMs` |
+| UI primitives | `src/components/ui` | Generic controls. No kit PNG chrome, no catalog parse, no route I/O |
+| Feature compositions | `src/features/<domain>/components` | Screens that compose primitives. Split list/detail/hooks into sibling files |
+| Adapters | `src/features/<domain>/*.ts`, `src/data` | Schema, lookup, merge. UI never parses catalogs |
+
+**File caps:** UI files soft ~220 lines, hard ~320. One primary export per file. Split before mixing list + detail + view-model + motion + demo data.
+
+**Reuse order:** existing primitive → small new primitive → feature-local split.
+
 ## Layout Patterns
 
 - `RivalsPageShell`
@@ -39,6 +52,10 @@ Canonical design rules also live in [`DESIGN.md`](../DESIGN.md).
   - `tone="secondary"` for supporting sections.
 - `StatRow`
   - Standard label/value row for any stat list.
+- `HudReadout`
+  - Technical HUD label/value row with `tabular-nums` (`tone="chrome" | "lab"`).
+- `HudEmptyState`
+  - Clipped “NO INTEL” empty panel for missing guide chapters.
 - `RivalsPill`
   - Reusable metadata chip for tags, status, and stat badges.
 - `RivalsCta`
@@ -46,19 +63,30 @@ Canonical design rules also live in [`DESIGN.md`](../DESIGN.md).
   - Supports `href` for link buttons. Prefer this for new work.
 - `ClippedButton` / `RivalsBrandButton` / `RivalsClipAction`
   - Legacy wrappers over `RivalsCta` — still fine at call sites; do not extend further.
-- `RivalsTabBar`, `RivalsRoleBadge`, `RivalsHeroTitle`
-  - Tabs, role labeling, and giant slanted titles.
+- `RivalsTabBar`, `RivalsClipSegment`, `RivalsRoleBadge`, `RivalsHeroTitle`
+  - `RivalsTabBar` is chapter navigation (gold underline). `RivalsClipSegment` is a compact 2–n clip toggle (Base/Enhanced, matchup filters). Do not fake chapter tabs for tiny segments.
 - `RivalsInput`
   - Standardized input field with brand focus and placeholder behavior.
 
 ## Theme Rules
 
 - Use tokenized colors (`brand-gold`, `muted-foreground`, role colors) from `src/app/globals.css`.
-- Use shared motion tokens (`--motion-*`, `--ease-*`) and runtime helpers from `src/components/ui/motion.ts` for any JS-driven timing.
+- Use shared motion tokens (`--motion-*`, `--ease-*`) and runtime helpers from `src/components/ui/motion.ts` for any JS-driven timing. No raw `duration-[Nms]`, no GSAP/Framer, no `transition-all`.
 - Prefer primitives over raw utility duplication.
-- If adding a repeated pattern in 2+ places, extract a `ui` component before expanding feature code.
+- If adding a repeated pattern in 2+ unrelated places, extract a `ui` component before expanding feature code. Hero-kit PNG chrome and catalog overlay stay in `features/heroes`.
 - Keep role accents semantically tied to hero role; use gold as global brand framing.
 - Keep repeated table/row definitions in a shared preset registry (`src/components/ui/presets/*`) so columns and stat layouts can be edited from one place.
+
+## HUD Assemble
+
+Shared-element morphs and clip-path continuity live on the Rivals materials — not a Jarvis overlay.
+
+- **Portrait morph:** wrap gallery and splash art with `HeroPortraitTransition` (`hero-portrait-${slug}`). Names live in `src/features/heroes/transition/`.
+- **Pointer only:** tab/filter morphs run on pointer. Keyboard tab changes must stay instant (`RivalsTabBar` / `RivalsClipSegment` pass `source: "keyboard"`).
+- **Loadout primitive:** `type: "loadout"` blocks belong on the Loadouts chapter only (`canUseBlockOnTab`). Empty chapters use `HudEmptyState`.
+- **Combo playback:** user-started, skippable, never autoplay; `prefersHudAssembleMotion()` gates Play.
+- Ban `transition-all` and `--ease-in` on UI primitives. Specify transform/opacity/color/clip-path.
+- `prefers-reduced-motion`: disable View Transitions and playback; keep color/opacity status.
 
 ## Preset Naming Conventions
 
@@ -76,8 +104,11 @@ Canonical design rules also live in [`DESIGN.md`](../DESIGN.md).
 4. Use `ClippedPanel`/`HudSection` for containers (avoid ad-hoc border/bg combinations).
 5. Use `StatRow` and `RivalsPill` instead of one-off rows/chips.
 6. Use `RivalsDataTableSection` for repeated row/column data (abilities, stats tables, etc.).
-7. Use `ClippedButton` and `RivalsInput` for controls.
-8. Run `npm run lint` and `npm run build`.
+7. Use `RivalsCta` and `RivalsInput` for controls.
+8. Use `HudEmptyState` for missing editorial chapters and `HudReadout` for kit/combo stats.
+9. Shared portrait morphs: wrap gallery and splash art with `HeroPortraitTransition`.
+10. Keyboard tab changes must skip clip-reveal (`onChange(id, "keyboard")`).
+11. Run `npm run lint` and `npm run build`.
 
 ## UI PR Checklist
 

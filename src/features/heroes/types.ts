@@ -41,6 +41,8 @@ function getBlockLabel(block: HeroGuideBlock, index: number): string {
       return block.title;
     case "strengthsWeaknesses":
       return block.title ?? "Strengths & Weaknesses";
+    case "loadout":
+      return block.name;
   }
 }
 

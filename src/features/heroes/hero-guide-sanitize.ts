@@ -131,6 +131,28 @@ function sanitizeBlock(block: unknown): unknown {
     return next;
   }
 
+  if (type === "loadout") {
+    const next = { ...b };
+    const name = typeof next.name === "string" ? next.name.trim() : "";
+    next.name = name.length > 0 ? name.slice(0, 120) : "Team-Up loadout";
+    const baseEffect = typeof next.baseEffect === "string" ? next.baseEffect.trim() : "";
+    next.baseEffect =
+      baseEffect.length > 0
+        ? baseEffect.slice(0, 1200)
+        : "Base effect is available without the named partner.";
+    if (typeof next.enhancedEffect === "string") {
+      const enhanced = next.enhancedEffect.trim();
+      if (enhanced) next.enhancedEffect = enhanced.slice(0, 1200);
+      else delete next.enhancedEffect;
+    }
+    if (typeof next.whenToPick === "string") {
+      const when = next.whenToPick.trim();
+      if (when) next.whenToPick = when.slice(0, 500);
+      else delete next.whenToPick;
+    }
+    return next;
+  }
+
   if (type === "video") {
     const watchUrl = typeof b.watchUrl === "string" ? b.watchUrl.trim() : "";
     if (!isValidUrl(watchUrl)) {

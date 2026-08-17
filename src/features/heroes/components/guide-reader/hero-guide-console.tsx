@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import Image from "next/image";
-import { RivalsTab, RivalsTabBar } from "@/components/ui";
+import { RivalsCta, RivalsTab, RivalsTabBar } from "@/components/ui";
 import type {
   HeroGuideTabContent,
   HeroGuideTabId,
@@ -21,9 +21,9 @@ import {
 } from "@/features/heroes/components/hero-guide-body";
 import { CombosTabPanel } from "@/features/heroes/components/combos-tab-panel";
 import { MatchupsTabPanel } from "@/features/heroes/components/matchups-tab-panel";
-import { ResourcesTabPanel } from "@/features/heroes/components/resources-tab-panel";
 import { KitTabPanel } from "@/features/heroes/components/kit-tab-panel";
 import { NotesTabPanel } from "@/features/heroes/components/notes-tab-panel";
+import { LoadoutsTabPanel } from "@/features/heroes/components/loadouts-tab-panel";
 import { GuideTabFallback } from "@/features/heroes/components/guide-tab-fallback";
 import type { ResolvedAbilityRef } from "@/features/heroes/ability-lookup";
 import { useOptionalAbilityLookup } from "@/features/heroes/components/ability-lookup-provider";
@@ -128,8 +128,9 @@ function GuideSectionNav({
 }
 
 const GUIDE_TAB_SHORT_LABELS: Record<HeroGuideTabId, string> = {
-  overview: "Overview",
+  overview: "Gameplan",
   abilities: "Kit",
+  loadouts: "Loadouts",
   combos: "Combos",
   matchups: "Matchups",
   resources: "Resources",
@@ -154,6 +155,7 @@ export function HeroGuideConsole({
   const [activeTabId, setActiveTabId] = useState<HeroGuideTabId>(
     (initialTabId ?? "overview") as HeroGuideTabId,
   );
+  const [tabMorph, setTabMorph] = useState<"pointer" | "keyboard">("pointer");
 
   const backdropImage = stackLogoUrl ?? RIVALS_LUNA.stackLogo;
   const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0];
@@ -285,7 +287,7 @@ export function HeroGuideConsole({
               </p>
             ) : (
               <p className="max-w-xl text-sm leading-relaxed text-white/70">
-                Overview, combos, matchups, and resources for {heroName}.
+                Gameplan, loadouts, combos, and matchups for {heroName}.
               </p>
             )}
           </div>
@@ -297,7 +299,10 @@ export function HeroGuideConsole({
         <RivalsTabBar
           tabs={tabBarItems}
           activeTabId={activeTabId}
-          onChange={(tabId) => setActiveTabId(tabId as HeroGuideTabId)}
+          onChange={(tabId, source) => {
+            setTabMorph(source === "keyboard" ? "keyboard" : "pointer");
+            setActiveTabId(tabId as HeroGuideTabId);
+          }}
           idBase={tabListIdBase}
           getPanelId={() => activePanelId}
           className="-mx-1 px-1 sm:mx-0 sm:px-0"
@@ -324,7 +329,10 @@ export function HeroGuideConsole({
 
           <div
             key={activeTabId}
-            className="flex min-w-0 flex-col overflow-x-hidden pt-4 tab-enter"
+            data-morph={tabMorph}
+            className={`flex min-w-0 flex-col overflow-x-hidden pt-4 hud-clip-reveal ${
+              tabMorph === "keyboard" ? "tab-enter-instant" : "tab-enter"
+            }`}
           >
             {showGenericSectionNav ? (
               <>
@@ -358,8 +366,8 @@ export function HeroGuideConsole({
                   primaryPoints={activeTab.primaryPoints}
                   secondaryPoints={activeTab.secondaryPoints}
                 />
-              ) : activeTabId === "resources" ? (
-                <ResourcesTabPanel tab={activeTab} anchorPrefix={bodyAnchorPrefix} />
+              ) : activeTabId === "loadouts" ? (
+                <LoadoutsTabPanel blocks={activeTab.body ?? []} heroPortraits={heroPortraits} />
               ) : activeTab.body && activeTab.body.length > 0 ? (
                 <HeroGuideBody
                   blocks={activeTab.body}
@@ -374,19 +382,21 @@ export function HeroGuideConsole({
               />
             )}
 
-            {activeTab.links && activeTab.links.length > 0 && activeTabId !== "resources" ? (
+            {activeTab.links && activeTab.links.length > 0 && activeTabId === "overview" ? (
               <footer className="mt-auto flex flex-wrap gap-2.5 border-t border-rivals-light-300 pt-4">
                 {activeTab.links.map((link) => (
-                  <a
+                  <RivalsCta
                     key={link.href}
                     href={link.href}
+                    context="lab"
+                    variant="gold-solid"
+                    size="sm"
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex min-h-11 items-center gap-2 rounded-md bg-rivals-yellow-500 px-3.5 py-2 font-display text-xs uppercase italic tracking-[0.16em] text-rivals-ink transition-colors hover:bg-rivals-yellow-400"
                   >
                     <span>{link.label}</span>
                     <span aria-hidden>&rarr;</span>
-                  </a>
+                  </RivalsCta>
                 ))}
               </footer>
             ) : null}

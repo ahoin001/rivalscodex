@@ -58,7 +58,7 @@ export function BlockMatchup({
   const tone = TONE[disposition];
 
   return (
-    <div className={`group overflow-hidden rounded border transition-all duration-200 hover:shadow-sm ${tone.shell}`}>
+    <div className={`group overflow-hidden rivals-clip-row border transition-[box-shadow,transform] duration-[var(--motion-fast)] ease-[var(--ease-out-soft)] hover:-translate-y-0.5 ${tone.shell}`}>
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
@@ -66,7 +66,7 @@ export function BlockMatchup({
         className="flex w-full items-center gap-3 px-4 py-3 text-left"
       >
         {portrait ? (
-          <div className="relative h-10 w-14 shrink-0 overflow-hidden rounded-lg border border-rivals-ink/10 bg-[#121726]">
+          <div className="relative h-10 w-14 shrink-0 overflow-hidden rivals-clip-row border border-rivals-ink/10 bg-surface-hud">
             <Image
               src={portrait.stackLogoUrl}
               alt={portrait.name}
@@ -108,7 +108,7 @@ export function BlockMatchup({
       </button>
 
       <div
-        className={`grid transition-[grid-template-rows] duration-[250ms] ease-out ${
+        className={`grid transition-[grid-template-rows] duration-[var(--motion-medium)] ease-[var(--ease-out)] ${
           expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
         }`}
       >

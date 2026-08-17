@@ -22,7 +22,7 @@ export function RivalsStatLine({
       <span className="font-display text-xs font-semibold uppercase italic tracking-[0.18em] text-rivals-ink-soft sm:text-[13px]">
         {label}
       </span>
-      <span className="text-right text-sm font-semibold text-rivals-ink sm:text-[15px]">
+      <span className="text-right text-sm font-semibold tabular-nums text-rivals-ink sm:text-[15px]">
         {value}
       </span>
     </div>

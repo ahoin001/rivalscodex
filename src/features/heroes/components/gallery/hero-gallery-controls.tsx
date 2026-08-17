@@ -1,4 +1,4 @@
-import { ClippedButton, ClippedPanel, RivalsInput } from "@/components/ui";
+import { ClippedPanel, RivalsCta, RivalsInput } from "@/components/ui";
 import {
   HeroRoleFilter,
   heroRoleFilterOptions,
@@ -28,15 +28,16 @@ export function HeroGalleryControls({
     >
       <div className="flex flex-wrap gap-2">
         {heroRoleFilterOptions.map((option) => (
-          <ClippedButton
+          <RivalsCta
             key={option}
+            context="chrome"
+            variant="brand"
             active={activeRole === option}
             onClick={() => onRoleChange(option)}
             className="min-w-24"
-            tone="brand"
           >
             {option}
-          </ClippedButton>
+          </RivalsCta>
         ))}
       </div>
 
@@ -50,13 +51,14 @@ export function HeroGalleryControls({
             className="mt-1 sm:w-52"
           />
         </label>
-        <ClippedButton
+        <RivalsCta
+          context="chrome"
+          variant="brand"
           active={showFavoritesOnly}
           onClick={() => onFavoritesOnlyChange(!showFavoritesOnly)}
-          tone="brand"
         >
           Favorites Only
-        </ClippedButton>
+        </RivalsCta>
       </div>
     </ClippedPanel>
   );

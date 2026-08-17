@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Hero, HeroRole } from "@/data/schema";
 import { ClippedPanel } from "@/components/ui/clipped-panel";
 import { roleColorClass } from "@/features/heroes/role-utils";
+import { HeroPortraitTransition } from "@/features/heroes/transition";
 
 type HeroCardProps = {
   hero: Hero;
@@ -82,19 +83,21 @@ export function HeroCard({
         />
 
         <div className="relative aspect-[3/4] w-full overflow-hidden">
-          <Image
-            src={hero.portraitImage}
-            alt=""
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-            quality={60}
-            loading={prioritizeImage ? "eager" : "lazy"}
-            fetchPriority={prioritizeImage ? "high" : "auto"}
-            className="object-cover object-top transition-transform duration-[var(--motion-slow)] ease-[var(--ease-out-soft)] group-hover:scale-[1.06]"
-          />
+          <HeroPortraitTransition slug={hero.slug}>
+            <Image
+              src={hero.portraitImage}
+              alt=""
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+              quality={60}
+              loading={prioritizeImage ? "eager" : "lazy"}
+              fetchPriority={prioritizeImage ? "high" : "auto"}
+              className="object-cover object-top transition-transform duration-[var(--motion-slow)] ease-[var(--ease-out-soft)] motion-safe:group-hover:scale-[1.06]"
+            />
+          </HeroPortraitTransition>
 
           <div
-            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0a0c14] via-[#0a0c14]/55 to-transparent"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/55 to-transparent"
             aria-hidden
           />
           <div
@@ -130,7 +133,7 @@ export function HeroCard({
                 <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/65 sm:text-[10px]">
                   HP
                 </span>
-                <span className="font-display text-lg italic leading-none text-brand-gold sm:text-xl">
+                <span className="font-display text-lg italic leading-none text-brand-gold tabular-nums sm:text-xl">
                   {hero.health}
                 </span>
               </div>
@@ -146,7 +149,7 @@ export function HeroCard({
         onClick={() => onToggleFavorite(hero.id)}
         aria-label={isFavorite ? `Remove ${hero.name} from favorites` : `Add ${hero.name} to favorites`}
         aria-pressed={isFavorite}
-        className={`absolute right-3 top-3 z-30 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-sm transition-all duration-[var(--motion-fast)] active:scale-95 ${
+        className={`absolute right-3 top-3 z-30 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-sm transition-[transform,background-color,border-color,box-shadow] duration-[var(--motion-fast)] ease-[var(--ease-out-soft)] active:scale-[0.97] ${
           isFavorite
             ? "border-brand-gold bg-brand-gold/95 shadow-[0_0_14px_rgb(var(--brand-gold-rgb)/50%)]"
             : "border-white/25 bg-black/45 hover:border-brand-gold hover:bg-black/65"

@@ -14,7 +14,7 @@ export const HERO_GUIDE_BLOCK_REGISTRY: BlockRegistryEntry[] = [
   {
     type: "callout",
     label: "Callout",
-    allowedTabs: ["overview", "resources"],
+    allowedTabs: ["overview"],
     readerId: "BlockCallout",
   },
   {
@@ -26,13 +26,13 @@ export const HERO_GUIDE_BLOCK_REGISTRY: BlockRegistryEntry[] = [
   {
     type: "bullets",
     label: "Bullets",
-    allowedTabs: ["overview", "resources"],
+    allowedTabs: ["overview"],
     readerId: "BlockBullets",
   },
   {
     type: "twoColumn",
     label: "Two columns",
-    allowedTabs: ["overview", "resources"],
+    allowedTabs: ["overview"],
     readerId: "BlockTwoColumn",
   },
   {
@@ -54,9 +54,15 @@ export const HERO_GUIDE_BLOCK_REGISTRY: BlockRegistryEntry[] = [
     readerId: "BlockMatchup",
   },
   {
+    type: "loadout",
+    label: "Team-Up loadout",
+    allowedTabs: ["loadouts"],
+    readerId: "BlockLoadout",
+  },
+  {
     type: "video",
     label: "Video",
-    allowedTabs: ["overview", "abilities", "combos", "matchups", "resources"],
+    allowedTabs: ["overview", "abilities", "combos", "matchups", "loadouts", "resources"],
     readerId: "BlockVideo",
   },
 ];

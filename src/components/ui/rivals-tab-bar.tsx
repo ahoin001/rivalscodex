@@ -17,10 +17,12 @@ export type RivalsTab = {
   icon?: ReactNode;
 };
 
+export type TabChangeSource = "pointer" | "keyboard";
+
 type RivalsTabBarProps = {
   tabs: RivalsTab[];
   activeTabId: string;
-  onChange: (tabId: string) => void;
+  onChange: (tabId: string, source?: TabChangeSource) => void;
   className?: string;
   orientation?: "horizontal" | "vertical";
   idBase?: string;
@@ -73,7 +75,7 @@ export function RivalsTabBar({
       const normalized = (index + tabs.length) % tabs.length;
       const nextTab = tabs[normalized];
       if (!nextTab) return;
-      onChange(nextTab.id);
+      onChange(nextTab.id, "keyboard");
       buttonRefs.current[normalized]?.focus();
     },
     [tabs, onChange],
@@ -149,8 +151,8 @@ export function RivalsTabBar({
               buttonRefs.current[index] = node;
             }}
             onKeyDown={(event) => handleKeyDown(event, index)}
-            onClick={() => onChange(tab.id)}
-            className={`rivals-clip-tab inline-flex min-h-11 shrink-0 snap-start items-center gap-2 whitespace-nowrap px-4 py-2.5 font-display text-xs font-bold uppercase italic tracking-[0.16em] transition-[background-color,color,box-shadow,transform] duration-[var(--motion-fast)] ease-[var(--ease-out-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-rivals-light-100 active:scale-[0.985] sm:px-5 sm:py-2 sm:text-base sm:tracking-[0.18em] ${
+            onClick={() => onChange(tab.id, "pointer")}
+            className={`rivals-clip-tab inline-flex min-h-11 shrink-0 snap-start items-center gap-2 whitespace-nowrap px-4 py-2.5 font-display text-xs font-bold uppercase italic tracking-[0.16em] transition-[background-color,color,box-shadow,transform] duration-[var(--motion-fast)] ease-[var(--ease-out-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-rivals-light-100 active:scale-[0.97] sm:px-5 sm:py-2 sm:text-base sm:tracking-[0.18em] ${
               isActive
                 ? "bg-rivals-yellow-500 text-rivals-ink shadow-[0_4px_18px_rgba(251,220,44,0.35)]"
                 : "bg-rivals-light-200 text-rivals-ink-soft hover:-translate-y-px hover:bg-rivals-light-300 hover:text-rivals-ink"

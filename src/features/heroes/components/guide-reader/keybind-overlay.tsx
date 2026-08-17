@@ -55,7 +55,7 @@ export function KeybindOverlay({ abilityLookup, heroName }: KeybindOverlayProps)
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1.5 rounded border border-rivals-ink/15 bg-white/70 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-rivals-ink-muted transition-colors hover:border-brand-gold/40 hover:text-rivals-ink"
+        className="inline-flex items-center gap-1.5 border border-brand-gold/40 bg-brand-gold-muted px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-brand-gold transition-[color,background-color,border-color,transform] duration-[var(--motion-fast)] ease-[var(--ease-out-soft)] hover:border-brand-gold hover:bg-brand-gold hover:text-ink-on-gold active:scale-[0.97]"
       >
         <span className="text-sm" aria-hidden>⌨</span>
         Keybinds
@@ -71,7 +71,7 @@ export function KeybindOverlay({ abilityLookup, heroName }: KeybindOverlayProps)
           }}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
         >
-          <div className="relative mx-4 w-full max-w-lg fade-slide-in rounded-xl border border-white/15 bg-[#161b28]/98 p-6 shadow-[0_16px_64px_rgba(0,0,0,0.5)]">
+          <div className="relative mx-4 w-full max-w-lg fade-slide-in clipped-edge border border-white/15 bg-surface-input/98 p-6 shadow-[0_16px_64px_rgba(0,0,0,0.5)]">
             <button
               type="button"
               onClick={() => setOpen(false)}
@@ -91,9 +91,9 @@ export function KeybindOverlay({ abilityLookup, heroName }: KeybindOverlayProps)
                 return (
                   <div
                     key={keyDef.key}
-                    className={`flex flex-col items-center gap-1 rounded-lg border p-2 transition-all ${
+                    className={`flex flex-col items-center gap-1 border p-2 transition-[background-color,border-color] duration-[var(--motion-fast)] ease-[var(--ease-out-soft)] ${
                       ability
-                        ? "border-brand-gold/30 bg-[#1e2436]"
+                        ? "border-brand-gold/30 bg-surface-hud"
                         : "border-white/8 bg-white/3"
                     } ${keyDef.wide ? "col-span-2" : ""}`}
                   >

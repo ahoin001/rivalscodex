@@ -69,9 +69,9 @@
   --motion-stagger: 28ms;
 
   --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-out: ease-out;
-  --ease-in: ease-in;
-  --ease-in-out: ease-in-out;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --motion-exit: 110ms;
 }
 
 @theme inline {
@@ -543,7 +543,19 @@ details.editor-disclosure-native > summary {
 }
 
 .tab-exit {
-  animation: tabSlideOut var(--motion-fast) var(--ease-in) forwards;
+  animation: tabSlideOut var(--motion-exit) var(--ease-out) forwards;
+}
+
+.tab-enter-instant {
+  animation: none;
+}
+
+.hud-clip-reveal[data-morph="pointer"] {
+  animation: clipReveal var(--motion-slow) var(--ease-out-soft) both;
+}
+
+.hud-clip-reveal[data-morph="keyboard"] {
+  animation: none;
 }
 
 .tab-enter {
@@ -762,9 +774,73 @@ details.editor-disclosure-native > summary {
 
 @media (prefers-reduced-motion: reduce) {
   .hero-page-shell .hero-stage-shell,
-  .hero-form-fade {
+  .hero-form-fade,
+  .hud-clip-reveal,
+  .hud-detail-crossfade {
     animation: none;
     opacity: 1;
     transform: none;
+    filter: none;
   }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+::view-transition-group(.hud-assemble) {
+  animation-duration: var(--motion-slow);
+  animation-timing-function: var(--ease-out-soft);
+  box-shadow: 0 0 0 1px var(--brand-gold), 0 0 18px rgb(var(--brand-gold-rgb) / 35%);
+}
+
+::view-transition-old(.hud-assemble),
+::view-transition-new(.hud-assemble) {
+  animation-duration: var(--motion-slow);
+  animation-timing-function: var(--ease-out-soft);
+  mix-blend-mode: plus-lighter;
+}
+
+@keyframes hudDetailCrossfade {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.hud-detail-crossfade {
+  animation: hudDetailCrossfade var(--motion-medium) var(--ease-out-soft) both;
+}
+
+.hud-ability-frame {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 2px solid var(--brand-gold);
+  box-shadow: 0 0 0 1px rgb(var(--brand-gold-rgb) / 35%), 0 0 18px rgb(var(--brand-gold-rgb) / 22%);
+  opacity: 0;
+  transition:
+    clip-path var(--motion-medium) var(--ease-in-out),
+    opacity var(--motion-fast) var(--ease-out);
+}
+
+.hud-ability-frame[data-active="true"] {
+  opacity: 1;
+}
+
+.hud-combo-step[data-playback="active"] {
+  outline: 2px solid var(--brand-gold);
+  outline-offset: 2px;
+  box-shadow: 0 0 16px rgb(var(--brand-gold-rgb) / 35%);
+}
+
+.hud-combo-step[data-playback="past"] {
+  opacity: 0.55;
 }

@@ -2,7 +2,9 @@ import { statSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import heroes from "../src/data/heroes.json";
+import teamUpLoadouts from "../src/data/team-up-loadouts.json";
 import { Hero, heroesSchema } from "../src/data/schema";
+import { teamUpLoadoutCatalogSchema } from "../src/data/team-up-loadouts-schema";
 
 function pushIfDuplicate(values: string[], label: string, errors: string[]) {
   const seen = new Set<string>();
@@ -98,9 +100,34 @@ export function validateHeroesData(input: unknown): Hero[] {
   return parsed.data;
 }
 
+export function validateTeamUpLoadoutCatalog(input: unknown) {
+  const parsed = teamUpLoadoutCatalogSchema.safeParse(input);
+  if (!parsed.success) {
+    throw new Error(
+      `Team-Up loadout catalog validation failed: ${JSON.stringify(parsed.error.format())}`,
+    );
+  }
+
+  const duplicateKeys: string[] = [];
+  const seen = new Set<string>();
+  for (const entry of parsed.data.loadouts) {
+    const key = `${entry.ownerSlug}::${entry.ownerRole}::${entry.name.toLowerCase()}`;
+    if (seen.has(key)) duplicateKeys.push(key);
+    seen.add(key);
+  }
+  if (duplicateKeys.length > 0) {
+    throw new Error(
+      `Team-Up loadout catalog has duplicate owner/role/name keys: ${duplicateKeys.join(", ")}`,
+    );
+  }
+
+  return parsed.data;
+}
+
 function main() {
   const heroesData = validateHeroesData(heroes);
   const errors = collectContentHealthErrors(heroesData);
+  const catalog = validateTeamUpLoadoutCatalog(teamUpLoadouts);
 
   if (errors.length > 0) {
     console.error("Content health checks failed:");
@@ -109,6 +136,9 @@ function main() {
   }
 
   console.log(`Validated ${heroesData.length} heroes successfully.`);
+  console.log(
+    `Validated ${catalog.loadouts.length} Season ${catalog.season} Team-Up loadouts successfully.`,
+  );
 }
 
 const isDirectExecution =
