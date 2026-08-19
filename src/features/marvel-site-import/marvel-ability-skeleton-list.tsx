@@ -16,6 +16,7 @@ type Props = {
   detailMessages: Record<number, string | undefined>;
   /** Lowercased ability names that appear more than once in this hero — surfaced as a tooltip hint so users know to keep their detail captures separated by row. */
   duplicateNameKeys: Set<string>;
+  emptyMessage?: string;
   onAbilityChange: (index: number, patch: Partial<MarvelImportAbility>) => void;
   onParseDetail: (abilityIndex: number, html: string) => void;
   onClearDetail: (abilityIndex: number) => void;
@@ -44,12 +45,22 @@ const CHIP_HINT: Record<ChipKind, string> = {
     "This hero has another ability with the same display name. Each row keeps its own detail — paste THIS row's .abilties-r.jnsx block here (the one matching this row's keybind).",
 };
 
+const TEAM_UP_CHIP_HINT: Record<ChipKind, string> = {
+  idle:
+    "One .jnsx paste usually contains both Base Effect and Enhanced Effect. Paste it here — both variant rows fill when the labels are present. Click Enhanced on the site only if the stat rows differ.",
+  captured:
+    "This variant's copy is captured. Re-paste the .jnsx block to refresh both Base and Enhanced rows, or Clear to drop this row.",
+  "duplicate-idle":
+    "Base and Enhanced share this display name. Paste the open .jnsx block once — the parser splits Base Effect / Enhanced Effect onto the matching rows.",
+};
+
 export function MarvelAbilitySkeletonList({
   heroSlug,
   abilities,
   details,
   detailMessages,
   duplicateNameKeys,
+  emptyMessage,
   onAbilityChange,
   onParseDetail,
   onClearDetail,
@@ -57,7 +68,7 @@ export function MarvelAbilitySkeletonList({
   if (abilities.length === 0) {
     return (
       <div className="rounded border border-brand-gold/30 bg-background/60 px-3 py-4 text-xs text-muted-foreground">
-        No abilities detected yet. Paste hero HTML above and click Parse.
+        {emptyMessage ?? "No abilities detected yet. Paste hero HTML above and click Parse."}
       </div>
     );
   }
@@ -68,11 +79,15 @@ export function MarvelAbilitySkeletonList({
         const detail = details[index];
         const hasDetail = Boolean(detail && (detail.description || detail.stats.length > 0));
         const isDuplicate = duplicateNameKeys.has(ability.name.trim().toLowerCase());
+        const isTeamUp = Boolean(ability.teamUpVariant);
         const chipKey: ChipKind = hasDetail
           ? "captured"
           : isDuplicate
           ? "duplicate-idle"
           : "idle";
+        const categoryLabel = ability.teamUpVariant
+          ? `Team-Up · ${ability.teamUpVariant === "enhanced" ? "Enhanced" : "Base"}`
+          : (ability.category ?? "Ability");
 
         return (
           <li
@@ -93,7 +108,7 @@ export function MarvelAbilitySkeletonList({
 
               <div className="flex flex-1 flex-wrap items-center gap-2">
                 <span className="rounded border border-brand-gold/40 bg-brand-gold-muted/40 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-gold">
-                  {ability.category ?? "Ability"}
+                  {categoryLabel}
                 </span>
                 <input
                   value={ability.name}
@@ -120,7 +135,7 @@ export function MarvelAbilitySkeletonList({
                 </div>
               </div>
 
-              <Tooltip content={CHIP_HINT[chipKey]} maxWidth="22rem">
+              <Tooltip content={(isTeamUp ? TEAM_UP_CHIP_HINT : CHIP_HINT)[chipKey]} maxWidth="22rem">
                 <span
                   className={`cursor-help rounded border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${STATUS_CHIP[chipKey]}`}
                   tabIndex={0}

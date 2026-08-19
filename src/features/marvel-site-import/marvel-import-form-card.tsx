@@ -5,6 +5,7 @@ import { ClippedButton } from "@/components/ui/clipped-button";
 import { RivalsInput } from "@/components/ui/rivals-input";
 import { HelpTooltip } from "@/components/ui/tooltip";
 import { MarvelAbilitySkeletonList } from "./marvel-ability-skeleton-list";
+import { MarvelImportTeamUpPaths } from "./marvel-import-teamup-paths";
 import type {
   MarvelImportAbility,
   MarvelImportFormDraft,
@@ -29,6 +30,26 @@ type Props = {
   ) => void;
   onParseDetail: (draftIndex: number, abilityIndex: number, html: string) => void;
   onClearDetail: (draftIndex: number, abilityIndex: number) => void;
+  onTeamUpPasteHtmlChange: (draftIndex: number, pathIndex: number, html: string) => void;
+  onParseTeamUpPartner: (draftIndex: number, pathIndex: number) => void;
+  onTeamUpPartnerNameChange: (draftIndex: number, pathIndex: number, name: string) => void;
+  onTeamUpAbilityChange: (
+    draftIndex: number,
+    pathIndex: number,
+    abilityIndex: number,
+    patch: Partial<MarvelImportAbility>,
+  ) => void;
+  onParseTeamUpDetail: (
+    draftIndex: number,
+    pathIndex: number,
+    abilityIndex: number,
+    html: string,
+  ) => void;
+  onClearTeamUpDetail: (
+    draftIndex: number,
+    pathIndex: number,
+    abilityIndex: number,
+  ) => void;
 };
 
 export function MarvelImportFormCard({
@@ -44,6 +65,12 @@ export function MarvelImportFormCard({
   onAbilityChange,
   onParseDetail,
   onClearDetail,
+  onTeamUpPasteHtmlChange,
+  onParseTeamUpPartner,
+  onTeamUpPartnerNameChange,
+  onTeamUpAbilityChange,
+  onParseTeamUpDetail,
+  onClearTeamUpDetail,
 }: Props) {
   const counts = useMemo(() => {
     const total = draft.abilities.length;
@@ -237,6 +264,27 @@ export function MarvelImportFormCard({
             onParseDetail(draftIndex, abilityIndex, html)
           }
           onClearDetail={(abilityIndex) => onClearDetail(draftIndex, abilityIndex)}
+        />
+
+        <MarvelImportTeamUpPaths
+          heroSlug={heroSlug}
+          paths={draft.teamUpPaths ?? []}
+          onPasteHtmlChange={(pathIndex, html) =>
+            onTeamUpPasteHtmlChange(draftIndex, pathIndex, html)
+          }
+          onParsePartner={(pathIndex) => onParseTeamUpPartner(draftIndex, pathIndex)}
+          onPartnerNameChange={(pathIndex, name) =>
+            onTeamUpPartnerNameChange(draftIndex, pathIndex, name)
+          }
+          onAbilityChange={(pathIndex, abilityIndex, patch) =>
+            onTeamUpAbilityChange(draftIndex, pathIndex, abilityIndex, patch)
+          }
+          onParseDetail={(pathIndex, abilityIndex, html) =>
+            onParseTeamUpDetail(draftIndex, pathIndex, abilityIndex, html)
+          }
+          onClearDetail={(pathIndex, abilityIndex) =>
+            onClearTeamUpDetail(draftIndex, pathIndex, abilityIndex)
+          }
         />
       </div>
     </section>

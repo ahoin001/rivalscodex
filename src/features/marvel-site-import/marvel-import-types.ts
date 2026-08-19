@@ -17,6 +17,30 @@ export function toImportAbility(ability: MarvelSiteAbility): MarvelImportAbility
   return { ...ability };
 }
 
+export function isImportTeamUpAbility(
+  ability: Pick<MarvelImportAbility, "category" | "teamUpVariant">,
+): boolean {
+  if (ability.teamUpVariant) return true;
+  const haystack = (ability.category ?? "").toLowerCase();
+  return haystack.includes("team-up") || haystack.includes("team up");
+}
+
+/**
+ * One Team-Up partner path. The site only renders the selected `.lx-hero`;
+ * remaining portraits need their own paste after the operator switches.
+ */
+export type MarvelImportTeamUpPath = {
+  partnerIndex: number;
+  portraitUrl?: string;
+  /** Editable; inferred from detail copy or the loadout catalog. */
+  partnerName?: string;
+  pasteHtml: string;
+  abilities: MarvelImportAbility[];
+  details: Record<number, MarvelImportAbilityDetail | undefined>;
+  detailMessages: Record<number, string | undefined>;
+  parseWarnings: string[];
+};
+
 /**
  * One form in the multi-form import flow. Single-form heroes still pass through
  * here with a synthetic `formId: 'base'` entry — the panel collapses that case
@@ -35,7 +59,7 @@ export type MarvelImportFormDraft = {
   portraitUrl?: string;
   /** Exactly one form must carry `isDefault: true` when there is more than one form. */
   isDefault: boolean;
-  /** Per-form ability skeleton. Empty until this card has been parsed. */
+  /** Per-form kit skeleton (Team-Ups live on `teamUpPaths`). */
   abilities: MarvelImportAbility[];
   /** Per-ability detail state keyed by the ability's index in `abilities`. */
   details: Record<number, MarvelImportAbilityDetail | undefined>;
@@ -47,4 +71,6 @@ export type MarvelImportFormDraft = {
   pasteHtml: string;
   /** Parse warnings surfaced under the card after the latest parse. */
   parseWarnings: string[];
+  /** One slot per `.lx-hero` portrait. Empty when the paste had no Team-Up switcher. */
+  teamUpPaths: MarvelImportTeamUpPath[];
 };

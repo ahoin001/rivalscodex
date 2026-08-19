@@ -16,6 +16,8 @@ export const abilityInputSchema = z.object({
   siteFormIndex: z.number().int().optional().nullable(),
   description: z.string().optional(),
   stats: z.array(abilityDetailStatInputSchema).optional(),
+  partnerName: z.string().optional(),
+  partnerIndex: z.number().int().optional().nullable(),
 });
 
 export const heroImageUrlsSchema = z

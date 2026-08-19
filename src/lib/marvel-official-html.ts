@@ -3,6 +3,16 @@ import {
   normalizeKeybindText,
   resolveCanonicalKeybindIcon,
 } from "@/lib/marvel-keybind-icons";
+import {
+  extractAvailableTeamUpPartners,
+  inferTeamUpVariantFromBlock,
+  isTeamUpSkillInfoBlock,
+  splitTeamUpDetailCopy,
+  type MarvelSiteAvailableTeamUpPartner,
+  type MarvelSiteTeamUpVariant,
+} from "@/lib/marvel-official-html-teamup";
+
+export type { MarvelSiteAvailableTeamUpPartner, MarvelSiteTeamUpVariant };
 
 /** Matches [`normalizeSlug`](src/lib/content-adapter.ts) for stable hero folder / JSON ids. */
 export function normalizeMarvelSlug(value: string): string {
@@ -223,6 +233,14 @@ export type MarvelSiteAbility = {
   keybindIconUrl: string | null;
   /** Remote URL of the ability art under `.skill-info li .img > img`. */
   iconUrl: string | null;
+  /** Base vs Enhanced row for Team-Up `.lx-info` blocks. */
+  teamUpVariant?: MarvelSiteTeamUpVariant;
+  /** `data-lx` of the selected `.lx-hero` when this row was captured. */
+  partnerIndex?: number | null;
+  /** Selected partner portrait URL (alts are typically empty). */
+  partnerPortraitUrl?: string | null;
+  /** Inferred from "When teaming up with X" in the open detail, when present. */
+  partnerName?: string | null;
 };
 
 export type MarvelSiteAbilityDetailParseResult = {
@@ -230,6 +248,12 @@ export type MarvelSiteAbilityDetailParseResult = {
   name: string | null;
   /** Long-form description from `.top-info span`. */
   description: string | null;
+  /** Team-Up Base Effect copy when the span concatenates both layers. */
+  baseEffect?: string | null;
+  /** Team-Up Enhanced Effect copy when the span concatenates both layers. */
+  enhancedEffect?: string | null;
+  /** From "When teaming up with X" in the Enhanced (or full) copy. */
+  partnerName?: string | null;
   /** Ordered key/value rows from `.sx-all.sx2-all .scroll-box .sxz`. */
   stats: MarvelSiteAbilityStat[];
   warnings: string[];
@@ -246,6 +270,8 @@ export type MarvelSiteAbilitiesParseResult = {
   openDetail: MarvelSiteAbilityDetailParseResult | null;
   /** `.abilties-r.jcsx` Base Stats block when present on the full page paste. */
   baseStats: MarvelSiteBaseStatsParseResult | null;
+  /** Every `.lx-hero` portrait. Empty when the paste has no Team-Up switcher. */
+  availableTeamUpPartners: MarvelSiteAvailableTeamUpPartner[];
   warnings: string[];
 };
 
@@ -289,7 +315,7 @@ function cleanText(value: string): string {
  */
 function sliceSkillInfoBlocks(html: string): string[] {
   const blocks: string[] = [];
-  const openRe = /<div\s+class="skill-info"[^>]*>/gi;
+  const openRe = /<div\s+class="[^"]*\bskill-info\b[^"]*"[^>]*>/gi;
   let match: RegExpExecArray | null;
   while ((match = openRe.exec(html)) !== null) {
     const start = match.index;
@@ -337,6 +363,9 @@ function sliceBalancedDiv(html: string, openMatchIndex: number, openLen: number)
 }
 
 function parseSkillInfoCategory(block: string, warnings: string[]): string {
+  if (isTeamUpSkillInfoBlock(block)) {
+    return "Team-Up Abilities";
+  }
   const heading = block.match(/<h5[^>]*>([\s\S]*?)<\/h5>/i)?.[1] ?? "";
   const text = cleanText(heading);
   const normalized = text.toLowerCase().replace(/\s+/g, " ");
@@ -360,6 +389,11 @@ function parseAbilityLi(
   liHtml: string,
   category: string,
   warnings: string[],
+  teamUp?: {
+    variant?: MarvelSiteTeamUpVariant;
+    partnerIndex?: number | null;
+    partnerPortraitUrl?: string | null;
+  },
 ): MarvelSiteAbility | null {
   const openTag = liHtml.match(/<li\b[^>]*>/i)?.[0] ?? "";
   const dataTypeRaw = attrValue(openTag, "data-type");
@@ -421,6 +455,13 @@ function parseAbilityLi(
     keybind: resolvedKeybind,
     keybindIconUrl,
     iconUrl,
+    ...(teamUp?.variant
+      ? {
+          teamUpVariant: teamUp.variant,
+          partnerIndex: teamUp.partnerIndex ?? null,
+          partnerPortraitUrl: teamUp.partnerPortraitUrl ?? null,
+        }
+      : {}),
   };
 }
 
@@ -587,7 +628,8 @@ export function parseMarvelOfficialAbilityDetailBlock(
   const descRaw = blockHtml.match(
     /<div[^>]*class="[^"]*\btop-info\b[^"]*"[^>]*>[\s\S]*?<span[^>]*>([\s\S]*?)<\/span>/i,
   )?.[1];
-  const description = descRaw ? cleanText(descRaw) : null;
+  const split = descRaw ? splitTeamUpDetailCopy(descRaw) : null;
+  const description = split?.description ?? null;
   if (!description)
     warnings.push("Ability detail block missing .top-info span description.");
 
@@ -597,7 +639,15 @@ export function parseMarvelOfficialAbilityDetailBlock(
     warnings.push("Ability detail block had no .sx2-all .sxz stat rows.");
   }
 
-  return { name, description, stats, warnings };
+  return {
+    name,
+    description,
+    baseEffect: split?.baseEffect ?? null,
+    enhancedEffect: split?.enhancedEffect ?? null,
+    partnerName: split?.partnerName ?? null,
+    stats,
+    warnings,
+  };
 }
 
 /** Parse `.skill-scroll` ability skeleton plus any inline open `.abilties-r.jnsx.on` detail. */
@@ -610,15 +660,33 @@ export function parseMarvelOfficialAbilities(
 
   if (!html.trim()) {
     warnings.push("HTML is empty.");
-    return { abilities: [], openDetail: null, baseStats, warnings };
+    return {
+      abilities: [],
+      openDetail: null,
+      baseStats,
+      availableTeamUpPartners: [],
+      warnings,
+    };
   }
+
+  const availableTeamUpPartners = extractAvailableTeamUpPartners(html);
+  const activePartner =
+    availableTeamUpPartners.find((partner) => partner.isActive) ??
+    availableTeamUpPartners[0] ??
+    null;
 
   const skillScrollMatch = html.match(
     /<div[^>]*class="[^"]*\bskill-scroll\b[^"]*"[^>]*>/i,
   );
   if (!skillScrollMatch) {
     warnings.push("Could not find .skill-scroll container.");
-    return { abilities: [], openDetail: null, baseStats, warnings };
+    return {
+      abilities: [],
+      openDetail: null,
+      baseStats,
+      availableTeamUpPartners,
+      warnings,
+    };
   }
 
   const skillScrollBlock = sliceBalancedDiv(
@@ -632,7 +700,13 @@ export function parseMarvelOfficialAbilities(
   );
   if (!scrollBoxMatch) {
     warnings.push("Could not find .scroll-box inside .skill-scroll.");
-    return { abilities: [], openDetail: null, baseStats, warnings };
+    return {
+      abilities: [],
+      openDetail: null,
+      baseStats,
+      availableTeamUpPartners,
+      warnings,
+    };
   }
 
   const scrollBoxBlock = sliceBalancedDiv(
@@ -645,6 +719,13 @@ export function parseMarvelOfficialAbilities(
   const skillInfoBlocks = sliceSkillInfoBlocks(scrollBoxBlock);
   for (const block of skillInfoBlocks) {
     const category = parseSkillInfoCategory(block, warnings);
+    const teamUp = isTeamUpSkillInfoBlock(block)
+      ? {
+          variant: inferTeamUpVariantFromBlock(block),
+          partnerIndex: activePartner?.partnerIndex ?? null,
+          partnerPortraitUrl: activePartner?.portraitUrl ?? null,
+        }
+      : undefined;
     const ulMatch = block.match(/<ul[^>]*>([\s\S]*?)<\/ul>/i);
     if (!ulMatch) {
       warnings.push(`No <ul> inside .skill-info "${category}".`);
@@ -652,7 +733,7 @@ export function parseMarvelOfficialAbilities(
     }
     const liBlocks = extractLiBlocks(ulMatch[1]);
     for (const li of liBlocks) {
-      const ability = parseAbilityLi(li, category, warnings);
+      const ability = parseAbilityLi(li, category, warnings, teamUp);
       if (ability) abilities.push(ability);
     }
   }
@@ -667,7 +748,21 @@ export function parseMarvelOfficialAbilities(
     : null;
   if (openDetail) warnings.push(...openDetail.warnings);
 
-  return { abilities, openDetail, baseStats, warnings };
+  if (openDetail?.partnerName) {
+    for (const ability of abilities) {
+      if (ability.teamUpVariant) {
+        ability.partnerName = openDetail.partnerName;
+      }
+    }
+  }
+
+  if (availableTeamUpPartners.length > 1) {
+    warnings.push(
+      `This hero has ${availableTeamUpPartners.length} Team-Up partner portraits. Only the selected partner's Team-Up is in this paste — click the other portrait on the site and paste into its slot.`,
+    );
+  }
+
+  return { abilities, openDetail, baseStats, availableTeamUpPartners, warnings };
 }
 
 /** Convenience for the per-ability paste flow: accepts either the bare block or a wider snippet. */
@@ -707,6 +802,8 @@ export type MarvelSiteFormParseResult = {
   openDetail: MarvelSiteAbilityDetailParseResult | null;
   /** Base stats panel for the active form. */
   baseStats: MarvelSiteBaseStatsParseResult | null;
+  /** Team-Up partner portraits from `.lx-hero`. Empty when none. */
+  availableTeamUpPartners: MarvelSiteAvailableTeamUpPartner[];
   /** True when the paste contains more than one `.abilties-wrap` block — caller should warn. */
   hasConcatenatedForms: boolean;
   warnings: string[];
@@ -774,6 +871,7 @@ export function parseMarvelOfficialForm(html: string): MarvelSiteFormParseResult
       abilities: [],
       openDetail: null,
       baseStats: null,
+      availableTeamUpPartners: [],
       hasConcatenatedForms: false,
       warnings,
     };
@@ -814,6 +912,7 @@ export function parseMarvelOfficialForm(html: string): MarvelSiteFormParseResult
     abilities: abilitiesResult.abilities,
     openDetail: abilitiesResult.openDetail,
     baseStats: abilitiesResult.baseStats,
+    availableTeamUpPartners: abilitiesResult.availableTeamUpPartners,
     hasConcatenatedForms,
     warnings,
   };

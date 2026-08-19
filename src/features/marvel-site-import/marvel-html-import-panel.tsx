@@ -20,6 +20,14 @@ import {
   type MarvelImportFormDraft,
   toImportAbility,
 } from "./marvel-import-types";
+import {
+  applyOpenDetailToAbilities,
+  applyTeamUpDetailPaste,
+  collapseTeamUpPathToAbilityInput,
+  countCapturedTeamUpDetails,
+  mergeTeamUpPathsFromParse,
+  splitKitAndTeamUpAbilities,
+} from "./marvel-import-teamup";
 
 const ROLE_OPTIONS: HeroRole[] = ["Vanguard", "Duelist", "Strategist"];
 
@@ -67,6 +75,7 @@ function baseFormDraftFor(siteFormIndex: number): MarvelImportFormDraft {
     baseStatRows: [],
     pasteHtml: "",
     parseWarnings: [],
+    teamUpPaths: [],
   };
 }
 
@@ -82,6 +91,7 @@ function singleBaseDraft(): MarvelImportFormDraft {
     baseStatRows: [],
     pasteHtml: "",
     parseWarnings: [],
+    teamUpPaths: [],
   };
 }
 
@@ -116,35 +126,26 @@ export function MarvelHtmlImportPanel({
   const multiForm = drafts.length > 1;
   const heroSlug = header.slug || "hero";
 
-  /**
-   * Apply an open detail block to the first ability in `abilities` whose
-   * normalized name matches. Duplicate-name rows still need a manual paste —
-   * we can't disambiguate from a single open block.
-   */
-  const applyOpenDetail = useCallback(
+  const applyFormParse = useCallback(
     (
-      abilities: MarvelImportAbility[],
-      openDetail: { name: string | null; description: string | null; stats: MarvelImportAbilityDetail["stats"] } | null,
-    ): { details: MarvelImportFormDraft["details"]; messages: MarvelImportFormDraft["detailMessages"] } => {
-      if (!openDetail?.name) {
-        return { details: {}, messages: {} };
-      }
-      const target = openDetail.name.trim().toLowerCase();
-      const idx = abilities.findIndex(
-        (a) => a.name.trim().toLowerCase() === target,
-      );
-      if (idx === -1) {
-        return { details: {}, messages: {} };
-      }
-      return {
-        details: {
-          [idx]: {
-            description: openDetail.description ?? "",
-            stats: openDetail.stats,
-          },
-        },
-        messages: {},
-      };
+      parsedAbilities: MarvelImportAbility[],
+      openDetail: Parameters<typeof applyOpenDetailToAbilities>[1],
+      partners: Parameters<typeof mergeTeamUpPathsFromParse>[0]["partners"],
+      pasteHtml: string,
+      existingPaths: MarvelImportFormDraft["teamUpPaths"],
+      slug: string,
+    ) => {
+      const { kit, teamUps } = splitKitAndTeamUpAbilities(parsedAbilities);
+      const kitRollup = applyOpenDetailToAbilities(kit, openDetail);
+      const teamUpPaths = mergeTeamUpPathsFromParse({
+        existing: existingPaths,
+        partners,
+        parsedTeamUps: teamUps,
+        openDetail,
+        pasteHtml,
+        heroSlug: slug,
+      });
+      return { kit, kitRollup, teamUpPaths };
     },
     [],
   );
@@ -178,18 +179,26 @@ export function MarvelHtmlImportPanel({
     }));
 
     const parsedAbilities = formResult.abilities.map(toImportAbility);
-    const openDetailRollup = applyOpenDetail(parsedAbilities, formResult.openDetail);
+    const parsed = applyFormParse(
+      parsedAbilities,
+      formResult.openDetail,
+      formResult.availableTeamUpPartners,
+      html,
+      [],
+      lockSlug ? header.slug.trim() || initialSlug || slug : slug,
+    );
 
     if (formResult.availableForms.length === 0) {
       // Single-form hero — keep the legacy 'base' form.
       const draft: MarvelImportFormDraft = {
         ...singleBaseDraft(),
         pasteHtml: html,
-        abilities: parsedAbilities,
-        details: openDetailRollup.details,
-        detailMessages: openDetailRollup.messages,
+        abilities: parsed.kit,
+        details: parsed.kitRollup.details,
+        detailMessages: parsed.kitRollup.messages,
         baseStatRows: formResult.baseStats?.stats ?? [],
         parseWarnings: formResult.warnings,
+        teamUpPaths: parsed.teamUpPaths,
       };
       setDrafts([draft]);
     } else {
@@ -208,11 +217,12 @@ export function MarvelHtmlImportPanel({
         };
         if (isActive) {
           draft.pasteHtml = html;
-          draft.abilities = parsedAbilities;
-          draft.details = openDetailRollup.details;
-          draft.detailMessages = openDetailRollup.messages;
+          draft.abilities = parsed.kit;
+          draft.details = parsed.kitRollup.details;
+          draft.detailMessages = parsed.kitRollup.messages;
           draft.baseStatRows = formResult.baseStats?.stats ?? [];
           draft.parseWarnings = formResult.warnings;
+          draft.teamUpPaths = parsed.teamUpPaths;
         }
         return draft;
       });
@@ -229,7 +239,7 @@ export function MarvelHtmlImportPanel({
     }
     setWarnings(combinedWarnings);
     setParsedOnce(true);
-  }, [html, applyOpenDetail, initialSlug, lockSlug]);
+  }, [html, applyFormParse, initialSlug, lockSlug, header.slug]);
 
   const updateDraft = useCallback(
     (draftIndex: number, patch: Partial<MarvelImportFormDraft>) => {
@@ -254,7 +264,14 @@ export function MarvelHtmlImportPanel({
           if (i !== draftIndex) return draft;
           const result = parseMarvelOfficialForm(draft.pasteHtml);
           const parsedAbilities = result.abilities.map(toImportAbility);
-          const rollup = applyOpenDetail(parsedAbilities, result.openDetail);
+          const parsed = applyFormParse(
+            parsedAbilities,
+            result.openDetail,
+            result.availableTeamUpPartners,
+            draft.pasteHtml,
+            draft.teamUpPaths ?? [],
+            heroSlug,
+          );
           const warningsForCard = result.warnings.slice();
           if (result.hasConcatenatedForms) {
             warningsForCard.push(
@@ -265,23 +282,22 @@ export function MarvelHtmlImportPanel({
           }
           return {
             ...draft,
-            // Keep the existing siteFormIndex but adopt the parsed result's
-            // values when they're more specific.
             siteFormIndex:
               result.siteFormIndex !== null
                 ? result.siteFormIndex
                 : draft.siteFormIndex,
             portraitUrl: result.formPortrait ?? draft.portraitUrl,
-            abilities: parsedAbilities,
-            details: rollup.details,
-            detailMessages: rollup.messages,
+            abilities: parsed.kit,
+            details: parsed.kitRollup.details,
+            detailMessages: parsed.kitRollup.messages,
             baseStatRows: result.baseStats?.stats ?? [],
             parseWarnings: warningsForCard,
+            teamUpPaths: parsed.teamUpPaths,
           };
         }),
       );
     },
-    [applyOpenDetail],
+    [applyFormParse, heroSlug],
   );
 
   const handleLabelChange = useCallback(
@@ -367,6 +383,172 @@ export function MarvelHtmlImportPanel({
     [],
   );
 
+  const handleTeamUpPasteHtmlChange = useCallback(
+    (draftIndex: number, pathIndex: number, html: string) => {
+      setDrafts((prev) =>
+        prev.map((draft, i) => {
+          if (i !== draftIndex) return draft;
+          return {
+            ...draft,
+            teamUpPaths: draft.teamUpPaths.map((path, index) =>
+              index === pathIndex ? { ...path, pasteHtml: html } : path,
+            ),
+          };
+        }),
+      );
+    },
+    [],
+  );
+
+  const handleParseTeamUpPartner = useCallback(
+    (draftIndex: number, pathIndex: number) => {
+      setDrafts((prev) =>
+        prev.map((draft, i) => {
+          if (i !== draftIndex) return draft;
+          const path = draft.teamUpPaths[pathIndex];
+          if (!path) return draft;
+          const result = parseMarvelOfficialForm(path.pasteHtml);
+          const parsedAbilities = result.abilities.map(toImportAbility);
+          const { kit, teamUps } = splitKitAndTeamUpAbilities(parsedAbilities);
+          const activeIndex =
+            result.availableTeamUpPartners.find((partner) => partner.isActive)
+              ?.partnerIndex ?? path.partnerIndex;
+          const parseWarnings: string[] = [];
+          if (teamUps.length === 0) {
+            parseWarnings.push(
+              "No Team-Up rows in this paste — click this portrait on the site first, then recopy .abilties-wrap.",
+            );
+          }
+          if (activeIndex !== path.partnerIndex) {
+            parseWarnings.push(
+              `This paste was partner ${activeIndex + 1}'s snapshot — filled that slot.`,
+            );
+          }
+          const teamUpPaths = mergeTeamUpPathsFromParse({
+            existing: draft.teamUpPaths,
+            partners:
+              result.availableTeamUpPartners.length > 0
+                ? result.availableTeamUpPartners
+                : draft.teamUpPaths.map((entry) => ({
+                    partnerIndex: entry.partnerIndex,
+                    isActive: entry.partnerIndex === activeIndex,
+                    portraitUrl: entry.portraitUrl ?? null,
+                  })),
+            parsedTeamUps: teamUps,
+            openDetail: result.openDetail,
+            pasteHtml: path.pasteHtml,
+            heroSlug,
+            targetPartnerIndex: path.partnerIndex,
+          }).map((entry) =>
+            entry.partnerIndex === activeIndex
+              ? { ...entry, parseWarnings }
+              : entry,
+          );
+          const kitEmpty = draft.abilities.length === 0;
+          const kitRollup = kitEmpty
+            ? applyOpenDetailToAbilities(kit, result.openDetail)
+            : null;
+          return {
+            ...draft,
+            abilities: kitEmpty ? kit : draft.abilities,
+            details: kitEmpty ? kitRollup!.details : draft.details,
+            detailMessages: kitEmpty ? kitRollup!.messages : draft.detailMessages,
+            teamUpPaths,
+          };
+        }),
+      );
+    },
+    [heroSlug],
+  );
+
+  const handleTeamUpPartnerNameChange = useCallback(
+    (draftIndex: number, pathIndex: number, name: string) => {
+      setDrafts((prev) =>
+        prev.map((draft, i) => {
+          if (i !== draftIndex) return draft;
+          return {
+            ...draft,
+            teamUpPaths: draft.teamUpPaths.map((path, index) =>
+              index === pathIndex ? { ...path, partnerName: name } : path,
+            ),
+          };
+        }),
+      );
+    },
+    [],
+  );
+
+  const handleTeamUpAbilityChange = useCallback(
+    (
+      draftIndex: number,
+      pathIndex: number,
+      abilityIndex: number,
+      patch: Partial<MarvelImportAbility>,
+    ) => {
+      setDrafts((prev) =>
+        prev.map((draft, i) => {
+          if (i !== draftIndex) return draft;
+          return {
+            ...draft,
+            teamUpPaths: draft.teamUpPaths.map((path, index) =>
+              index === pathIndex
+                ? {
+                    ...path,
+                    abilities: path.abilities.map((ability, j) =>
+                      j === abilityIndex ? { ...ability, ...patch } : ability,
+                    ),
+                  }
+                : path,
+            ),
+          };
+        }),
+      );
+    },
+    [],
+  );
+
+  const handleParseTeamUpDetail = useCallback(
+    (draftIndex: number, pathIndex: number, abilityIndex: number, detailHtml: string) => {
+      const parsed = parseMarvelOfficialAbilityDetail(detailHtml);
+      setDrafts((prev) =>
+        prev.map((draft, i) => {
+          if (i !== draftIndex) return draft;
+          return {
+            ...draft,
+            teamUpPaths: draft.teamUpPaths.map((path, index) =>
+              index === pathIndex
+                ? applyTeamUpDetailPaste(path, abilityIndex, parsed)
+                : path,
+            ),
+          };
+        }),
+      );
+    },
+    [],
+  );
+
+  const handleClearTeamUpDetail = useCallback(
+    (draftIndex: number, pathIndex: number, abilityIndex: number) => {
+      setDrafts((prev) =>
+        prev.map((draft, i) => {
+          if (i !== draftIndex) return draft;
+          return {
+            ...draft,
+            teamUpPaths: draft.teamUpPaths.map((path, index) => {
+              if (index !== pathIndex) return path;
+              const details = { ...path.details };
+              const messages = { ...path.detailMessages };
+              delete details[abilityIndex];
+              delete messages[abilityIndex];
+              return { ...path, details, detailMessages: messages };
+            }),
+          };
+        }),
+      );
+    },
+    [],
+  );
+
   const totalsAcrossForms = useMemo(() => {
     let total = 0;
     let captured = 0;
@@ -378,6 +560,9 @@ export function MarvelHtmlImportPanel({
           captured += 1;
         }
       }
+      const teamUpCounts = countCapturedTeamUpDetails(draft.teamUpPaths ?? []);
+      total += teamUpCounts.total;
+      captured += teamUpCounts.captured;
     }
     return { total, captured };
   }, [drafts]);
@@ -410,8 +595,8 @@ export function MarvelHtmlImportPanel({
         },
       };
 
-      const mapAbilities = (draft: MarvelImportFormDraft) =>
-        draft.abilities.map((ability, abilityIndex) => {
+      const mapAbilities = (draft: MarvelImportFormDraft) => {
+        const kit = draft.abilities.map((ability, abilityIndex) => {
           const detail = draft.details[abilityIndex];
           return {
             name: ability.name,
@@ -428,6 +613,15 @@ export function MarvelHtmlImportPanel({
             ...(detail?.stats?.length ? { stats: detail.stats } : {}),
           };
         });
+        const teamUps = (draft.teamUpPaths ?? [])
+          .map((path) => collapseTeamUpPathToAbilityInput(path))
+          .filter((entry): entry is NonNullable<typeof entry> => entry != null)
+          .map((entry) => ({
+            ...entry,
+            siteFormIndex: draft.siteFormIndex,
+          }));
+        return [...kit, ...teamUps];
+      };
 
       const body = useFormsPath
         ? {
@@ -568,6 +762,7 @@ export function MarvelHtmlImportPanel({
               ...ability,
               detail: draft.details[index],
             })),
+            teamUpPaths: draft.teamUpPaths,
           })),
         },
         null,
@@ -596,6 +791,7 @@ export function MarvelHtmlImportPanel({
         <label className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-muted-foreground">
           <span>Paste hero HTML from marvelrivals.com</span>
           <HelpTooltip
+            maxWidth="28rem"
             content={
               <>
                 Open the hero&apos;s official page on{" "}
@@ -605,7 +801,10 @@ export function MarvelHtmlImportPanel({
                 heroes (Magik, Bruce Banner, Jeff, etc.) the additional form cards
                 start empty — click the form&apos;s circular tab on the site, copy its{" "}
                 <span className="font-mono">.abilties-wrap</span> block, and paste
-                it into its card.
+                it into its card. If a Team-Up row of partner portraits (
+                <span className="font-mono">.lxbox</span>) appears, only the
+                selected partner is in this snapshot — click the other portrait
+                on the site and paste again into that partner slot.
               </>
             }
           />
@@ -872,6 +1071,12 @@ export function MarvelHtmlImportPanel({
                 onAbilityChange={handleAbilityChange}
                 onParseDetail={handleParseDetail}
                 onClearDetail={handleClearDetail}
+                onTeamUpPasteHtmlChange={handleTeamUpPasteHtmlChange}
+                onParseTeamUpPartner={handleParseTeamUpPartner}
+                onTeamUpPartnerNameChange={handleTeamUpPartnerNameChange}
+                onTeamUpAbilityChange={handleTeamUpAbilityChange}
+                onParseTeamUpDetail={handleParseTeamUpDetail}
+                onClearTeamUpDetail={handleClearTeamUpDetail}
               />
             </div>
           ))}

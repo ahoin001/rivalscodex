@@ -42,14 +42,26 @@ export function MarvelAbilityDetailEditor({
         </button>
         <div className="flex items-center gap-2">
           <HelpTooltip
+            maxWidth={ability.teamUpVariant ? "26rem" : undefined}
             content={
-              <>
-                Paste the <span className="font-mono">.abilties-r.jnsx</span> block
-                for this ability from <span className="font-mono">marvelrivals.com/{heroSlug}</span>.
-                Use <strong>Parse detail</strong> to preview it locally; the parsed
-                data ships automatically with the next <strong>Apply</strong> on the
-                main form. No per-ability save is needed.
-              </>
+              ability.teamUpVariant ? (
+                <>
+                  One <span className="font-mono">.abilties-r.jnsx</span> paste
+                  usually contains both <strong>Base Effect</strong> and{" "}
+                  <strong>Enhanced Effect</strong> in the same{" "}
+                  <span className="font-mono">.top-info span</span>. Parse
+                  detail fills both variant rows. Click Enhanced on the site
+                  and paste again only if the stat rows differ.
+                </>
+              ) : (
+                <>
+                  Paste the <span className="font-mono">.abilties-r.jnsx</span> block
+                  for this ability from <span className="font-mono">marvelrivals.com/{heroSlug}</span>.
+                  Use <strong>Parse detail</strong> to preview it locally; the parsed
+                  data ships automatically with the next <strong>Apply</strong> on the
+                  main form. No per-ability save is needed.
+                </>
+              )
             }
           />
           {hasParsed ? (

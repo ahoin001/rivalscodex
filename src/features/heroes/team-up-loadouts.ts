@@ -87,6 +87,7 @@ export function overlayCatalogTeamUpAbilities(
   slug: string,
   role?: HeroRole,
 ): HeroAbility[] {
+  if (abilities.some(isTeamUpAbility)) return abilities;
   const loadouts = getTeamUpLoadoutsForHero(slug, role);
   if (loadouts.length === 0) return abilities;
 
@@ -101,6 +102,7 @@ export function overlayCatalogTeamUpExternalAbilities(
   role?: string,
 ): ExternalAbility[] | undefined {
   if (!slug) return abilities;
+  if ((abilities ?? []).some(isTeamUpAbility)) return abilities;
   const normalizedRole =
     role === "Vanguard" || role === "Duelist" || role === "Strategist" ? role : undefined;
   const loadouts = getTeamUpLoadoutsForHero(slug, normalizedRole);

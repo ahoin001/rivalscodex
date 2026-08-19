@@ -69,11 +69,17 @@ export function buildAbilityRecord(args: {
     (stat) => stat.label.trim().length > 0 && stat.value.length > 0,
   );
 
+  const partnerKey = ability.partnerName?.trim()
+    ? normalizeMarvelSlug(ability.partnerName)
+    : typeof ability.partnerIndex === "number"
+      ? `partner-${ability.partnerIndex}`
+      : "";
+  const partnerSuffix = partnerKey ? `-${partnerKey}` : "";
   const idSuffix = needsKeybindSuffix
     ? `-${normalizeMarvelSlug(keybind) || "alt"}`
     : "";
   const formPrefix = formId ? `${formId}-` : "";
-  const id = `${heroSlug}-${formPrefix}${abilitySlug}${idSuffix}`;
+  const id = `${heroSlug}-${formPrefix}${abilitySlug}${partnerSuffix}${idSuffix}`;
 
   const base: HeroAbility = {
     id,
